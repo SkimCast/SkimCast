@@ -1,0 +1,1648 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1D1C1A">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="SkimCast">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<title>Skimboarding Forecast for Florida &amp; California | SkimCast</title><!-- To rename the site, change this title AND SITE_NAME in the script -->
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="icon" type="image/png" sizes="48x48" href="favicon-48.png">
+<meta name="google-site-verification" content="2LiAyfE-o__MfAzGVLctQG_M-xmfXTqAM6R7DLclSsw">
+<meta name="description" content="Free skimboarding forecast for 300 Florida and California beaches. Live skim scores, shorebreak size, tide and wind, so you know when it's a W Skim.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="SkimCast: Skimboarding Forecast for Florida &amp; California">
+<meta property="og:description" content="Skimboard forecast: shorebreak, tide, wind and the best time to go.">
+<meta property="og:url" content="https://skimcastapp.com/">
+<link rel="canonical" href="https://skimcastapp.com/">
+<meta property="og:image" content="https://skimcastapp.com/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://skimcastapp.com/og-image.png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@400;500;600;800&display=swap" rel="stylesheet">
+<style>
+/* Calm forecast-site look: warm paper, charcoal text, one coral accent, thin lines, soft grade tints */
+:root{
+  --bg:#F2EFE8; --surface:#FFFFFF; --ink:#24221E; --mute:#6A655C; --line:#DCD7CC;
+  --dark:#1D1C1A; --dline:#3A3733; --on:#F2EFE8; --onmute:#A8A296;
+  --coral:#D2425A; --coral-soft:#F6E1E4;
+  --good:#DCEFE2; --good-t:#1F5C38; --fair:#E7E3DA; --fair-t:#4A463F; --skip:#F4DCDA; --skip-t:#8A2E2A;
+  --s1:8px; --s2:16px; --s3:24px; --s4:40px; --s5:64px;
+  --fs-sm:.82rem; --fs-body:1rem; --fs-h:1.2rem;
+}
+*{box-sizing:border-box}
+body{margin:0;font:var(--fs-body)/1.5 'Archivo',system-ui,sans-serif;background:var(--bg);color:var(--ink);font-variant-numeric:tabular-nums}
+button{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--coral);outline-offset:2px}
+.wrap{max-width:1280px;margin:0 auto;padding:0 var(--s3)}
+.anton{font-family:'Anton',Impact,sans-serif;font-weight:400;letter-spacing:.005em}
+
+/* ---- dark top section ---- */
+.top{background:var(--dark);color:var(--on)}
+.bar{display:flex;align-items:center;gap:12px;padding:14px 0;border-bottom:1px solid var(--dline)}
+#menu{width:40px;height:40px;padding:0;border-radius:8px;border:1px solid var(--dline);background:transparent;display:grid;place-items:center;cursor:pointer;flex:none}
+#menu:hover{background:#2a2825}
+#brand{display:inline-block;font-family:'Anton',sans-serif;font-weight:400;font-size:1.75rem;letter-spacing:.04em;line-height:1;color:#F2EFE8}#brand svg{display:block;width:100%;height:.24em;overflow:visible;margin-top:2px}
+
+.tools{margin-left:auto;display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:flex-end}
+#upd{font-size:var(--fs-sm);color:var(--onmute)}
+#refresh{padding:7px 14px;border-radius:999px;border:1px solid var(--dline);background:transparent;cursor:pointer;font-weight:600;font-size:.9rem}
+#refresh:hover{background:#2a2825}
+.controls{display:flex;border:1px solid var(--dline);border-radius:999px;padding:3px}
+.controls button{padding:5px 14px;border:0;border-radius:999px;background:transparent;cursor:pointer;font-weight:600;font-size:.9rem;color:var(--onmute)}
+.controls button.on{background:var(--coral);color:#fff}
+.hero{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:var(--s4);align-items:end;padding:var(--s5) 0 var(--s4)}
+#spotname{margin:0;font-size:clamp(2.4rem,6vw,4.6rem);line-height:.95}
+.dateline{margin:12px 0 0;color:var(--onmute);font-weight:600}
+.lede{margin:var(--s2) 0 0;font-size:1.15rem;line-height:1.5;max-width:58ch;color:#E6E1D7}
+.tags{display:flex;flex-wrap:wrap;gap:8px;margin-top:var(--s2)}
+.tag{display:inline-flex;align-items:center;gap:8px;font-size:.85rem;font-weight:600;padding:5px 12px;border-radius:999px;background:#2C2A27;color:var(--on)}
+.dot{width:8px;height:8px;border-radius:50%;flex:none}
+.score{text-align:right;min-width:220px}
+.score .num{font-size:clamp(4.2rem,8vw,6.4rem);line-height:.9}
+.score .of{font-family:'Archivo',sans-serif;font-size:1rem;font-weight:600;color:var(--onmute);margin-left:6px}
+.meter{height:5px;border-radius:3px;background:var(--dline);margin:14px 0 12px auto;width:220px;overflow:hidden}
+.meter i{display:block;height:100%;border-radius:3px}
+.grade{display:inline-block;font-size:.85rem;font-weight:800;padding:4px 12px;border-radius:999px}
+.wbadge{display:inline-flex;align-items:center;gap:6px;background:var(--coral);color:#fff;font-weight:800;font-size:.9rem;padding:5px 14px;border-radius:999px}
+.wbadge b{font-family:'Anton',Impact,sans-serif;font-weight:400;font-size:1.05rem;line-height:1}
+#stath{margin:0;padding:var(--s2) 0 0;border-top:1px solid var(--dline);font-size:var(--fs-sm);color:var(--onmute);font-weight:600}
+.strip{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));padding-bottom:var(--s3)}
+@media(min-width:640px){.strip{grid-template-columns:repeat(4,minmax(0,1fr))}}
+@media(min-width:1000px){.strip{grid-template-columns:repeat(8,minmax(0,1fr))}}
+.st{padding:12px 16px 4px 0;min-width:0}
+.st .k{display:block;font-size:var(--fs-sm);color:var(--onmute);font-weight:600}
+.st .v{display:flex;align-items:center;gap:6px;font-size:1.45rem;font-weight:800;line-height:1.25;white-space:nowrap}
+.st .v small{font-size:.85rem;font-weight:600;color:var(--onmute)}
+.st .s{display:block;font-size:var(--fs-sm);color:var(--onmute)}
+.arw{width:16px;height:16px;flex:none}
+
+/* ---- open sections ---- */
+.sec{padding-top:var(--s5)}
+.sec>.wrap>.head{display:flex;justify-content:space-between;align-items:baseline;gap:var(--s2);flex-wrap:wrap;padding-top:var(--s3);border-top:1px solid var(--line);margin-bottom:var(--s3)}
+.sec.first>.wrap>.head{border-top:0;padding-top:0}
+h2.h{margin:0;font-size:var(--fs-h);font-weight:800;letter-spacing:-.01em}
+.meta{display:flex;flex-wrap:wrap;gap:18px;font-size:.9rem;color:var(--mute)}
+.note{font-size:var(--fs-sm);color:var(--mute);margin:12px 0 0;line-height:1.45}
+.seo-more{max-width:90ch;margin-top:20px}.seo-more .h{margin:0 0 4px}.seo-q{font-size:var(--fs-sm);margin:18px 0 0;font-weight:700}
+.seo-more a{color:inherit;text-decoration-color:var(--coral,#D2425A);text-underline-offset:3px}
+.seo-near{list-style:none;padding:0;margin:10px 0 0;display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:6px 18px;font-size:var(--fs-sm)}
+.seo-near span{color:var(--mute)}
+
+/* grade chips (soft tints, W Skim solid coral) */
+.chip{display:inline-block;min-width:44px;text-align:center;font-weight:800;font-size:.9rem;padding:3px 8px;border-radius:6px}
+.g-w{background:var(--coral);color:#fff}.g-good{background:var(--good);color:var(--good-t)}.g-fair{background:var(--fair);color:var(--fair-t)}.g-skip{background:var(--skip);color:var(--skip-t)}
+.legend{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}.legend .chip{min-width:0;font-size:var(--fs-sm);font-weight:600}
+
+/* hour by hour */
+.hours{display:grid;grid-auto-flow:column;grid-template-columns:110px;grid-auto-columns:minmax(66px,1fr);overflow-x:auto;background:var(--surface);border-radius:12px;border:1px solid var(--line)}
+.hc{display:grid;grid-template-rows:44px 48px 40px 40px 40px;align-items:center;justify-items:center;border-left:1px solid var(--line);font-size:.92rem;min-width:66px}
+.hc>span{display:flex;align-items:center;gap:4px}
+.hc.lab{position:sticky;left:0;z-index:1;background:var(--surface);border-left:0;justify-items:start;padding:0 16px;min-width:110px;color:var(--mute);font-size:var(--fs-sm);font-weight:600}
+.hc .ht{font-weight:800}
+.hc.past>span{opacity:.4}
+.hc.win{box-shadow:inset 0 3px 0 var(--coral);background:#FCF6F7}
+.hc.win .ht{color:var(--coral)}
+
+/* tide (chart itself unchanged) */
+#tide svg{touch-action:pan-y;cursor:crosshair;display:block}
+svg text{font-family:inherit}
+
+/* next 5 days */
+.days{display:grid;grid-template-columns:repeat(5,minmax(110px,1fr));overflow-x:auto;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.day{display:flex;flex-direction:column;align-items:flex-start;gap:6px;padding:16px;border:0;border-left:1px solid var(--line);background:none;text-align:left;cursor:pointer}
+.day:first-child{border-left:0}
+.day:hover{background:var(--surface)}
+.day.sel{background:var(--coral-soft);box-shadow:inset 0 -3px 0 var(--coral)}
+.day .dn{font-weight:800}.day small{color:var(--mute);font-size:var(--fs-sm)}
+
+/* report + second opinions */
+.two{display:grid;grid-template-columns:minmax(0,1fr);gap:var(--s4)}
+@media(min-width:960px){.two{grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:var(--s5)}.side{border-left:1px solid var(--line);padding-left:var(--s5)}}
+#report p{margin:0 0 var(--s2);font-size:1.05rem;line-height:1.65;max-width:68ch}
+#report p:last-child{margin:0}
+.kv{margin:0 0 var(--s4)}
+.kv h3{margin:0 0 4px;font-size:1rem;font-weight:800}
+.kv .r{display:flex;justify-content:space-between;align-items:baseline;gap:var(--s2);padding:10px 0;border-bottom:1px solid var(--line)}
+.kv dt{color:var(--mute);font-size:.92rem}
+.kv dd{margin:0;font-weight:700;text-align:right}
+.kv dd em{display:block;font-style:normal;font-weight:400;font-size:var(--fs-sm);color:var(--mute)}
+.tog{display:flex;gap:8px;align-items:center;margin-top:12px;font-size:.92rem;cursor:pointer}
+.tog input{width:16px;height:16px;accent-color:var(--coral);flex:none}
+.flag,.okline{display:flex;gap:8px;align-items:baseline;font-size:.92rem;margin:12px 0 0}
+.flag::before,.okline::before{content:"";width:8px;height:8px;border-radius:50%;flex:none;transform:translateY(-1px)}
+.flag::before{background:#D9822B}.okline::before{background:#3E9B63}
+.howwas{margin-top:var(--s3);padding:var(--s2);background:var(--surface);border:1px solid var(--line);border-radius:10px}
+.howwas h3{margin:0 0 4px;font-size:1rem}.howwas p{margin:0 0 var(--s1);color:var(--mute);font-size:var(--fs-sm)}
+.hw-b{display:flex;gap:8px;flex-wrap:wrap}
+.hw-b button{flex:1 1 90px;min-height:44px;padding:8px 12px;border-radius:8px;border:1px solid var(--line);background:var(--bg);font-weight:700;cursor:pointer}
+.hw-b button:hover,.hw-b button:focus-visible{border-color:var(--coral)}
+.hw-b button.on{background:var(--coral);border-color:var(--coral);color:#fff}
+.hw-c{margin-top:var(--s1);font-size:var(--fs-sm);color:var(--ink)}
+
+/* rankings */
+.rank{border-top:1px solid var(--line)}
+.rk{display:grid;grid-template-columns:32px minmax(0,1.6fr) 64px minmax(0,.8fr) minmax(0,1fr) minmax(0,.9fr);gap:var(--s2);align-items:center;width:100%;padding:12px 8px;border:0;border-bottom:1px solid var(--line);background:none;text-align:left;cursor:pointer}
+.rk:hover{background:var(--surface)}
+.rk.sel{background:var(--coral-soft)}
+.rk-n{color:var(--mute);font-weight:800}.rk-name{font-weight:700}.rk-l,.rk-d,.rk-r{color:var(--mute);font-size:.92rem}
+@media(max-width:700px){.rk{grid-template-columns:28px minmax(0,1fr) auto;row-gap:2px}.rk-l,.rk-d,.rk-r{grid-column:2/-1;font-size:var(--fs-sm)}.rk-l{display:none}}
+
+/* session log */
+.logs{display:grid;grid-template-columns:minmax(0,1fr);gap:var(--s4)}
+@media(min-width:960px){.logs{grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:var(--s5)}}
+.form{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;align-items:end}
+.form label{display:block;font-size:var(--fs-sm);color:var(--mute);font-weight:600}
+.form input,.form select{width:100%;height:42px;margin-top:4px;padding:0 10px;border:1px solid var(--line);border-radius:8px;font:inherit;background:var(--surface);color:var(--ink)}
+.form input:focus,.form select:focus{border-color:var(--coral);outline:none}
+.form .wide{grid-column:1/-1}
+.btn{padding:9px 16px;border-radius:8px;border:1px solid var(--coral);background:var(--coral);color:#fff;font-weight:700;cursor:pointer;margin:var(--s2) 8px 0 0}
+.btn:hover{filter:brightness(.95)}
+.btn.alt{background:transparent;color:var(--ink);border-color:var(--line)}
+.btn.alt:hover{background:var(--surface)}
+table.log{width:100%;border-collapse:collapse;font-size:.88rem}
+.log th,.log td{text-align:left;padding:8px 6px;border-bottom:1px solid var(--line);vertical-align:top}
+.log th{color:var(--mute);font-weight:600}
+.lead{margin:0 0 var(--s2);color:var(--mute)}
+
+/* about + footer */
+.about{margin:0;padding-left:18px;color:var(--mute);font-size:.92rem;line-height:1.6;max-width:90ch}.about li{margin:4px 0}
+footer{background:var(--dark);color:var(--onmute);margin-top:var(--s5)}
+footer .wrap{padding-top:var(--s3);padding-bottom:var(--s3);font-size:var(--fs-sm);display:flex;flex-wrap:wrap;justify-content:space-between;gap:10px 24px}
+footer a{color:var(--on);font-weight:700;text-decoration:none;border-bottom:1px solid var(--coral);white-space:nowrap}
+footer a:hover{color:#fff;border-bottom-width:2px}
+footer .flinks{display:flex;flex-wrap:wrap;gap:8px 20px}
+
+/* sponsor spot ("Presented by") in the dark hero */
+.pres{display:inline-flex;align-items:center;flex-wrap:wrap;gap:6px 12px;margin-top:var(--s2);padding:8px 14px;border-radius:10px;border:1px solid var(--dline);background:#252320;color:var(--on);text-decoration:none;max-width:100%}
+.pres:hover{border-color:var(--onmute)}
+.pres-k{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--onmute)}
+.pres img{height:28px;width:auto;max-width:140px;object-fit:contain;display:block}
+.pres-n{font-weight:800;font-size:.98rem}
+.pres-go{font-size:var(--fs-sm);font-weight:700;color:var(--coral)}
+.pres.empty{border-style:dashed;background:transparent}
+.pres.empty .pres-n{color:var(--onmute);font-weight:600}
+
+/* verse of the day, top of the dark hero */
+.votd{margin:var(--s3) 0 0;max-width:80ch;font-size:.95rem;line-height:1.5;color:#E6E1D7}
+.votd:empty{display:none}
+.votd-k{display:inline-block;margin-right:10px;font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--coral)}
+.votd q{font-style:italic;quotes:"\201C" "\201D"}
+.votd cite{font-style:normal;font-weight:700;color:var(--onmute);white-space:nowrap;margin-left:6px}
+.votd:not(:empty) + .hero{padding-top:var(--s4)}
+
+/* partners, bottom of the page */
+#partners .head h2{font-family:'Anton',Impact,sans-serif;font-weight:400;font-size:clamp(2rem,4vw,2.8rem);letter-spacing:.02em;text-transform:uppercase}
+.partners{display:flex;flex-wrap:wrap;gap:var(--s3)}
+.partner{display:flex;flex-direction:column;align-items:center;gap:12px;min-width:240px;padding:var(--s3) var(--s4);border:1px solid var(--line);border-radius:14px;background:var(--surface);color:var(--ink);text-decoration:none;text-align:center}
+.partner:hover{border-color:#C9A24A}
+.partner img{height:120px;width:auto;max-width:260px;object-fit:contain;display:block}
+.partner-d{font-size:var(--fs-sm);color:var(--mute)}
+
+/* drawer */
+#scrim{position:fixed;inset:0;background:rgba(0,0,0,.4);opacity:0;pointer-events:none;transition:opacity .2s;z-index:9}
+#drawer{position:fixed;top:0;left:0;bottom:0;width:min(330px,88vw);background:var(--surface);z-index:10;transform:translateX(-105%);transition:transform .22s;padding:20px 0;overflow-y:auto;box-shadow:0 0 40px rgba(0,0,0,.18)}
+body.open #scrim{opacity:1;pointer-events:auto} body.open #drawer{transform:none}
+#drawer h2{margin:0 20px 10px;font-size:var(--fs-h);font-weight:800}
+#drawer button{display:flex;justify-content:space-between;align-items:center;gap:8px;width:100%;text-align:left;padding:12px 20px;border:0;border-left:3px solid transparent;border-bottom:1px solid var(--line);background:none;cursor:pointer;font-weight:600}
+#drawer button:hover{background:var(--bg)}
+#drawer button.sel{border-left-color:var(--coral);background:var(--coral-soft)}
+
+/* beach menu groups + search */
+#q{display:block;margin:0 20px 8px;width:calc(100% - 40px);height:40px;padding:0 12px;border:1px solid var(--line);border-radius:8px;font:inherit;background:var(--bg)}
+#q:focus{outline:none;border-color:var(--coral)}
+.dg{margin:16px 20px 4px;font-size:var(--fs-sm);font-weight:800;color:var(--mute)}
+#drawer .row{display:flex;align-items:stretch;border-bottom:1px solid var(--line)}
+#drawer .row>button.pk{flex:1;min-width:0;border-bottom:0}
+#drawer .row>button.star{width:auto;flex:none;justify-content:center;padding:0 18px 0 8px;border:0;font-size:1.2rem;line-height:1;color:#B9B3A8}
+#drawer .row>button.star:hover{color:var(--coral);background:none}
+#drawer .row>button.star.on{color:var(--coral)}
+#drawer .row.sel{background:var(--coral-soft)}
+
+/* W Skim finder */
+.finder{border-top:1px solid var(--line)}
+.fd{display:grid;grid-template-columns:90px 150px minmax(0,1fr) auto;gap:var(--s2);align-items:center;width:100%;padding:12px 8px;border:0;border-bottom:1px solid var(--line);background:none;text-align:left;cursor:pointer}
+.fd:hover{background:var(--surface)}
+.fd-d{font-weight:800}.fd-t{color:var(--mute)}.fd-n{font-weight:600}
+.fd-none{margin:0;padding:16px 8px;border-bottom:1px solid var(--line);color:var(--mute)}
+.fd-none button{background:none;border:0;padding:0;font:inherit;font-weight:700;color:var(--ink);text-decoration:underline;text-underline-offset:3px;cursor:pointer}
+@media(max-width:700px){.fd{grid-template-columns:64px minmax(0,1fr) auto;row-gap:2px}.fd-n{grid-column:2/3;grid-row:2;font-size:.9rem}.fd-t{grid-column:2/3}}
+
+/* beach settings panel */
+.cfglink{display:inline-block;margin-top:12px;background:none;border:0;padding:0;color:var(--onmute);font-size:var(--fs-sm);font-weight:600;text-decoration:underline;text-underline-offset:3px;cursor:pointer}
+.cfglink:hover{color:var(--on)}
+.score .cfglink{display:block;margin:12px 0 0 auto}
+#cfgp{position:fixed;top:0;right:0;bottom:0;width:min(420px,92vw);background:var(--surface);z-index:12;transform:translateX(105%);transition:transform .22s;padding:24px;overflow-y:auto;box-shadow:0 0 40px rgba(0,0,0,.18)}
+body.cfg #cfgp{transform:none} body.cfg #scrim{opacity:1;pointer-events:auto}
+#cfgp h2{margin:0 36px 6px 0;font-size:var(--fs-h);font-weight:800}
+#cfgp label{display:block;margin-top:16px;font-size:.9rem;font-weight:600}
+#cfgp label small{display:block;font-weight:400;color:var(--mute)}
+#cfgp input,#cfgp select{display:block;width:100%;height:42px;margin-top:6px;padding:0 10px;border:1px solid var(--line);border-radius:8px;font:inherit;background:var(--surface);color:var(--ink)}
+#cfgp input:focus,#cfgp select:focus{outline:none;border-color:var(--coral)}
+#cfgp .pair{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+#cfgp .x{position:absolute;top:16px;right:16px;width:36px;height:36px;border-radius:8px;border:1px solid var(--line);background:none;cursor:pointer;font-size:1.2rem;line-height:1}
+.custom{display:inline-block;margin-left:6px;font-size:.75rem;font-weight:700;color:var(--coral)}
+
+/* W SKIM caution tape */
+.top{overflow:hidden}
+.tape{position:relative;width:100%;margin:16px 0 -6px 0;background:var(--coral);color:#000;cursor:pointer}
+.tape[hidden]{display:none}
+.tape-track{display:flex;width:max-content;padding:13px 0;animation:tapeRight 42s linear infinite}
+.tape-track span{font-family:'Anton',Impact,sans-serif;font-weight:400;font-size:clamp(1.25rem,2.4vw,1.9rem);line-height:1;letter-spacing:.08em;white-space:nowrap;padding-right:.5em}
+.tape:hover .tape-track{animation-play-state:paused}
+/* straight strip that keeps scrolling to the right, same on phone and desktop */
+@keyframes tapeRight{from{transform:translateX(-50%)}to{transform:translateX(0)}}
+
+/* loading placeholders */
+.sk{display:block;height:14px;border-radius:6px;margin:10px 0;background:linear-gradient(90deg,#E4DFD4 25%,#EEEAE3 40%,#E4DFD4 60%);background-size:300% 100%;animation:sk 1.3s ease-in-out infinite}
+.top .sk{background:linear-gradient(90deg,#2C2A27 25%,#363330 40%,#2C2A27 60%);background-size:300% 100%}
+.sk.big{height:36px;width:60%}.sk.w80{width:80%}.sk.w50{width:50%}
+@keyframes sk{0%{background-position:100% 0}100%{background-position:0 0}}
+
+@media(max-width:760px){
+  :root{--s5:44px;--s4:28px}
+  .score .cfglink{margin-left:0}
+  .score .sk{margin-left:0!important}
+  .tape{margin-top:14px}
+  .tape-track{padding:7px 0}
+  .tape-track span{font-size:1rem}
+  .wrap{padding:0 var(--s2)}
+  .hero{grid-template-columns:minmax(0,1fr);gap:var(--s3);padding:var(--s4) 0 var(--s3)}
+  .score{text-align:left}.meter{margin-left:0}
+  .tools{width:100%;justify-content:space-between}
+  .bar{flex-wrap:wrap}
+}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}.sk{animation:none}}
+</style>
+</head>
+<body>
+<div class="top"><div class="wrap">
+  <div class="bar">
+    <button id="menu" aria-label="Choose a beach"><svg width="20" height="20" viewBox="0 0 22 22" fill="none" stroke="#F2EFE8" stroke-width="2" stroke-linecap="round"><path d="M3 6h16M3 11h16M3 16h16"/></svg></button>
+    <span id="brand" aria-label="SkimCast"><span id="brandTxt">SKIMCAST</span><svg viewBox="0 0 100 10" preserveAspectRatio="none" aria-hidden="true"><path d="M1 6 Q36 1 99 6" stroke="#D2425A" fill="none" stroke-linecap="round" vector-effect="non-scaling-stroke" style="stroke-width:2.6px"/></svg></span>
+    <div class="tools"><span id="upd"></span><button id="refresh" aria-label="Refresh data">Refresh</button>
+      <div class="controls" role="group" aria-label="Riding style"><button id="wave" class="on">Wave riding</button><button id="flat">Flatland</button></div></div>
+  </div>
+</div>
+<div class="tape" id="wtape" hidden role="link" tabindex="0" aria-label="W Skim conditions: see every W Skim in the next 5 days" onclick="tapeGo()" onkeydown="if(event.key==='Enter')tapeGo()">
+  <div class="tape-track" aria-hidden="true"><span>W SKIM ★ W SKIM ★ W SKIM ★ W SKIM ★ W SKIM ★ W SKIM ★ W SKIM ★ W SKIM ★ W SKIM ★ W SKIM ★ W SKIM ★ W SKIM ★ W SKIM ★ W SKIM ★</span><span>W SKIM ★ W SKIM ★ W SKIM ★ W SKIM ★ W SKIM ★ W SKIM ★ W SKIM ★ W SKIM ★ W SKIM ★ W SKIM ★ W SKIM ★ W SKIM ★ W SKIM ★ W SKIM ★</span></div>
+</div>
+<div class="wrap">
+  <p class="votd" id="votd" aria-label="Bible verse of the day"></p>
+  <div class="hero">
+    <div><h1 id="spotname" class="anton"></h1><div id="best"></div></div>
+    <div class="score" id="heroScore"></div>
+  </div>
+  <p id="stath"></p>
+  <div class="strip" id="stats"></div>
+</div></div>
+<div id="scrim"></div>
+<nav id="drawer"><h2>Choose a beach</h2><input id="q" type="search" placeholder="Search beaches" autocomplete="off" oninput="drawList()"><div id="list"></div></nav>
+<aside id="cfgp" aria-label="Beach settings"></aside>
+<main>
+  <section class="sec first"><div class="wrap"><div class="head"><h2 class="h" id="hourtitle">Hour by hour</h2></div>
+    <div class="hours" id="hours"></div>
+    <div class="legend"><span class="chip g-w">W Skim 8+</span><span class="chip g-good">Good 6.5+</span><span class="chip g-fair">Fair 4.5+</span><span class="chip g-skip">Skip it</span></div></div></section>
+  <section class="sec"><div class="wrap"><div class="two">
+    <div><div class="head" style="border:0;padding:0;margin-bottom:var(--s2)"><h2 class="h">Beach report</h2></div><div id="report"></div><div id="howwas"></div></div>
+    <aside class="side"><div id="nws"></div><div id="buoy"></div></aside></div></div></section>
+  <section class="sec"><div class="wrap"><div class="head"><h2 class="h" id="tidetitle">Tide</h2><div class="meta" id="sunmoon"></div></div>
+    <div id="tide"></div><p class="note">Hover or drag across the chart to read any time. Yellow dots are low tide.</p></div></section>
+  <section class="sec"><div class="wrap"><div class="head"><h2 class="h">Next 5 days</h2></div><div class="days" id="days"></div></div></section>
+  <section class="sec"><div class="wrap"><div class="head"><h2 class="h" id="findtitle">W Skim in the next 5 days</h2><span class="note" id="findnote" style="margin:0"></span></div><div class="finder" id="finder"></div></div></section>
+  <section class="sec"><div class="wrap"><div class="head"><h2 class="h" id="ranktitle">Beaches nearby</h2><span class="note" id="tilenote" style="margin:0"></span></div><div class="rank" id="tiles"></div></div></section>
+  <section class="sec"><div class="wrap"><div class="head"><h2 class="h">Log a session</h2></div><div class="logs"><div id="logform"></div><div id="logsaved"></div></div></div></section>
+  <section class="sec"><div class="wrap"><div class="head"><h2 class="h">About the data</h2></div><ul class="about" id="about"></ul></div></section>
+</main>
+<section class="sec" id="seo"><div class="wrap"><p class="note" id="seoText" style="max-width:90ch">SkimCast is a free skimboarding forecast for 300 beaches, covering every Florida coast and California, plus a few East Coast and Gulf spots. Each beach gets a skim score with shorebreak size, how far out the waves break, tide, wind and the best time to go, updated through the day from NOAA, the National Weather Service and marine forecast models.</p></div></section>
+<section class="sec" id="partners" hidden><div class="wrap"><div class="head"><h2 class="h">Partners</h2></div><div class="partners" id="partnerList"></div></div></section>
+<footer><div class="wrap"><span>Forecasts are estimates and can be wrong. Check local conditions and lifeguard flags before you go in the water.</span><span class="flinks"><a id="statsLink" href="stats.html" hidden>Stats</a><a href="/sponsor">Sponsor SkimCast →</a></span></div></footer>
+<script>
+const SITE_NAME = "SkimCast";      // <-- change your site name here
+const PROXY_URL = "";               // optional: your own CORS proxy, ending in "?url=" (used before the public ones)
+// Each beach: name, region, lat, lon, NOAA tide station, NDBC wave buoy, face = compass direction the beach looks toward (E=90, S=180, W=270),
+// slope = beach steepness (0.045 gentle and wide, 0.06 medium, 0.08 steep), nws = National Weather Service surf forecast zone,
+// cfg = this beach's ideal skim conditions (best tide, flatland max size, wave-riding size range, too-far-out distance, wind limit)
+const REGIONS = ["Treasure Coast","Palm Beach","Broward","Miami","Keys","Space Coast","Volusia","First Coast","Tampa Bay","Sarasota","Southwest Florida","Panhandle","San Diego","Orange County","Los Angeles","Central Coast","NorCal","Georgia & Carolinas","Mid-Atlantic & Northeast","Texas"];
+const STEEP_FL = {tide:"auto",   flat:1, wave:[1,3],     far:35, wind:10};
+const MIAMI    = {tide:"auto",   flat:1, wave:[1,2.5],   far:40, wind:10};
+const FLAT_FL  = {tide:"auto",   flat:1, wave:[1,3],     far:45, wind:10};
+const EAST     = {tide:"auto",   flat:1, wave:[1,3],     far:40, wind:8};
+const WEST     = {tide:"auto",   flat:1, wave:[1.5,3.5], far:40, wind:8};
+const GULF     = {tide:"auto",   flat:1, wave:[0.8,2.5], far:45, wind:10};   // Gulf side: small tides, gentle wide beaches
+const KEYS     = {tide:"auto",   flat:1, wave:[0.8,2],   far:40, wind:10};   // Keys: reef-sheltered, mostly flat water
+const BAHAMAS_SHADOW = ["Palm Beach","Broward","Miami"];
+const MLB = (key) => ({office:"MLB", file:"fzus52.kmlb.srf.mlb.txt", key});
+const MFL = (key) => ({office:"MFL", file:"fzus52.kmfl.srf.mfl.txt", key});
+const SPOTS = [
+  // Treasure Coast
+  {name:"Jensen Beach, FL",        region:"Treasure Coast", lat:27.25, lon:-80.22,  tide:"8722375", buoy:"41114", face:80,  slope:0.072, usgs:1,  cfg:STEEP_FL, nws:MLB("Jensen Beach")},
+  {name:"Stuart Beach, FL",        region:"Treasure Coast", lat:27.20, lon:-80.16,  tide:"8722375", buoy:"41114", face:75,  slope:0.078, usgs:1,  cfg:STEEP_FL, nws:MLB("Jensen Beach")},
+  {name:"Hobe Sound, FL",          region:"Treasure Coast", lat:27.06, lon:-80.11,  tide:"8722375", buoy:"41114", face:75,  slope:0.062, usgs:1,  cfg:STEEP_FL, nws:MLB("Jensen Beach")},
+  {name:"Fort Pierce, FL",         region:"Treasure Coast", lat:27.47, lon:-80.29,  tide:"8722212", buoy:"41114", face:70,  slope:0.06, usgs:1,  cfg:STEEP_FL, nws:MLB("Jensen Beach")},
+  {name:"Vero Beach, FL",          region:"Treasure Coast", lat:27.64, lon:-80.36,  tide:"8722105", buoy:"41114", face:70,  slope:0.06, usgs:1,  cfg:STEEP_FL, nws:MLB("Melbourne Beach")},
+  {name:"Sebastian Inlet, FL",     region:"Treasure Coast", lat:27.86, lon:-80.45,  tide:"8722004", buoy:"41114", face:70,  slope:0.065, usgs:1,  cfg:FLAT_FL,  nws:MLB("Melbourne Beach")},
+  {name:"Wabasso Beach, FL", region:"Treasure Coast", lat:27.76, lon:-80.395, tide:"8722105", buoy:"41114", face:70, slope:0.085, usgs:1, cfg:STEEP_FL, nws:MLB("Cocoa Beach")},
+  {name:"Tracking Station Park (Vero), FL", region:"Treasure Coast", lat:27.675, lon:-80.36, tide:"8722105", buoy:"41114", face:70, slope:0.069, usgs:1, cfg:STEEP_FL, nws:MLB("Cocoa Beach")},
+  {name:"Round Island Beach, FL", region:"Treasure Coast", lat:27.56, lon:-80.325, tide:"8722212", buoy:"41114", face:70, slope:0.038, usgs:1, cfg:STEEP_FL, nws:MLB("Cocoa Beach")},
+  {name:"Waveland Beach, FL", region:"Treasure Coast", lat:27.3, lon:-80.215, tide:"8722375", buoy:"41114", face:75, slope:0.088, usgs:1, cfg:STEEP_FL, nws:MLB("Jensen Beach")},
+  {name:"Bathtub Reef Beach, FL", region:"Treasure Coast", lat:27.115, lon:-80.15, tide:"8722375", buoy:"41114", face:75, slope:0.05, usgs:1, cfg:STEEP_FL, nws:MLB("Jensen Beach")},
+  {name:"Blowing Rocks, FL", region:"Treasure Coast", lat:26.997, lon:-80.085, tide:"8722495", buoy:"41114", face:80, slope:0.044, usgs:1, cfg:STEEP_FL, nws:MLB("Jensen Beach")},
+  {name:"Jaycee Park (Vero), FL", region:"Treasure Coast", lat:27.65, lon:-80.354, tide:"8722105", buoy:"41114", face:70, slope:0.063, usgs:1, cfg:STEEP_FL, nws:MLB("Cocoa Beach")},
+  {name:"Pepper Park, FL", region:"Treasure Coast", lat:27.49, lon:-80.3, tide:"8722212", buoy:"41114", face:70, slope:0.055, usgs:1, cfg:STEEP_FL, nws:MLB("Jensen Beach")},
+  {name:"Hobe Sound Refuge Beach, FL", region:"Treasure Coast", lat:27.03, lon:-80.105, tide:"8722495", buoy:"41114", face:80, slope:0.056, usgs:1, cfg:STEEP_FL, nws:MLB("Jensen Beach")},
+  // Palm Beach
+  {name:"Jupiter, FL",             region:"Palm Beach",     lat:26.94, lon:-80.07,  tide:"8722495", buoy:"41114", face:80,  slope:0.072, usgs:1,  cfg:STEEP_FL, nws:MFL("Palm Beach")},
+  {name:"Juno Beach, FL",          region:"Palm Beach",     lat:26.88, lon:-80.05,  tide:"8722495", buoy:"41114", face:80,  slope:0.068, usgs:1,  cfg:STEEP_FL, nws:MFL("Palm Beach")},
+  {name:"Palm Beach, FL",          region:"Palm Beach",     lat:26.70, lon:-80.03,  tide:"8722607", buoy:"41122", face:85,  slope:0.064, usgs:1,  cfg:STEEP_FL, nws:MFL("Palm Beach")},
+  {name:"Lake Worth Beach, FL",    region:"Palm Beach",     lat:26.61, lon:-80.03,  tide:"8722670", buoy:"41122", face:90,  slope:0.081, usgs:1,  cfg:STEEP_FL, nws:MFL("Palm Beach")},
+  {name:"Delray Beach, FL",        region:"Palm Beach",     lat:26.46, lon:-80.06,  tide:"8722670", buoy:"41122", face:90,  slope:0.045, usgs:1,  cfg:STEEP_FL, nws:MFL("Palm Beach")},
+  {name:"Boca Raton, FL",          region:"Palm Beach",     lat:26.35, lon:-80.07,  tide:"8722862", buoy:"41122", face:90,  slope:0.061, usgs:1,  cfg:STEEP_FL, nws:MFL("Palm Beach")},
+  {name:"Coral Cove (Tequesta), FL", region:"Palm Beach", lat:26.983, lon:-80.077, tide:"8722495", buoy:"41114", face:80, slope:0.086, usgs:1, cfg:STEEP_FL, nws:MFL("Palm Beach")},
+  {name:"Singer Island, FL", region:"Palm Beach", lat:26.785, lon:-80.032, tide:"8722607", buoy:"41122", face:85, slope:0.049, usgs:1, cfg:STEEP_FL, nws:MFL("Palm Beach")},
+  {name:"Ocean Ridge, FL", region:"Palm Beach", lat:26.528, lon:-80.044, tide:"8722670", buoy:"41122", face:90, slope:0.062, usgs:1, cfg:STEEP_FL, nws:MFL("Palm Beach")},
+  {name:"Highland Beach, FL", region:"Palm Beach", lat:26.4, lon:-80.064, tide:"8722862", buoy:"41122", face:90, slope:0.084, usgs:1, cfg:STEEP_FL, nws:MFL("Palm Beach")},
+  {name:"Jupiter Inlet Beach (DuBois), FL", region:"Palm Beach", lat:26.945, lon:-80.072, tide:"8722495", buoy:"41114", face:80, slope:0.076, usgs:1, cfg:STEEP_FL, nws:MFL("Palm Beach")},
+  {name:"Carlin Park, FL", region:"Palm Beach", lat:26.927, lon:-80.067, tide:"8722495", buoy:"41114", face:80, slope:0.07, usgs:1, cfg:STEEP_FL, nws:MFL("Palm Beach")},
+  {name:"Juno Beach Pier, FL", region:"Palm Beach", lat:26.895, lon:-80.056, tide:"8722495", buoy:"41114", face:80, slope:0.068, usgs:1, cfg:STEEP_FL, nws:MFL("Palm Beach")},
+  {name:"Loggerhead Park, FL", region:"Palm Beach", lat:26.865, lon:-80.045, tide:"8722495", buoy:"41114", face:80, slope:0.076, usgs:1, cfg:STEEP_FL, nws:MFL("Palm Beach")},
+  {name:"Ocean Reef Park, FL", region:"Palm Beach", lat:26.7937, lon:-80.0333, tide:"8722607", buoy:null, face:85, slope:0.069, usgs:1, cfg:STEEP_FL, nws:MFL("Palm Beach")},
+  {name:"Midtown Beach (Palm Beach), FL", region:"Palm Beach", lat:26.708, lon:-80.034, tide:"8722607", buoy:"41122", face:85, slope:0.064, usgs:1, cfg:STEEP_FL, nws:MFL("Palm Beach")},
+  {name:"Phipps Ocean Park, FL", region:"Palm Beach", lat:26.65, lon:-80.036, tide:"8722670", buoy:"41122", face:90, slope:0.102, usgs:1, cfg:STEEP_FL, nws:MFL("Palm Beach")},
+  {name:"Lantana Beach, FL", region:"Palm Beach", lat:26.585, lon:-80.039, tide:"8722670", buoy:"41122", face:90, slope:0.102, usgs:1, cfg:STEEP_FL, nws:MFL("Palm Beach")},
+  {name:"Boynton Inlet, FL", region:"Palm Beach", lat:26.545, lon:-80.043, tide:"8722670", buoy:"41122", face:90, slope:0.052, usgs:1, cfg:STEEP_FL, nws:MFL("Palm Beach")},
+  {name:"Atlantic Dunes Park, FL", region:"Palm Beach", lat:26.44, lon:-80.06, tide:"8722670", buoy:"41122", face:90, slope:0.045, usgs:1, cfg:STEEP_FL, nws:MFL("Palm Beach")},
+  {name:"Spanish River Park, FL", region:"Palm Beach", lat:26.385, lon:-80.067, tide:"8722862", buoy:"41122", face:90, slope:0.078, usgs:1, cfg:STEEP_FL, nws:MFL("Palm Beach")},
+  {name:"Red Reef Park, FL", region:"Palm Beach", lat:26.36, lon:-80.068, tide:"8722862", buoy:"41122", face:90, slope:0.068, usgs:1, cfg:STEEP_FL, nws:MFL("Palm Beach")},
+  {name:"South Beach Park (Boca), FL", region:"Palm Beach", lat:26.343, lon:-80.071, tide:"8722862", buoy:"41122", face:90, slope:0.058, usgs:1, cfg:STEEP_FL, nws:MFL("Palm Beach")},
+  // Broward
+  {name:"Fort Lauderdale, FL",     region:"Broward", lat:26.12, lon:-80.10, tide:"8722899", buoy:"41122", face:95,  slope:0.056, usgs:1,  cfg:MIAMI,    nws:MFL("Fort Lauderdale")},
+  {name:"Hollywood, FL",           region:"Broward", lat:26.01, lon:-80.12, tide:"8722979", buoy:"41122", face:95,  slope:0.046, usgs:1,  cfg:MIAMI,    nws:MFL("Fort Lauderdale")},
+  {name:"Deerfield Beach, FL", region:"Broward", lat:26.317, lon:-80.075, tide:"8722862", buoy:"41122", face:90, slope:0.059, usgs:1, cfg:MIAMI, nws:MFL("Fort Lauderdale")},
+  {name:"Pompano Beach, FL", region:"Broward", lat:26.234, lon:-80.088, tide:"8722862", buoy:"41122", face:90, slope:0.036, usgs:1, cfg:MIAMI, nws:MFL("Fort Lauderdale")},
+  {name:"Lauderdale-by-the-Sea, FL", region:"Broward", lat:26.19, lon:-80.094, tide:"8722899", buoy:"41122", face:90, slope:0.058, usgs:1, cfg:MIAMI, nws:MFL("Fort Lauderdale")},
+  {name:"Dania Beach, FL", region:"Broward", lat:26.053, lon:-80.111, tide:"8722979", buoy:"41122", face:95, slope:0.063, usgs:1, cfg:MIAMI, nws:MFL("Fort Lauderdale")},
+  {name:"Hallandale Beach, FL", region:"Broward", lat:25.985, lon:-80.118, tide:"8723050", buoy:"41122", face:95, slope:0.062, usgs:1, cfg:MIAMI, nws:MFL("Fort Lauderdale")},
+  {name:"Hillsboro Beach, FL", region:"Broward", lat:26.275, lon:-80.078, tide:"8722862", buoy:"41122", face:90, slope:0.088, usgs:1, cfg:MIAMI, nws:MFL("Fort Lauderdale")},
+  {name:"Galt Ocean Mile, FL", region:"Broward", lat:26.2, lon:-80.094, tide:"8722899", buoy:"41122", face:90, slope:0.053, usgs:1, cfg:MIAMI, nws:MFL("Fort Lauderdale")},
+  {name:"Las Olas Beach, FL", region:"Broward", lat:26.119, lon:-80.104, tide:"8722899", buoy:"41122", face:95, slope:0.056, usgs:1, cfg:MIAMI, nws:MFL("Fort Lauderdale")},
+  {name:"John U. Lloyd Beach, FL", region:"Broward", lat:26.085, lon:-80.108, tide:"8722979", buoy:"41122", face:95, slope:0.075, usgs:1, cfg:MIAMI, nws:MFL("Fort Lauderdale")},
+  // Miami
+  {name:"Haulover, FL",            region:"Miami", lat:25.90, lon:-80.12, tide:"8723080", buoy:"41122", face:95,  slope:0.042, usgs:1,  cfg:MIAMI,    nws:MFL("Miami")},
+  {name:"Miami Beach, FL",         region:"Miami", lat:25.79, lon:-80.13, tide:"8723178", buoy:"41122", face:95,  slope:0.06, local:1,  cfg:MIAMI,    nws:MFL("Miami")},
+  {name:"South Pointe, Miami Beach, FL", region:"Miami", lat:25.765, lon:-80.13, tide:"8723178", buoy:"41122", face:100, slope:0.03, usgs:1, cfg:MIAMI, nws:MFL("Miami")},
+  {name:"Sunny Isles, FL", region:"Miami", lat:25.94, lon:-80.12, tide:"8723050", buoy:"41122", face:95, slope:0.046, usgs:1, cfg:MIAMI, nws:MFL("Miami")},
+  {name:"Surfside, FL", region:"Miami", lat:25.879, lon:-80.121, tide:"8723080", buoy:"41122", face:95, slope:0.055, usgs:1, cfg:MIAMI, nws:MFL("Miami")},
+  {name:"Key Biscayne, FL", region:"Miami", lat:25.7, lon:-80.153, tide:"8723178", buoy:"41122", face:110, slope:0.062, usgs:1, cfg:MIAMI, nws:MFL("Miami")},
+  {name:"Golden Beach, FL", region:"Miami", lat:25.966, lon:-80.12, tide:"8723050", buoy:"41122", face:95, slope:0.061, usgs:1, cfg:MIAMI, nws:MFL("Miami")},
+  {name:"Bal Harbour, FL", region:"Miami", lat:25.89, lon:-80.122, tide:"8723080", buoy:"41122", face:95, slope:0.052, usgs:1, cfg:MIAMI, nws:MFL("Miami")},
+  {name:"North Beach (Miami Beach), FL", region:"Miami", lat:25.86, lon:-80.12, tide:"8723080", buoy:"41122", face:95, slope:0.057, usgs:1, cfg:MIAMI, nws:MFL("Miami")},
+  {name:"Mid-Beach (41st St), FL", region:"Miami", lat:25.815, lon:-80.122, tide:"8723178", buoy:"41122", face:95, slope:0.05, usgs:1, cfg:MIAMI, nws:MFL("Miami")},
+  {name:"Lummus Park (South Beach), FL", region:"Miami", lat:25.78, lon:-80.13, tide:"8723178", buoy:"41122", face:95, slope:0.03, usgs:1, cfg:MIAMI, nws:MFL("Miami")},
+  {name:"Cape Florida, FL", region:"Miami", lat:25.67, lon:-80.157, tide:"8723178", buoy:"41122", face:110, slope:0.081, usgs:1, cfg:MIAMI, nws:MFL("Miami")},
+  {name:"Virginia Key Beach, FL", region:"Miami", lat:25.74, lon:-80.148, tide:"8723178", buoy:"41122", face:110, slope:0.067, usgs:1, cfg:MIAMI, nws:MFL("Miami")},
+  {name:"Crandon Park North, FL", region:"Miami", lat:25.725, lon:-80.155, tide:"8723178", buoy:"41122", face:110, slope:0.08, usgs:1, cfg:MIAMI, nws:MFL("Miami")},
+  // Keys
+  {name:"Bahia Honda, FL", region:"Keys", lat:24.656, lon:-81.277, tide:"8724138", buoy:"42095", face:160, slope:0.04, cfg:KEYS},
+  {name:"Sombrero Beach (Marathon), FL", region:"Keys", lat:24.692, lon:-81.085, tide:"8723971", buoy:null, face:180, slope:0.04, cfg:KEYS},
+  {name:"Smathers Beach (Key West), FL", region:"Keys", lat:24.55, lon:-81.773, tide:"8724557", buoy:"42095", face:180, slope:0.04, cfg:KEYS},
+  {name:"Cannon Beach (Key Largo), FL", region:"Keys", lat:25.125, lon:-80.405, tide:"8723667", buoy:null, face:110, slope:0.04, cfg:KEYS},
+  {name:"Anne's Beach, FL", region:"Keys", lat:24.85, lon:-80.735, tide:"8723869", buoy:null, face:150, slope:0.03, cfg:KEYS},
+  {name:"Long Key State Park, FL", region:"Keys", lat:24.815, lon:-80.822, tide:"8723899", buoy:null, face:150, slope:0.03, cfg:KEYS},
+  {name:"Coco Plum Beach, FL", region:"Keys", lat:24.73, lon:-81.0, tide:"8723971", buoy:null, face:160, slope:0.03, cfg:KEYS},
+  {name:"Higgs Beach (Key West), FL", region:"Keys", lat:24.548, lon:-81.787, tide:"8724557", buoy:"42095", face:180, slope:0.04, cfg:KEYS},
+  {name:"Fort Zachary Taylor, FL", region:"Keys", lat:24.546, lon:-81.81, tide:"8724557", buoy:"42095", face:200, slope:0.05, cfg:KEYS},
+  // Space Coast
+  {name:"Melbourne Beach, FL",     region:"Space Coast",    lat:28.07, lon:-80.56,  tide:"8721804", buoy:"41113", face:65,  slope:0.053, usgs:1,  cfg:FLAT_FL,  nws:MLB("Melbourne Beach")},
+  {name:"Cocoa Beach, FL",         region:"Space Coast",    lat:28.32, lon:-80.60,  tide:"8721649", buoy:"41113", face:85,  slope:0.03, usgs:1, cfg:FLAT_FL,  nws:MLB("Cocoa Beach")},
+  {name:"Cape Canaveral (Jetty Park), FL", region:"Space Coast", lat:28.405, lon:-80.59, tide:"8721604", buoy:"41113", face:95, slope:0.03, usgs:1, cfg:FLAT_FL, nws:MLB("Daytona Beach")},
+  {name:"Satellite Beach, FL", region:"Space Coast", lat:28.172, lon:-80.591, tide:"8721804", buoy:"41113", face:75, slope:0.075, usgs:1, cfg:FLAT_FL, nws:MLB("Cocoa Beach")},
+  {name:"Indian Harbour Beach, FL", region:"Space Coast", lat:28.15, lon:-80.585, tide:"8721804", buoy:"41113", face:75, slope:0.069, usgs:1, cfg:FLAT_FL, nws:MLB("Cocoa Beach")},
+  {name:"Indialantic, FL", region:"Space Coast", lat:28.09, lon:-80.566, tide:"8721804", buoy:"41113", face:70, slope:0.052, usgs:1, cfg:FLAT_FL, nws:MLB("Cocoa Beach")},
+  {name:"Cocoa Beach Pier, FL", region:"Space Coast", lat:28.367, lon:-80.601, tide:"8721649", buoy:"41113", face:85, slope:0.037, usgs:1, cfg:FLAT_FL, nws:MLB("Cocoa Beach")},
+  {name:"Lori Wilson Park, FL", region:"Space Coast", lat:28.335, lon:-80.607, tide:"8721649", buoy:"41113", face:85, slope:0.03, usgs:1, cfg:FLAT_FL, nws:MLB("Cocoa Beach")},
+  {name:"Patrick SFB Beach, FL", region:"Space Coast", lat:28.24, lon:-80.598, tide:"8721804", buoy:"41113", face:80, slope:0.077, usgs:1, cfg:FLAT_FL, nws:MLB("Cocoa Beach")},
+  {name:"Paradise Beach Park, FL", region:"Space Coast", lat:28.12, lon:-80.578, tide:"8721804", buoy:"41113", face:75, slope:0.062, usgs:1, cfg:FLAT_FL, nws:MLB("Cocoa Beach")},
+  {name:"Spessard Holland Beach, FL", region:"Space Coast", lat:28.03, lon:-80.54, tide:"8721804", buoy:"41113", face:70, slope:0.082, usgs:1, cfg:FLAT_FL, nws:MLB("Cocoa Beach")},
+  {name:"Coconut Point, FL", region:"Space Coast", lat:27.98, lon:-80.51, tide:"8722004", buoy:"41113", face:70, slope:0.095, usgs:1, cfg:FLAT_FL, nws:MLB("Cocoa Beach")},
+  {name:"Sebastian Inlet North, FL", region:"Space Coast", lat:27.866, lon:-80.447, tide:"8722004", buoy:"41114", face:70, slope:0.067, usgs:1, cfg:FLAT_FL, nws:MLB("Cocoa Beach")},
+  // Volusia
+  {name:"New Smyrna Beach, FL",    region:"Volusia",  lat:29.03, lon:-80.89,  tide:"8721164", buoy:"41070", face:65,  slope:0.03, usgs:1, cfg:FLAT_FL,  nws:MLB("Daytona Beach")},
+  {name:"Daytona Beach, FL",       region:"Volusia",  lat:29.21, lon:-80.98,  tide:"8721120", buoy:"41070", face:70,  slope:0.031, usgs:1,  cfg:FLAT_FL,  nws:MLB("Daytona Beach")},
+  {name:"Ormond Beach, FL", region:"Volusia", lat:29.287, lon:-81.04, tide:"8721120", buoy:"41070", face:70, slope:0.038, usgs:1, cfg:FLAT_FL, nws:MLB("Daytona Beach")},
+  {name:"Daytona Beach Shores, FL", region:"Volusia", lat:29.17, lon:-80.972, tide:"8721120", buoy:"41070", face:65, slope:0.035, usgs:1, cfg:FLAT_FL, nws:MLB("Daytona Beach")},
+  {name:"Ponce Inlet, FL", region:"Volusia", lat:29.095, lon:-80.933, tide:"8721120", buoy:"41070", face:65, slope:0.03, usgs:1, cfg:FLAT_FL, nws:MLB("Daytona Beach")},
+  {name:"Main Street Pier (Daytona), FL", region:"Volusia", lat:29.229, lon:-81.004, tide:"8721120", buoy:"41070", face:70, slope:0.03, usgs:1, cfg:FLAT_FL, nws:MLB("Daytona Beach")},
+  {name:"Wilbur-by-the-Sea, FL", region:"Volusia", lat:29.15, lon:-80.96, tide:"8721120", buoy:"41070", face:65, slope:0.033, usgs:1, cfg:FLAT_FL, nws:MLB("Daytona Beach")},
+  {name:"Smyrna Dunes, FL", region:"Volusia", lat:29.065, lon:-80.912, tide:"8721164", buoy:"41070", face:60, slope:0.03, usgs:1, cfg:FLAT_FL, nws:MLB("Daytona Beach")},
+  {name:"Flagler Avenue (New Smyrna), FL", region:"Volusia", lat:29.04, lon:-80.893, tide:"8721164", buoy:"41070", face:65, slope:0.03, usgs:1, cfg:FLAT_FL, nws:MLB("Daytona Beach")},
+  {name:"Bethune Beach, FL", region:"Volusia", lat:28.96, lon:-80.855, tide:"8721164", buoy:"41070", face:65, slope:0.058, usgs:1, cfg:FLAT_FL, nws:MLB("Daytona Beach")},
+  // First Coast
+  {name:"St. Augustine, FL",       region:"First Coast",  lat:29.86, lon:-81.26,  tide:"8720587", buoy:"41117", face:80,  slope:0.03, usgs:1, cfg:FLAT_FL,  nws:{office:"JAX", file:"fzus52.kjax.srf.jax.txt", key:"St. Augustine"}},
+  {name:"Jacksonville Beach, FL",  region:"First Coast",  lat:30.29, lon:-81.39,  tide:"8720291", buoy:"41112", face:85,  slope:0.043, usgs:1,  cfg:FLAT_FL,  nws:{office:"JAX", file:"fzus52.kjax.srf.jax.txt", key:"Jacksonville Beach"}},
+  {name:"Fernandina Beach, FL", region:"First Coast", lat:30.672, lon:-81.432, tide:"8679997", buoy:"41112", face:85, slope:0.038, usgs:1, cfg:FLAT_FL, nws:{office:"JAX", file:"fzus52.kjax.srf.jax.txt", key:"Jacksonville Beach"}},
+  {name:"Atlantic Beach, FL", region:"First Coast", lat:30.334, lon:-81.396, tide:"8720259", buoy:"41112", face:85, slope:0.052, usgs:1, cfg:FLAT_FL, nws:{office:"JAX", file:"fzus52.kjax.srf.jax.txt", key:"Jacksonville Beach"}},
+  {name:"Neptune Beach, FL", region:"First Coast", lat:30.312, lon:-81.394, tide:"8720259", buoy:"41112", face:85, slope:0.052, usgs:1, cfg:FLAT_FL, nws:{office:"JAX", file:"fzus52.kjax.srf.jax.txt", key:"Jacksonville Beach"}},
+  {name:"Ponte Vedra Beach, FL", region:"First Coast", lat:30.24, lon:-81.373, tide:"8720291", buoy:"41117", face:80, slope:0.043, usgs:1, cfg:FLAT_FL, nws:{office:"JAX", file:"fzus52.kjax.srf.jax.txt", key:"Jacksonville Beach"}},
+  {name:"Vilano Beach, FL", region:"First Coast", lat:29.918, lon:-81.293, tide:"8720587", buoy:"41117", face:75, slope:0.068, usgs:1, cfg:FLAT_FL, nws:{office:"JAX", file:"fzus52.kjax.srf.jax.txt", key:"Jacksonville Beach"}},
+  {name:"Crescent Beach, FL", region:"First Coast", lat:29.768, lon:-81.25, tide:"8720587", buoy:"41117", face:75, slope:0.036, usgs:1, cfg:FLAT_FL, nws:{office:"JAX", file:"fzus52.kjax.srf.jax.txt", key:"Jacksonville Beach"}},
+  {name:"American Beach, FL", region:"First Coast", lat:30.59, lon:-81.44, tide:"8679997", buoy:"41112", face:85, slope:0.044, usgs:1, cfg:FLAT_FL, nws:{office:"JAX", file:"fzus52.kjax.srf.jax.txt", key:"Jacksonville Beach"}},
+  {name:"Little Talbot Island, FL", region:"First Coast", lat:30.46, lon:-81.405, tide:"8720194", buoy:"41112", face:85, slope:0.032, usgs:1, cfg:FLAT_FL, nws:{office:"JAX", file:"fzus52.kjax.srf.jax.txt", key:"Jacksonville Beach"}},
+  {name:"Huguenot Park, FL", region:"First Coast", lat:30.41, lon:-81.41, tide:"8720194", buoy:"41112", face:90, slope:0.03, usgs:1, cfg:FLAT_FL, nws:{office:"JAX", file:"fzus52.kjax.srf.jax.txt", key:"Jacksonville Beach"}},
+  {name:"Hanna Park, FL", region:"First Coast", lat:30.37, lon:-81.402, tide:"8720259", buoy:"41112", face:85, slope:0.045, usgs:1, cfg:FLAT_FL, nws:{office:"JAX", file:"fzus52.kjax.srf.jax.txt", key:"Jacksonville Beach"}},
+  {name:"Mickler's Landing, FL", region:"First Coast", lat:30.18, lon:-81.357, tide:"8720291", buoy:"41117", face:80, slope:0.07, usgs:1, cfg:FLAT_FL, nws:{office:"JAX", file:"fzus52.kjax.srf.jax.txt", key:"Jacksonville Beach"}},
+  {name:"Guana Beach (South Ponte Vedra), FL", region:"First Coast", lat:30.03, lon:-81.325, tide:"8720587", buoy:"41117", face:80, slope:0.072, usgs:1, cfg:FLAT_FL, nws:{office:"JAX", file:"fzus52.kjax.srf.jax.txt", key:"Jacksonville Beach"}},
+  {name:"Anastasia State Park, FL", region:"First Coast", lat:29.875, lon:-81.27, tide:"8720587", buoy:"41117", face:80, slope:0.035, usgs:1, cfg:FLAT_FL, nws:{office:"JAX", file:"fzus52.kjax.srf.jax.txt", key:"Jacksonville Beach"}},
+  {name:"St. Augustine Beach Pier, FL", region:"First Coast", lat:29.857, lon:-81.264, tide:"8720587", buoy:"41117", face:80, slope:0.03, usgs:1, cfg:FLAT_FL, nws:{office:"JAX", file:"fzus52.kjax.srf.jax.txt", key:"Jacksonville Beach"}},
+  // Tampa Bay
+  {name:"Honeymoon Island, FL", region:"Tampa Bay", lat:28.072, lon:-82.833, tide:"8726809", buoy:"42098", face:270, slope:0.044, usgs:1, cfg:GULF, nws:{office:"TBW", file:"fzus52.ktbw.srf.tbw.txt", key:"Clearwater Beach"}},
+  {name:"Clearwater Beach, FL", region:"Tampa Bay", lat:27.978, lon:-82.829, tide:"8726724", buoy:"42098", face:270, slope:0.03, usgs:1, cfg:GULF, nws:{office:"TBW", file:"fzus52.ktbw.srf.tbw.txt", key:"Clearwater Beach"}},
+  {name:"Indian Rocks Beach, FL", region:"Tampa Bay", lat:27.89, lon:-82.852, tide:"8726601", buoy:"42098", face:265, slope:0.04, usgs:1, cfg:GULF, nws:{office:"TBW", file:"fzus52.ktbw.srf.tbw.txt", key:"Clearwater Beach"}},
+  {name:"Madeira Beach, FL", region:"Tampa Bay", lat:27.797, lon:-82.799, tide:"8726533", buoy:"42098", face:250, slope:0.034, usgs:1, cfg:GULF, nws:{office:"TBW", file:"fzus52.ktbw.srf.tbw.txt", key:"Clearwater Beach"}},
+  {name:"Treasure Island, FL", region:"Tampa Bay", lat:27.768, lon:-82.771, tide:"8726533", buoy:"42098", face:250, slope:0.03, usgs:1, cfg:GULF, nws:{office:"TBW", file:"fzus52.ktbw.srf.tbw.txt", key:"Clearwater Beach"}},
+  {name:"St. Pete Beach, FL", region:"Tampa Bay", lat:27.725, lon:-82.746, tide:"TEC4271", buoy:"42098", face:250, slope:0.03, usgs:1, cfg:GULF, nws:{office:"TBW", file:"fzus52.ktbw.srf.tbw.txt", key:"Clearwater Beach"}},
+  {name:"Pass-a-Grille, FL", region:"Tampa Bay", lat:27.69, lon:-82.738, tide:"TEC4271", buoy:"42098", face:245, slope:0.03, usgs:1, cfg:GULF, nws:{office:"TBW", file:"fzus52.ktbw.srf.tbw.txt", key:"Clearwater Beach"}},
+  {name:"Anna Maria Island, FL", region:"Tampa Bay", lat:27.531, lon:-82.737, tide:"8726243", buoy:"42098", face:260, slope:0.032, usgs:1, cfg:GULF, nws:{office:"TBW", file:"fzus52.ktbw.srf.tbw.txt", key:"Clearwater Beach"}},
+  {name:"Bradenton Beach, FL", region:"Tampa Bay", lat:27.468, lon:-82.7, tide:"8726243", buoy:"42098", face:255, slope:0.044, usgs:1, cfg:GULF, nws:{office:"TBW", file:"fzus52.ktbw.srf.tbw.txt", key:"Clearwater Beach"}},
+  {name:"Fred Howard Park, FL", region:"Tampa Bay", lat:28.155, lon:-82.808, tide:"8726809", buoy:"42098", face:260, slope:0.03, usgs:1, cfg:GULF, nws:{office:"TBW", file:"fzus52.ktbw.srf.tbw.txt", key:"Clearwater Beach"}},
+  {name:"Caladesi Island, FL", region:"Tampa Bay", lat:28.03, lon:-82.823, tide:"8726809", buoy:"42098", face:270, slope:0.03, usgs:1, cfg:GULF, nws:{office:"TBW", file:"fzus52.ktbw.srf.tbw.txt", key:"Clearwater Beach"}},
+  {name:"Sand Key Park, FL", region:"Tampa Bay", lat:27.958, lon:-82.83, tide:"8726724", buoy:"42098", face:270, slope:0.03, usgs:1, cfg:GULF, nws:{office:"TBW", file:"fzus52.ktbw.srf.tbw.txt", key:"Clearwater Beach"}},
+  {name:"Belleair Beach, FL", region:"Tampa Bay", lat:27.93, lon:-82.845, tide:"8726724", buoy:"42098", face:265, slope:0.051, usgs:1, cfg:GULF, nws:{office:"TBW", file:"fzus52.ktbw.srf.tbw.txt", key:"Clearwater Beach"}},
+  {name:"Redington Shores, FL", region:"Tampa Bay", lat:27.83, lon:-82.832, tide:"8726601", buoy:"42098", face:255, slope:0.032, usgs:1, cfg:GULF, nws:{office:"TBW", file:"fzus52.ktbw.srf.tbw.txt", key:"Clearwater Beach"}},
+  {name:"Sunset Beach (Treasure Island), FL", region:"Tampa Bay", lat:27.745, lon:-82.757, tide:"8726533", buoy:"42098", face:245, slope:0.035, usgs:1, cfg:GULF, nws:{office:"TBW", file:"fzus52.ktbw.srf.tbw.txt", key:"Clearwater Beach"}},
+  {name:"Upham Beach, FL", region:"Tampa Bay", lat:27.738, lon:-82.752, tide:"8726533", buoy:"42098", face:250, slope:0.03, usgs:1, cfg:GULF, nws:{office:"TBW", file:"fzus52.ktbw.srf.tbw.txt", key:"Clearwater Beach"}},
+  {name:"Fort De Soto (North Beach), FL", region:"Tampa Bay", lat:27.638, lon:-82.74, tide:"TEC4271", buoy:"42098", face:260, slope:0.03, usgs:1, cfg:GULF, nws:{office:"TBW", file:"fzus52.ktbw.srf.tbw.txt", key:"Clearwater Beach"}},
+  {name:"Holmes Beach, FL", region:"Tampa Bay", lat:27.51, lon:-82.72, tide:"8726243", buoy:"42098", face:255, slope:0.035, usgs:1, cfg:GULF, nws:{office:"TBW", file:"fzus52.ktbw.srf.tbw.txt", key:"Clearwater Beach"}},
+  {name:"Coquina Beach, FL", region:"Tampa Bay", lat:27.45, lon:-82.692, tide:"8726243", buoy:"42098", face:250, slope:0.039, usgs:1, cfg:GULF, nws:{office:"TBW", file:"fzus52.ktbw.srf.tbw.txt", key:"Clearwater Beach"}},
+  // Sarasota
+  {name:"Longboat Key, FL", region:"Sarasota", lat:27.4, lon:-82.662, tide:"8726243", buoy:"42098", face:250, slope:0.045, usgs:1, cfg:GULF, nws:{office:"TBW", file:"fzus52.ktbw.srf.tbw.txt", key:"Clearwater Beach"}},
+  {name:"Lido Key, FL", region:"Sarasota", lat:27.312, lon:-82.58, tide:"8726034", buoy:"42098", face:250, slope:0.03, usgs:1, cfg:GULF, nws:{office:"TBW", file:"fzus52.ktbw.srf.tbw.txt", key:"Clearwater Beach"}},
+  {name:"Siesta Key, FL", region:"Sarasota", lat:27.266, lon:-82.552, tide:"8726034", buoy:"42098", face:250, slope:0.03, usgs:1, cfg:GULF, nws:{office:"TBW", file:"fzus52.ktbw.srf.tbw.txt", key:"Clearwater Beach"}},
+  {name:"Venice, FL", region:"Sarasota", lat:27.1, lon:-82.461, tide:"8725858", buoy:"42098", face:265, slope:0.084, usgs:1, cfg:GULF, nws:{office:"TBW", file:"fzus52.ktbw.srf.tbw.txt", key:"Clearwater Beach"}},
+  {name:"Manasota Key, FL", region:"Sarasota", lat:26.97, lon:-82.4, tide:"8725858", buoy:null, face:250, slope:0.062, usgs:1, cfg:GULF, nws:{office:"TBW", file:"fzus52.ktbw.srf.tbw.txt", key:"Fort Myers Beach"}},
+  {name:"Whitney Beach (Longboat), FL", region:"Sarasota", lat:27.44, lon:-82.688, tide:"8726243", buoy:"42098", face:250, slope:0.038, usgs:1, cfg:GULF, nws:{office:"TBW", file:"fzus52.ktbw.srf.tbw.txt", key:"Clearwater Beach"}},
+  {name:"North Lido Beach, FL", region:"Sarasota", lat:27.325, lon:-82.587, tide:"8726034", buoy:"42098", face:250, slope:0.03, usgs:1, cfg:GULF, nws:{office:"TBW", file:"fzus52.ktbw.srf.tbw.txt", key:"Clearwater Beach"}},
+  {name:"South Lido Beach, FL", region:"Sarasota", lat:27.3, lon:-82.57, tide:"8726034", buoy:"42098", face:240, slope:0.03, usgs:1, cfg:GULF, nws:{office:"TBW", file:"fzus52.ktbw.srf.tbw.txt", key:"Clearwater Beach"}},
+  {name:"Crescent Beach (Siesta), FL", region:"Sarasota", lat:27.255, lon:-82.545, tide:"8726034", buoy:"42098", face:250, slope:0.03, usgs:1, cfg:GULF, nws:{office:"TBW", file:"fzus52.ktbw.srf.tbw.txt", key:"Clearwater Beach"}},
+  {name:"Turtle Beach, FL", region:"Sarasota", lat:27.22, lon:-82.518, tide:"8726034", buoy:"42098", face:250, slope:0.071, usgs:1, cfg:GULF, nws:{office:"TBW", file:"fzus52.ktbw.srf.tbw.txt", key:"Clearwater Beach"}},
+  {name:"Nokomis Beach, FL", region:"Sarasota", lat:27.125, lon:-82.47, tide:"8725858", buoy:"42098", face:260, slope:0.065, usgs:1, cfg:GULF, nws:{office:"TBW", file:"fzus52.ktbw.srf.tbw.txt", key:"Clearwater Beach"}},
+  {name:"Brohard Beach (Venice), FL", region:"Sarasota", lat:27.07, lon:-82.45, tide:"8725858", buoy:"42098", face:260, slope:0.063, usgs:1, cfg:GULF, nws:{office:"TBW", file:"fzus52.ktbw.srf.tbw.txt", key:"Clearwater Beach"}},
+  {name:"Caspersen Beach, FL", region:"Sarasota", lat:27.058, lon:-82.443, tide:"8725858", buoy:"42098", face:260, slope:0.062, usgs:1, cfg:GULF, nws:{office:"TBW", file:"fzus52.ktbw.srf.tbw.txt", key:"Clearwater Beach"}},
+  {name:"Englewood Beach, FL", region:"Sarasota", lat:26.93, lon:-82.36, tide:"8725858", buoy:null, face:240, slope:0.057, usgs:1, cfg:GULF, nws:{office:"TBW", file:"fzus52.ktbw.srf.tbw.txt", key:"Fort Myers Beach"}},
+  {name:"Stump Pass Beach, FL", region:"Sarasota", lat:26.9, lon:-82.337, tide:"8725577", buoy:null, face:240, slope:0.052, usgs:1, cfg:GULF, nws:{office:"TBW", file:"fzus52.ktbw.srf.tbw.txt", key:"Fort Myers Beach"}},
+  {name:"Point of Rocks (Siesta), FL", region:"Sarasota", lat:27.245, lon:-82.538, tide:"8726034", buoy:"42098", face:250, slope:0.066, usgs:1, cfg:GULF, nws:{office:"TBW", file:"fzus52.ktbw.srf.tbw.txt", key:"Clearwater Beach"}},
+  // Southwest Florida
+  {name:"Sanibel, FL", region:"Southwest Florida", lat:26.44, lon:-82.08, tide:"TEC4207", buoy:null, face:200, slope:0.037, usgs:1, cfg:GULF, nws:{office:"TBW", file:"fzus52.ktbw.srf.tbw.txt", key:"Fort Myers Beach"}},
+  {name:"Fort Myers Beach, FL", region:"Southwest Florida", lat:26.452, lon:-81.95, tide:"TEC4207", buoy:null, face:220, slope:0.03, usgs:1, cfg:GULF, nws:{office:"TBW", file:"fzus52.ktbw.srf.tbw.txt", key:"Fort Myers Beach"}},
+  {name:"Bonita Beach, FL", region:"Southwest Florida", lat:26.33, lon:-81.848, tide:"8725283", buoy:null, face:260, slope:0.052, usgs:1, cfg:GULF, nws:{office:"TBW", file:"fzus52.ktbw.srf.tbw.txt", key:"Fort Myers Beach"}},
+  {name:"Naples, FL", region:"Southwest Florida", lat:26.131, lon:-81.808, tide:"8725110", buoy:null, face:265, slope:0.033, usgs:1, cfg:GULF, nws:MFL("Naples")},
+  {name:"Marco Island, FL", region:"Southwest Florida", lat:25.94, lon:-81.728, tide:"8724967", buoy:null, face:250, slope:0.03, usgs:1, cfg:GULF, nws:MFL("Naples")},
+  {name:"Boca Grande, FL", region:"Southwest Florida", lat:26.75, lon:-82.263, tide:"8725577", buoy:null, face:250, slope:0.068, usgs:1, cfg:GULF, nws:{office:"TBW", file:"fzus52.ktbw.srf.tbw.txt", key:"Fort Myers Beach"}},
+  {name:"Captiva, FL", region:"Southwest Florida", lat:26.53, lon:-82.192, tide:"8725383", buoy:null, face:260, slope:0.052, usgs:1, cfg:GULF, nws:{office:"TBW", file:"fzus52.ktbw.srf.tbw.txt", key:"Fort Myers Beach"}},
+  {name:"Bowman's Beach (Sanibel), FL", region:"Southwest Florida", lat:26.462, lon:-82.158, tide:"8725383", buoy:null, face:220, slope:0.03, usgs:1, cfg:GULF, nws:{office:"TBW", file:"fzus52.ktbw.srf.tbw.txt", key:"Fort Myers Beach"}},
+  {name:"Lighthouse Beach (Sanibel), FL", region:"Southwest Florida", lat:26.452, lon:-82.015, tide:"TEC4207", buoy:null, face:180, slope:0.035, cfg:GULF, nws:{office:"TBW", file:"fzus52.ktbw.srf.tbw.txt", key:"Fort Myers Beach"}},
+  {name:"Lovers Key, FL", region:"Southwest Florida", lat:26.39, lon:-81.872, tide:"8725283", buoy:null, face:240, slope:0.041, usgs:1, cfg:GULF, nws:{office:"TBW", file:"fzus52.ktbw.srf.tbw.txt", key:"Fort Myers Beach"}},
+  {name:"Barefoot Beach, FL", region:"Southwest Florida", lat:26.31, lon:-81.84, tide:"8725283", buoy:null, face:265, slope:0.036, usgs:1, cfg:GULF, nws:MFL("Naples")},
+  {name:"Delnor-Wiggins Pass, FL", region:"Southwest Florida", lat:26.28, lon:-81.83, tide:"8725283", buoy:null, face:265, slope:0.045, usgs:1, cfg:GULF, nws:MFL("Naples")},
+  {name:"Vanderbilt Beach, FL", region:"Southwest Florida", lat:26.255, lon:-81.825, tide:"8725283", buoy:null, face:265, slope:0.043, usgs:1, cfg:GULF, nws:MFL("Naples")},
+  {name:"Clam Pass Beach, FL", region:"Southwest Florida", lat:26.215, lon:-81.817, tide:"8725110", buoy:null, face:265, slope:0.051, usgs:1, cfg:GULF, nws:MFL("Naples")},
+  {name:"Lowdermilk Park, FL", region:"Southwest Florida", lat:26.15, lon:-81.81, tide:"8725110", buoy:null, face:265, slope:0.034, usgs:1, cfg:GULF, nws:MFL("Naples")},
+  {name:"Tigertail Beach (Marco), FL", region:"Southwest Florida", lat:25.95, lon:-81.745, tide:"8724967", buoy:null, face:265, slope:0.03, usgs:1, cfg:GULF, nws:MFL("Naples")},
+  {name:"South Marco Beach, FL", region:"Southwest Florida", lat:25.915, lon:-81.722, tide:"8724967", buoy:null, face:220, slope:0.03, usgs:1, cfg:GULF, nws:MFL("Naples")},
+  {name:"Seagate Beach (Naples), FL", region:"Southwest Florida", lat:26.19, lon:-81.815, tide:"8725110", buoy:null, face:265, slope:0.042, usgs:1, cfg:GULF, nws:MFL("Naples")},
+  {name:"Blind Pass (Sanibel), FL", region:"Southwest Florida", lat:26.482, lon:-82.183, tide:"8725383", buoy:null, face:230, slope:0.046, usgs:1, cfg:GULF, nws:{office:"TBW", file:"fzus52.ktbw.srf.tbw.txt", key:"Fort Myers Beach"}},
+  {name:"Bowditch Point, FL", region:"Southwest Florida", lat:26.464, lon:-81.965, tide:"TEC4207", buoy:null, face:220, slope:0.03, usgs:1, cfg:GULF, nws:{office:"TBW", file:"fzus52.ktbw.srf.tbw.txt", key:"Fort Myers Beach"}},
+  // Panhandle
+  {name:"Pensacola Beach, FL", region:"Panhandle", lat:30.329, lon:-87.142, tide:"8729807", buoy:"42012", face:180, slope:0.041, usgs:1, cfg:GULF, nws:{office:"MOB", file:"fzus54.kmob.srf.mob.txt", key:"Destin"}},
+  {name:"Navarre Beach, FL", region:"Panhandle", lat:30.377, lon:-86.862, tide:"8729678", buoy:"42012", face:180, slope:0.045, usgs:1, cfg:GULF, nws:{office:"MOB", file:"fzus54.kmob.srf.mob.txt", key:"Destin"}},
+  {name:"Destin, FL", region:"Panhandle", lat:30.385, lon:-86.47, tide:"8729511", buoy:null, face:185, slope:0.045, usgs:1, cfg:GULF, nws:{office:"MOB", file:"fzus54.kmob.srf.mob.txt", key:"Destin"}},
+  {name:"Panama City Beach, FL", region:"Panhandle", lat:30.175, lon:-85.805, tide:"8729210", buoy:null, face:205, slope:0.03, usgs:1, cfg:GULF, nws:{office:"TAE", file:"fzus52.ktae.srf.tae.txt", key:"Panama City Beach"}},
+  {name:"Perdido Key, FL", region:"Panhandle", lat:30.29, lon:-87.46, tide:"8730667", buoy:"42012", face:180, slope:0.033, usgs:1, cfg:GULF, nws:{office:"MOB", file:"fzus54.kmob.srf.mob.txt", key:"Destin"}},
+  {name:"Johnson Beach, FL", region:"Panhandle", lat:30.32, lon:-87.36, tide:"8729887", buoy:"42012", face:180, slope:0.041, usgs:1, cfg:GULF, nws:{office:"MOB", file:"fzus54.kmob.srf.mob.txt", key:"Destin"}},
+  {name:"Fort Pickens, FL", region:"Panhandle", lat:30.32, lon:-87.28, tide:"8729887", buoy:"42012", face:180, slope:0.03, usgs:1, cfg:GULF, nws:{office:"MOB", file:"fzus54.kmob.srf.mob.txt", key:"Destin"}},
+  {name:"Opal Beach, FL", region:"Panhandle", lat:30.358, lon:-86.985, tide:"8729678", buoy:"42012", face:180, slope:0.03, usgs:1, cfg:GULF, nws:{office:"MOB", file:"fzus54.kmob.srf.mob.txt", key:"Destin"}},
+  {name:"Okaloosa Island, FL", region:"Panhandle", lat:30.392, lon:-86.6, tide:"8729511", buoy:null, face:180, slope:0.038, usgs:1, cfg:GULF, nws:{office:"MOB", file:"fzus54.kmob.srf.mob.txt", key:"Destin"}},
+  {name:"Henderson Beach, FL", region:"Panhandle", lat:30.385, lon:-86.445, tide:"8729511", buoy:null, face:185, slope:0.045, usgs:1, cfg:GULF, nws:{office:"MOB", file:"fzus54.kmob.srf.mob.txt", key:"Destin"}},
+  {name:"Miramar Beach, FL", region:"Panhandle", lat:30.372, lon:-86.36, tide:"8729511", buoy:null, face:185, slope:0.038, usgs:1, cfg:GULF, nws:{office:"MOB", file:"fzus54.kmob.srf.mob.txt", key:"Destin"}},
+  {name:"Rosemary Beach, FL", region:"Panhandle", lat:30.28, lon:-86.015, tide:"8729210", buoy:null, face:195, slope:0.052, usgs:1, cfg:GULF, nws:{office:"TAE", file:"fzus52.ktae.srf.tae.txt", key:"Panama City Beach"}},
+  {name:"St. Andrews State Park, FL", region:"Panhandle", lat:30.128, lon:-85.738, tide:"8729136", buoy:null, face:205, slope:0.048, usgs:1, cfg:GULF, nws:{office:"TAE", file:"fzus52.ktae.srf.tae.txt", key:"Panama City Beach"}},
+  {name:"Mexico Beach, FL", region:"Panhandle", lat:29.94, lon:-85.415, tide:"8728958", buoy:null, face:210, slope:0.032, usgs:1, cfg:GULF, nws:{office:"TAE", file:"fzus52.ktae.srf.tae.txt", key:"Panama City Beach"}},
+  {name:"Cape San Blas, FL", region:"Panhandle", lat:29.67, lon:-85.355, tide:"8728978", buoy:null, face:240, slope:0.03, usgs:1, cfg:GULF, nws:{office:"TAE", file:"fzus52.ktae.srf.tae.txt", key:"Panama City Beach"}},
+  {name:"Laguna Beach, FL", region:"Panhandle", lat:30.24, lon:-85.925, tide:"8729210", buoy:null, face:200, slope:0.042, usgs:1, cfg:GULF, nws:{office:"TAE", file:"fzus52.ktae.srf.tae.txt", key:"Panama City Beach"}},
+  // San Diego
+  {name:"Oceanside, CA",           region:"San Diego", lat:33.19, lon:-117.39, tide:"9410230", buoy:"46224", face:260, slope:0.038, usgs:1, cfg:WEST, nws:{office:"SGX", file:"fzus56.ksgx.srf.sgx.txt", key:"San Diego County Coastal"}},
+  {name:"Imperial Beach, CA", region:"San Diego", lat:32.579, lon:-117.135, tide:"9410120", buoy:"46232", face:265, slope:0.04, usgs:1, cfg:WEST, nws:{office:"SGX", file:"fzus56.ksgx.srf.sgx.txt", key:"San Diego County Coastal"}},
+  {name:"Coronado, CA", region:"San Diego", lat:32.681, lon:-117.181, tide:"TWC0405", buoy:"46254", face:240, slope:0.038, usgs:1, cfg:WEST, nws:{office:"SGX", file:"fzus56.ksgx.srf.sgx.txt", key:"San Diego County Coastal"}},
+  {name:"Ocean Beach, San Diego, CA", region:"San Diego", lat:32.75, lon:-117.254, tide:"TWC0405", buoy:"46254", face:270, slope:0.047, usgs:1, cfg:WEST, nws:{office:"SGX", file:"fzus56.ksgx.srf.sgx.txt", key:"San Diego County Coastal"}},
+  {name:"Pacific Beach, CA", region:"San Diego", lat:32.797, lon:-117.257, tide:"9410230", buoy:"46254", face:265, slope:0.034, usgs:1, cfg:WEST, nws:{office:"SGX", file:"fzus56.ksgx.srf.sgx.txt", key:"San Diego County Coastal"}},
+  {name:"La Jolla Shores, CA", region:"San Diego", lat:32.858, lon:-117.257, tide:"9410230", buoy:"46254", face:290, slope:0.03, usgs:1, cfg:WEST, nws:{office:"SGX", file:"fzus56.ksgx.srf.sgx.txt", key:"San Diego County Coastal"}},
+  {name:"Del Mar, CA", region:"San Diego", lat:32.959, lon:-117.269, tide:"9410230", buoy:"46266", face:260, slope:0.036, usgs:1, cfg:WEST, nws:{office:"SGX", file:"fzus56.ksgx.srf.sgx.txt", key:"San Diego County Coastal"}},
+  {name:"Solana Beach, CA", region:"San Diego", lat:32.991, lon:-117.274, tide:"9410230", buoy:"46266", face:260, slope:0.034, usgs:1, cfg:WEST, nws:{office:"SGX", file:"fzus56.ksgx.srf.sgx.txt", key:"San Diego County Coastal"}},
+  {name:"Cardiff, CA", region:"San Diego", lat:33.015, lon:-117.282, tide:"9410230", buoy:"46274", face:255, slope:0.03, usgs:1, cfg:WEST, nws:{office:"SGX", file:"fzus56.ksgx.srf.sgx.txt", key:"San Diego County Coastal"}},
+  {name:"Encinitas (Moonlight), CA", region:"San Diego", lat:33.047, lon:-117.297, tide:"9410230", buoy:"46274", face:255, slope:0.038, usgs:1, cfg:WEST, nws:{office:"SGX", file:"fzus56.ksgx.srf.sgx.txt", key:"San Diego County Coastal"}},
+  {name:"Silver Strand, CA", region:"San Diego", lat:32.63, lon:-117.142, tide:"9410120", buoy:"46254", face:255, slope:0.033, usgs:1, cfg:WEST, nws:{office:"SGX", file:"fzus56.ksgx.srf.sgx.txt", key:"San Diego County Coastal"}},
+  {name:"Mission Beach, CA", region:"San Diego", lat:32.775, lon:-117.253, tide:"9410230", buoy:"46254", face:270, slope:0.042, usgs:1, cfg:WEST, nws:{office:"SGX", file:"fzus56.ksgx.srf.sgx.txt", key:"San Diego County Coastal"}},
+  {name:"Tourmaline, CA", region:"San Diego", lat:32.805, lon:-117.262, tide:"9410230", buoy:"46254", face:265, slope:0.032, usgs:1, cfg:WEST, nws:{office:"SGX", file:"fzus56.ksgx.srf.sgx.txt", key:"San Diego County Coastal"}},
+  {name:"Windansea, CA", region:"San Diego", lat:32.83, lon:-117.282, tide:"9410230", buoy:"46254", face:265, slope:0.085, usgs:1, cfg:WEST, nws:{office:"SGX", file:"fzus56.ksgx.srf.sgx.txt", key:"San Diego County Coastal"}},
+  {name:"Black's Beach, CA", region:"San Diego", lat:32.89, lon:-117.253, tide:"9410230", buoy:"46254", face:270, slope:0.035, usgs:1, cfg:WEST, nws:{office:"SGX", file:"fzus56.ksgx.srf.sgx.txt", key:"San Diego County Coastal"}},
+  {name:"Torrey Pines, CA", region:"San Diego", lat:32.925, lon:-117.26, tide:"9410230", buoy:"46266", face:265, slope:0.042, usgs:1, cfg:WEST, nws:{office:"SGX", file:"fzus56.ksgx.srf.sgx.txt", key:"San Diego County Coastal"}},
+  {name:"Swami's, CA", region:"San Diego", lat:33.035, lon:-117.293, tide:"9410230", buoy:"46274", face:255, slope:0.032, usgs:1, cfg:WEST, nws:{office:"SGX", file:"fzus56.ksgx.srf.sgx.txt", key:"San Diego County Coastal"}},
+  {name:"Beacon's, CA", region:"San Diego", lat:33.065, lon:-117.305, tide:"9410230", buoy:"46274", face:255, slope:0.038, usgs:1, cfg:WEST, nws:{office:"SGX", file:"fzus56.ksgx.srf.sgx.txt", key:"San Diego County Coastal"}},
+  {name:"Grandview (Leucadia), CA", region:"San Diego", lat:33.075, lon:-117.311, tide:"9410230", buoy:"46274", face:255, slope:0.04, usgs:1, cfg:WEST, nws:{office:"SGX", file:"fzus56.ksgx.srf.sgx.txt", key:"San Diego County Coastal"}},
+  // Orange County
+  {name:"Laguna Beach, CA",        region:"Orange County", lat:33.54, lon:-117.79, tide:"9410580", buoy:"46253", face:245, slope:0.064, usgs:1, cfg:WEST, nws:{office:"SGX", file:"fzus56.ksgx.srf.sgx.txt", key:"Orange County Coastal"}},
+  {name:"San Clemente, CA", region:"Orange County", lat:33.418, lon:-117.62, tide:"TWC0419", buoy:"46285", face:225, slope:0.042, usgs:1, cfg:WEST, nws:{office:"SGX", file:"fzus56.ksgx.srf.sgx.txt", key:"Orange County Coastal"}},
+  {name:"Doheny, CA", region:"Orange County", lat:33.46, lon:-117.687, tide:"TWC0419", buoy:"46285", face:180, slope:0.084, usgs:1, cfg:WEST, nws:{office:"SGX", file:"fzus56.ksgx.srf.sgx.txt", key:"Orange County Coastal"}},
+  {name:"Aliso Beach, CA", region:"Orange County", lat:33.51, lon:-117.752, tide:"9410580", buoy:"46285", face:230, slope:0.092, usgs:1, cfg:WEST, nws:{office:"SGX", file:"fzus56.ksgx.srf.sgx.txt", key:"Orange County Coastal"}},
+  {name:"Victoria Beach, CA", region:"Orange County", lat:33.521, lon:-117.763, tide:"9410580", buoy:"46285", face:230, slope:0.073, usgs:1, cfg:WEST, nws:{office:"SGX", file:"fzus56.ksgx.srf.sgx.txt", key:"Orange County Coastal"}},
+  {name:"Crystal Cove, CA", region:"Orange County", lat:33.571, lon:-117.838, tide:"9410580", buoy:"46285", face:225, slope:0.042, usgs:1, cfg:WEST, nws:{office:"SGX", file:"fzus56.ksgx.srf.sgx.txt", key:"Orange County Coastal"}},
+  {name:"Corona del Mar, CA", region:"Orange County", lat:33.591, lon:-117.873, tide:"9410580", buoy:"46285", face:210, slope:0.072, usgs:1, cfg:WEST, nws:{office:"SGX", file:"fzus56.ksgx.srf.sgx.txt", key:"Orange County Coastal"}},
+  {name:"The Wedge (Newport), CA", region:"Orange County", lat:33.593, lon:-117.882, tide:"9410580", buoy:"46285", face:200, slope:0.092, usgs:1, cfg:WEST, nws:{office:"SGX", file:"fzus56.ksgx.srf.sgx.txt", key:"Orange County Coastal"}},
+  {name:"Newport Beach, CA", region:"Orange County", lat:33.607, lon:-117.93, tide:"9410583", buoy:"46253", face:215, slope:0.034, usgs:1, cfg:WEST, nws:{office:"SGX", file:"fzus56.ksgx.srf.sgx.txt", key:"Orange County Coastal"}},
+  {name:"Huntington Beach, CA", region:"Orange County", lat:33.655, lon:-118.003, tide:"9410583", buoy:"46253", face:220, slope:0.038, usgs:1, cfg:WEST, nws:{office:"SGX", file:"fzus56.ksgx.srf.sgx.txt", key:"Orange County Coastal"}},
+  {name:"Seal Beach, CA", region:"Orange County", lat:33.74, lon:-118.105, tide:"9410680", buoy:"46256", face:210, slope:0.078, usgs:1, cfg:WEST, nws:{office:"SGX", file:"fzus56.ksgx.srf.sgx.txt", key:"Orange County Coastal"}},
+  {name:"Trestles, CA", region:"Orange County", lat:33.385, lon:-117.59, tide:"TWC0419", buoy:"46277", face:215, slope:0.088, usgs:1, cfg:WEST, nws:{office:"SGX", file:"fzus56.ksgx.srf.sgx.txt", key:"Orange County Coastal"}},
+  {name:"T-Street, CA", region:"Orange County", lat:33.415, lon:-117.616, tide:"TWC0419", buoy:"46285", face:225, slope:0.041, usgs:1, cfg:WEST, nws:{office:"SGX", file:"fzus56.ksgx.srf.sgx.txt", key:"Orange County Coastal"}},
+  {name:"Poche Beach, CA", region:"Orange County", lat:33.44, lon:-117.642, tide:"TWC0419", buoy:"46285", face:220, slope:0.065, usgs:1, cfg:WEST, nws:{office:"SGX", file:"fzus56.ksgx.srf.sgx.txt", key:"Orange County Coastal"}},
+  {name:"Capistrano Beach, CA", region:"Orange County", lat:33.455, lon:-117.668, tide:"TWC0419", buoy:"46285", face:200, slope:0.05, usgs:1, cfg:WEST, nws:{office:"SGX", file:"fzus56.ksgx.srf.sgx.txt", key:"Orange County Coastal"}},
+  {name:"Strands Beach, CA", region:"Orange County", lat:33.47, lon:-117.712, tide:"TWC0419", buoy:"46285", face:230, slope:0.038, usgs:1, cfg:WEST, nws:{office:"SGX", file:"fzus56.ksgx.srf.sgx.txt", key:"Orange County Coastal"}},
+  {name:"Salt Creek, CA", region:"Orange County", lat:33.478, lon:-117.722, tide:"TWC0419", buoy:"46285", face:235, slope:0.038, usgs:1, cfg:WEST, nws:{office:"SGX", file:"fzus56.ksgx.srf.sgx.txt", key:"Orange County Coastal"}},
+  {name:"Thousand Steps, CA", region:"Orange County", lat:33.495, lon:-117.742, tide:"TWC0419", buoy:"46285", face:230, slope:0.065, usgs:1, cfg:WEST, nws:{office:"SGX", file:"fzus56.ksgx.srf.sgx.txt", key:"Orange County Coastal"}},
+  {name:"Brooks Street, CA", region:"Orange County", lat:33.534, lon:-117.778, tide:"9410580", buoy:"46285", face:240, slope:0.072, usgs:1, cfg:WEST, nws:{office:"SGX", file:"fzus56.ksgx.srf.sgx.txt", key:"Orange County Coastal"}},
+  {name:"Thalia Street, CA", region:"Orange County", lat:33.537, lon:-117.781, tide:"9410580", buoy:"46285", face:240, slope:0.065, usgs:1, cfg:WEST, nws:{office:"SGX", file:"fzus56.ksgx.srf.sgx.txt", key:"Orange County Coastal"}},
+  {name:"Crescent Bay (Laguna), CA", region:"Orange County", lat:33.546, lon:-117.802, tide:"9410580", buoy:"46285", face:250, slope:0.061, usgs:1, cfg:WEST, nws:{office:"SGX", file:"fzus56.ksgx.srf.sgx.txt", key:"Orange County Coastal"}},
+  {name:"Little Corona, CA", region:"Orange County", lat:33.589, lon:-117.868, tide:"9410580", buoy:"46285", face:210, slope:0.069, usgs:1, cfg:WEST, nws:{office:"SGX", file:"fzus56.ksgx.srf.sgx.txt", key:"Orange County Coastal"}},
+  {name:"Balboa Pier, CA", region:"Orange County", lat:33.6, lon:-117.9, tide:"9410583", buoy:"46253", face:200, slope:0.105, usgs:1, cfg:WEST, nws:{office:"SGX", file:"fzus56.ksgx.srf.sgx.txt", key:"Orange County Coastal"}},
+  {name:"56th Street (Newport), CA", region:"Orange County", lat:33.628, lon:-117.955, tide:"9410583", buoy:"46253", face:220, slope:0.044, usgs:1, cfg:WEST, nws:{office:"SGX", file:"fzus56.ksgx.srf.sgx.txt", key:"Orange County Coastal"}},
+  {name:"Huntington State Beach, CA", region:"Orange County", lat:33.643, lon:-117.98, tide:"9410583", buoy:"46253", face:215, slope:0.051, usgs:1, cfg:WEST, nws:{office:"SGX", file:"fzus56.ksgx.srf.sgx.txt", key:"Orange County Coastal"}},
+  {name:"Huntington Dog Beach, CA", region:"Orange County", lat:33.672, lon:-118.016, tide:"9410583", buoy:"46256", face:225, slope:0.042, usgs:1, cfg:WEST, nws:{office:"SGX", file:"fzus56.ksgx.srf.sgx.txt", key:"Orange County Coastal"}},
+  {name:"Bolsa Chica, CA", region:"Orange County", lat:33.7, lon:-118.048, tide:"9410680", buoy:"46256", face:225, slope:0.062, usgs:1, cfg:WEST, nws:{office:"SGX", file:"fzus56.ksgx.srf.sgx.txt", key:"Orange County Coastal"}},
+  {name:"Sunset Beach, CA", region:"Orange County", lat:33.72, lon:-118.073, tide:"9410680", buoy:"46256", face:225, slope:0.074, usgs:1, cfg:WEST, nws:{office:"SGX", file:"fzus56.ksgx.srf.sgx.txt", key:"Orange County Coastal"}},
+  {name:"San Onofre, CA", region:"Orange County", lat:33.375, lon:-117.567, tide:"TWC0419", buoy:"46277", face:215, slope:0.076, usgs:1, cfg:WEST, nws:{office:"SGX", file:"fzus56.ksgx.srf.sgx.txt", key:"Orange County Coastal"}},
+  // Los Angeles
+  {name:"Redondo Beach, CA", region:"Los Angeles", lat:33.842, lon:-118.392, tide:"9410738", buoy:"46221", face:255, slope:0.108, usgs:1, cfg:WEST, nws:{office:"LOX", file:"fzus56.klox.srf.lox.txt", key:"Los Angeles County Beaches"}},
+  {name:"Hermosa Beach, CA", region:"Los Angeles", lat:33.862, lon:-118.402, tide:"9410738", buoy:"46221", face:265, slope:0.055, usgs:1, cfg:WEST, nws:{office:"LOX", file:"fzus56.klox.srf.lox.txt", key:"Los Angeles County Beaches"}},
+  {name:"Manhattan Beach, CA", region:"Los Angeles", lat:33.885, lon:-118.413, tide:"9410777", buoy:"46221", face:265, slope:0.046, usgs:1, cfg:WEST, nws:{office:"LOX", file:"fzus56.klox.srf.lox.txt", key:"Los Angeles County Beaches"}},
+  {name:"Venice Beach, CA", region:"Los Angeles", lat:33.985, lon:-118.475, tide:"9410840", buoy:"46268", face:240, slope:0.045, usgs:1, cfg:WEST, nws:{office:"LOX", file:"fzus56.klox.srf.lox.txt", key:"Los Angeles County Beaches"}},
+  {name:"Santa Monica, CA", region:"Los Angeles", lat:34.008, lon:-118.497, tide:"9410840", buoy:"46268", face:225, slope:0.043, usgs:1, cfg:WEST, nws:{office:"LOX", file:"fzus56.klox.srf.lox.txt", key:"Los Angeles County Beaches"}},
+  {name:"Malibu (Surfrider), CA", region:"Los Angeles", lat:34.035, lon:-118.678, tide:"9410840", buoy:"46268", face:180, slope:0.072, usgs:1, cfg:WEST, nws:{office:"LOX", file:"fzus56.klox.srf.lox.txt", key:"Malibu Coast"}},
+  {name:"Torrance Beach, CA", region:"Los Angeles", lat:33.81, lon:-118.393, tide:"9410738", buoy:"46256", face:250, slope:0.085, usgs:1, cfg:WEST, nws:{office:"LOX", file:"fzus56.klox.srf.lox.txt", key:"Los Angeles County Beaches"}},
+  {name:"El Porto, CA", region:"Los Angeles", lat:33.9, lon:-118.421, tide:"9410777", buoy:"46268", face:260, slope:0.043, usgs:1, cfg:WEST, nws:{office:"LOX", file:"fzus56.klox.srf.lox.txt", key:"Los Angeles County Beaches"}},
+  {name:"Dockweiler, CA", region:"Los Angeles", lat:33.93, lon:-118.438, tide:"9410777", buoy:"46268", face:255, slope:0.064, usgs:1, cfg:WEST, nws:{office:"LOX", file:"fzus56.klox.srf.lox.txt", key:"Los Angeles County Beaches"}},
+  {name:"Playa del Rey, CA", region:"Los Angeles", lat:33.955, lon:-118.447, tide:"9410777", buoy:"46268", face:250, slope:0.08, usgs:1, cfg:WEST, nws:{office:"LOX", file:"fzus56.klox.srf.lox.txt", key:"Los Angeles County Beaches"}},
+  {name:"Will Rogers Beach, CA", region:"Los Angeles", lat:34.033, lon:-118.535, tide:"9410840", buoy:"46268", face:200, slope:0.07, usgs:1, cfg:WEST, nws:{office:"LOX", file:"fzus56.klox.srf.lox.txt", key:"Los Angeles County Beaches"}},
+  {name:"Topanga Beach, CA", region:"Los Angeles", lat:34.039, lon:-118.582, tide:"9410840", buoy:"46268", face:190, slope:0.078, usgs:1, cfg:WEST, nws:{office:"LOX", file:"fzus56.klox.srf.lox.txt", key:"Malibu Coast"}},
+  {name:"Leo Carrillo, CA", region:"Los Angeles", lat:34.043, lon:-118.935, tide:"TWC0445", buoy:"46268", face:210, slope:0.068, usgs:1, cfg:WEST, nws:{office:"LOX", file:"fzus56.klox.srf.lox.txt", key:"Malibu Coast"}},
+  // Central Coast
+  {name:"Ventura, CA", region:"Central Coast", lat:34.275, lon:-119.293, tide:"9411189", buoy:"46053", face:215, slope:0.071, usgs:1, cfg:WEST, nws:{office:"LOX", file:"fzus56.klox.srf.lox.txt", key:"Ventura County Beaches"}},
+  {name:"Santa Barbara (East Beach), CA", region:"Central Coast", lat:34.416, lon:-119.676, tide:"9411340", buoy:"46053", face:160, slope:0.078, usgs:1, cfg:WEST, nws:{office:"LOX", file:"fzus56.klox.srf.lox.txt", key:"Santa Barbara County Southeastern Coast"}},
+  {name:"Pismo Beach, CA", region:"Central Coast", lat:35.14, lon:-120.645, tide:"9412110", buoy:"46286", face:250, slope:0.03, usgs:1, cfg:WEST, nws:{office:"LOX", file:"fzus56.klox.srf.lox.txt", key:"San Luis Obispo County Beaches"}},
+  {name:"Avila Beach, CA", region:"Central Coast", lat:35.179, lon:-120.733, tide:"9412110", buoy:"46286", face:180, slope:0.04, usgs:1, cfg:WEST, nws:{office:"LOX", file:"fzus56.klox.srf.lox.txt", key:"San Luis Obispo County Beaches"}},
+  {name:"Silver Strand (Oxnard), CA", region:"Central Coast", lat:34.16, lon:-119.224, tide:"9411065", buoy:"46025", face:220, slope:0.078, usgs:1, cfg:WEST, nws:{office:"LOX", file:"fzus56.klox.srf.lox.txt", key:"Ventura County Beaches"}},
+  {name:"Hollywood Beach (Oxnard), CA", region:"Central Coast", lat:34.17, lon:-119.234, tide:"9411065", buoy:"46025", face:230, slope:0.071, usgs:1, cfg:WEST, nws:{office:"LOX", file:"fzus56.klox.srf.lox.txt", key:"Ventura County Beaches"}},
+  {name:"Oxnard Shores, CA", region:"Central Coast", lat:34.195, lon:-119.247, tide:"9411065", buoy:"46025", face:240, slope:0.073, usgs:1, cfg:WEST, nws:{office:"LOX", file:"fzus56.klox.srf.lox.txt", key:"Ventura County Beaches"}},
+  {name:"Emma Wood, CA", region:"Central Coast", lat:34.29, lon:-119.335, tide:"9411189", buoy:"46053", face:210, slope:0.062, usgs:1, cfg:WEST, nws:{office:"LOX", file:"fzus56.klox.srf.lox.txt", key:"Ventura County Beaches"}},
+  {name:"Rincon, CA", region:"Central Coast", lat:34.373, lon:-119.477, tide:"9411270", buoy:"46053", face:200, slope:0.065, usgs:1, cfg:WEST, nws:{office:"LOX", file:"fzus56.klox.srf.lox.txt", key:"Santa Barbara County Southeastern Coast"}},
+  {name:"Carpinteria, CA", region:"Central Coast", lat:34.393, lon:-119.52, tide:"9411270", buoy:"46053", face:200, slope:0.04, cfg:WEST, nws:{office:"LOX", file:"fzus56.klox.srf.lox.txt", key:"Santa Barbara County Southeastern Coast"}},
+  {name:"Leadbetter Beach, CA", region:"Central Coast", lat:34.402, lon:-119.7, tide:"9411340", buoy:"46053", face:180, slope:0.065, usgs:1, cfg:WEST, nws:{office:"LOX", file:"fzus56.klox.srf.lox.txt", key:"Santa Barbara County Southeastern Coast"}},
+  {name:"Hendry's Beach, CA", region:"Central Coast", lat:34.403, lon:-119.743, tide:"9411340", buoy:"46053", face:190, slope:0.035, usgs:1, cfg:WEST, nws:{office:"LOX", file:"fzus56.klox.srf.lox.txt", key:"Santa Barbara County Southeastern Coast"}},
+  {name:"Goleta Beach, CA", region:"Central Coast", lat:34.416, lon:-119.83, tide:"9411340", buoy:"46053", face:180, slope:0.072, usgs:1, cfg:WEST, nws:{office:"LOX", file:"fzus56.klox.srf.lox.txt", key:"Santa Barbara County Southeastern Coast"}},
+  {name:"Refugio, CA", region:"Central Coast", lat:34.462, lon:-120.07, tide:"9411399", buoy:"46053", face:190, slope:0.052, usgs:1, cfg:WEST, nws:{office:"LOX", file:"fzus56.klox.srf.lox.txt", key:"Santa Barbara County Southwestern Coast"}},
+  {name:"Oceano Dunes, CA", region:"Central Coast", lat:35.095, lon:-120.63, tide:"9412110", buoy:"46286", face:260, slope:0.03, usgs:1, cfg:WEST, nws:{office:"LOX", file:"fzus56.klox.srf.lox.txt", key:"San Luis Obispo County Beaches"}},
+  {name:"Grover Beach, CA", region:"Central Coast", lat:35.12, lon:-120.637, tide:"9412110", buoy:"46286", face:255, slope:0.03, usgs:1, cfg:WEST, nws:{office:"LOX", file:"fzus56.klox.srf.lox.txt", key:"San Luis Obispo County Beaches"}},
+  {name:"Shell Beach, CA", region:"Central Coast", lat:35.155, lon:-120.672, tide:"9412110", buoy:"46286", face:230, slope:0.089, usgs:1, cfg:WEST, nws:{office:"LOX", file:"fzus56.klox.srf.lox.txt", key:"San Luis Obispo County Beaches"}},
+  {name:"Point Mugu Beach, CA", region:"Central Coast", lat:34.085, lon:-119.06, tide:"TWC0445", buoy:"46025", face:200, slope:0.092, usgs:1, cfg:WEST, nws:{office:"LOX", file:"fzus56.klox.srf.lox.txt", key:"Ventura County Beaches"}},
+  {name:"Mandalay Beach, CA", region:"Central Coast", lat:34.21, lon:-119.255, tide:"9411189", buoy:"46025", face:250, slope:0.068, usgs:1, cfg:WEST, nws:{office:"LOX", file:"fzus56.klox.srf.lox.txt", key:"Ventura County Beaches"}},
+  {name:"Pierpont (Ventura), CA", region:"Central Coast", lat:34.263, lon:-119.272, tide:"9411189", buoy:"46053", face:215, slope:0.058, usgs:1, cfg:WEST, nws:{office:"LOX", file:"fzus56.klox.srf.lox.txt", key:"Ventura County Beaches"}},
+  // NorCal
+  {name:"Ocean Beach, SF, CA",     region:"NorCal", lat:37.76, lon:-122.51, tide:"9414290", buoy:"46237", face:270, slope:0.03, usgs:1, cfg:WEST, nws:{office:"MTR", file:"fzus56.kmtr.srf.mtr.txt", key:"San Francisco and San Mateo"}},
+  {name:"Santa Cruz (Main Beach), CA", region:"NorCal", lat:36.963, lon:-122.02, tide:"9413745", buoy:"46236", face:180, slope:0.053, usgs:1, cfg:WEST, nws:{office:"MTR", file:"fzus56.kmtr.srf.mtr.txt", key:"Santa Cruz County Coastal"}},
+  {name:"Capitola, CA", region:"NorCal", lat:36.972, lon:-121.952, tide:"9413745", buoy:"46236", face:180, slope:0.068, usgs:1, cfg:WEST, nws:{office:"MTR", file:"fzus56.kmtr.srf.mtr.txt", key:"Santa Cruz County Coastal"}},
+  {name:"Monterey (Del Monte), CA", region:"NorCal", lat:36.602, lon:-121.88, tide:"9413450", buoy:"46236", face:10, slope:0.038, usgs:1, cfg:WEST, nws:{office:"MTR", file:"fzus56.kmtr.srf.mtr.txt", key:"Monterey Bay"}},
+  {name:"Carmel, CA", region:"NorCal", lat:36.553, lon:-121.928, tide:"9413375", buoy:"46236", face:260, slope:0.05, usgs:1, cfg:WEST, nws:{office:"MTR", file:"fzus56.kmtr.srf.mtr.txt", key:"Monterey Bay"}},
+  {name:"Pacifica, CA", region:"NorCal", lat:37.595, lon:-122.502, tide:"9414131", buoy:"46237", face:265, slope:0.039, usgs:1, cfg:WEST, nws:{office:"MTR", file:"fzus56.kmtr.srf.mtr.txt", key:"San Francisco and San Mateo"}},
+  {name:"Stinson Beach, CA", region:"NorCal", lat:37.9, lon:-122.645, tide:"9414906", buoy:"46237", face:200, slope:0.043, usgs:1, cfg:WEST, nws:{office:"MTR", file:"fzus56.kmtr.srf.mtr.txt", key:"Marin"}},
+  {name:"Pleasure Point, CA", region:"NorCal", lat:36.955, lon:-121.97, tide:"9413745", buoy:"46236", face:170, slope:0.072, usgs:1, cfg:WEST, nws:{office:"MTR", file:"fzus56.kmtr.srf.mtr.txt", key:"Santa Cruz County Coastal"}},
+  {name:"Seabright, CA", region:"NorCal", lat:36.964, lon:-122.005, tide:"9413745", buoy:"46236", face:180, slope:0.058, usgs:1, cfg:WEST, nws:{office:"MTR", file:"fzus56.kmtr.srf.mtr.txt", key:"Santa Cruz County Coastal"}},
+  {name:"Seacliff, CA", region:"NorCal", lat:36.97, lon:-121.915, tide:"9413745", buoy:"46236", face:200, slope:0.082, usgs:1, cfg:WEST, nws:{office:"MTR", file:"fzus56.kmtr.srf.mtr.txt", key:"Santa Cruz County Coastal"}},
+  {name:"Rio Del Mar, CA", region:"NorCal", lat:36.965, lon:-121.902, tide:"9413745", buoy:"46236", face:205, slope:0.068, usgs:1, cfg:WEST, nws:{office:"MTR", file:"fzus56.kmtr.srf.mtr.txt", key:"Santa Cruz County Coastal"}},
+  {name:"Manresa, CA", region:"NorCal", lat:36.932, lon:-121.862, tide:"9413745", buoy:"46236", face:230, slope:0.063, usgs:1, cfg:WEST, nws:{office:"MTR", file:"fzus56.kmtr.srf.mtr.txt", key:"Santa Cruz County Coastal"}},
+  {name:"Sunset State Beach, CA", region:"NorCal", lat:36.89, lon:-121.835, tide:"9413616", buoy:"46236", face:240, slope:0.059, usgs:1, cfg:WEST, nws:{office:"MTR", file:"fzus56.kmtr.srf.mtr.txt", key:"Santa Cruz County Coastal"}},
+  {name:"Moss Landing, CA", region:"NorCal", lat:36.81, lon:-121.79, tide:"9413616", buoy:"46236", face:270, slope:0.055, usgs:1, cfg:WEST, nws:{office:"MTR", file:"fzus56.kmtr.srf.mtr.txt", key:"Monterey Bay"}},
+  {name:"Marina State Beach, CA", region:"NorCal", lat:36.698, lon:-121.81, tide:"9413616", buoy:"46236", face:270, slope:0.087, usgs:1, cfg:WEST, nws:{office:"MTR", file:"fzus56.kmtr.srf.mtr.txt", key:"Monterey Bay"}},
+  {name:"Asilomar, CA", region:"NorCal", lat:36.62, lon:-121.94, tide:"9413450", buoy:"46236", face:270, slope:0.032, usgs:1, cfg:WEST, nws:{office:"MTR", file:"fzus56.kmtr.srf.mtr.txt", key:"Monterey Bay"}},
+  {name:"Half Moon Bay, CA", region:"NorCal", lat:37.47, lon:-122.448, tide:"9414131", buoy:"46237", face:260, slope:0.111, usgs:1, cfg:WEST, nws:{office:"MTR", file:"fzus56.kmtr.srf.mtr.txt", key:"San Francisco and San Mateo"}},
+  {name:"Montara, CA", region:"NorCal", lat:37.545, lon:-122.515, tide:"9414131", buoy:"46237", face:270, slope:0.089, usgs:1, cfg:WEST, nws:{office:"MTR", file:"fzus56.kmtr.srf.mtr.txt", key:"San Francisco and San Mateo"}},
+  {name:"Fort Funston, CA", region:"NorCal", lat:37.715, lon:-122.505, tide:"9414290", buoy:"46237", face:270, slope:0.041, usgs:1, cfg:WEST, nws:{office:"MTR", file:"fzus56.kmtr.srf.mtr.txt", key:"San Francisco and San Mateo"}},
+  {name:"Baker Beach, CA", region:"NorCal", lat:37.795, lon:-122.484, tide:"9414290", buoy:"46237", face:290, slope:0.06, cfg:WEST, nws:{office:"MTR", file:"fzus56.kmtr.srf.mtr.txt", key:"San Francisco and San Mateo"}},
+  {name:"Muir Beach, CA", region:"NorCal", lat:37.86, lon:-122.576, tide:"9414906", buoy:"46237", face:200, slope:0.056, usgs:1, cfg:WEST, nws:{office:"MTR", file:"fzus56.kmtr.srf.mtr.txt", key:"Marin"}},
+  {name:"Bolinas, CA", region:"NorCal", lat:37.905, lon:-122.688, tide:"9414906", buoy:"46237", face:170, slope:0.061, usgs:1, cfg:WEST, nws:{office:"MTR", file:"fzus56.kmtr.srf.mtr.txt", key:"Marin"}},
+  {name:"Carmel River Beach, CA", region:"NorCal", lat:36.536, lon:-121.93, tide:"9413375", buoy:"46236", face:250, slope:0.088, usgs:1, cfg:WEST, nws:{office:"MTR", file:"fzus56.kmtr.srf.mtr.txt", key:"Monterey Bay"}},
+  {name:"Ocean Beach South (Sloat), CA", region:"NorCal", lat:37.735, lon:-122.507, tide:"9414290", buoy:"46237", face:270, slope:0.038, usgs:1, cfg:WEST, nws:{office:"MTR", file:"fzus56.kmtr.srf.mtr.txt", key:"San Francisco and San Mateo"}},
+  {name:"Rockaway Beach (Pacifica), CA", region:"NorCal", lat:37.61, lon:-122.496, tide:"9414131", buoy:"46237", face:270, slope:0.095, usgs:1, cfg:WEST, nws:{office:"MTR", file:"fzus56.kmtr.srf.mtr.txt", key:"San Francisco and San Mateo"}},
+  // Georgia & Carolinas
+  {name:"Tybee Island, GA",        region:"Georgia & Carolinas", lat:32.00, lon:-80.84, tide:"8670892", buoy:"41067", face:110, slope:0.03, usgs:1, cfg:EAST, nws:{office:"CHS", file:"fzus52.kchs.srf.chs.txt", key:"Tybee Island"}},
+  {name:"Folly Beach, SC",         region:"Georgia & Carolinas", lat:32.65, lon:-79.94, tide:"TEC3127", buoy:"41076", face:150, slope:0.038, usgs:1, cfg:EAST, nws:{office:"CHS", file:"fzus52.kchs.srf.chs.txt", key:"Folly Beach"}},
+  {name:"Myrtle Beach, SC",        region:"Georgia & Carolinas", lat:33.69, lon:-78.89, tide:"8661070", buoy:"41013", face:125, slope:0.048, usgs:1, cfg:EAST, nws:{office:"ILM", file:"fzus52.kilm.srf.ilm.txt", key:"Myrtle Beach", sub:"Myrtle Beach South"}},
+  {name:"Wrightsville Beach, NC",  region:"Georgia & Carolinas", lat:34.21, lon:-77.80, tide:"8658163", buoy:"41110", face:165, slope:0.042, usgs:1, cfg:EAST, nws:{office:"ILM", file:"fzus52.kilm.srf.ilm.txt", key:"Wrightsville Beach"}},
+  {name:"Rodanthe, NC",            region:"Georgia & Carolinas", lat:35.59, lon:-75.46, tide:"8652678", buoy:"44095", face:80,  slope:0.058, usgs:1, cfg:EAST, nws:{office:"MHX", file:"fzus52.kmhx.srf.mhx.txt", key:"Rodanthe"}},
+  {name:"Nags Head, NC",           region:"Georgia & Carolinas", lat:35.96, lon:-75.62, tide:"8651370", buoy:"44086", face:80,  slope:0.063, usgs:1, cfg:EAST, nws:{office:"MHX", file:"fzus52.kmhx.srf.mhx.txt", key:"Nags Head"}},
+  // Mid-Atlantic & Northeast
+  {name:"Virginia Beach, VA",      region:"Mid-Atlantic & Northeast", lat:36.85, lon:-75.98, tide:"8638863", buoy:"44099", face:60, slope:0.06, cfg:EAST, nws:{office:"AKQ", file:"fzus51.kakq.srf.akq.txt", key:"Virginia Beach"}},
+  {name:"Ocean City, MD",          region:"Mid-Atlantic & Northeast", lat:38.33, lon:-75.08, tide:"8570283", buoy:"44084", face:90, slope:0.032, usgs:1, cfg:EAST, nws:{office:"AKQ", file:"fzus51.kakq.srf.akq.txt", key:"Ocean City Beaches"}},
+  {name:"Dewey Beach, DE",         region:"Mid-Atlantic & Northeast", lat:38.69, lon:-75.07, tide:"8557380", buoy:"44084", face:90, slope:0.031, usgs:1, cfg:EAST, nws:{office:"PHI", file:"fzus51.kphi.srf.phi.txt", key:"Rehoboth Beach", alt:{office:"AKQ", file:"fzus51.kakq.srf.akq.txt", key:"Ocean City Beaches", label:"Ocean City, MD zone"}}},
+  {name:"Ocean City, NJ",          region:"Mid-Atlantic & Northeast", lat:39.26, lon:-74.58, tide:"8534770", buoy:"44091", face:120, slope:0.03, usgs:1, cfg:EAST, nws:{office:"PHI", file:"fzus51.kphi.srf.phi.txt", key:"Ocean City"}},
+  {name:"Long Beach, NY",          region:"Mid-Atlantic & Northeast", lat:40.58, lon:-73.66, tide:"8516881", buoy:"44065", face:180, slope:0.03, usgs:1, cfg:EAST, nws:{office:"OKX", file:"fzus51.kokx.srf.okx.txt", key:"Long Beach"}},
+  // Texas
+  {name:"Galveston, TX",           region:"Texas", lat:29.30, lon:-94.79, tide:"8771450", buoy:"42035", face:150, slope:0.03, usgs:1, cfg:EAST}
+];
+let mode="wave", cur=null, selDay=0, spotIdx=0, useNws=true, dataSpot=-1, loadId=0, snap=null, buoyNow=null, logs=[];
+const $ = id => document.getElementById(id);
+const pad = n => String(n).padStart(2,"0");
+const store = {get(k){try{return localStorage.getItem(k);}catch(e){return null;}}, set(k,v){try{localStorage.setItem(k,v);}catch(e){}}};
+const slug = n => n.toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");
+const fcCache = {}, buoyCache = {}, nwsCache = {}, nwsTs = {}, nwsText = {}, inflight = {};
+const TTL = 10*60e3, STALE = 3*3600e3;
+
+// ---------- setup ----------
+if (location.pathname !== "/") document.title = SITE_NAME; $("brandTxt").textContent = SITE_NAME.toUpperCase();
+const setOpen = o => document.body.classList.toggle("open", o);
+$("menu").onclick = () => { setOpen(true); watchMenu(); }; $("scrim").onclick = () => { setOpen(false); closeCfg(); };
+
+// ---------- helpers ----------
+const compass = d => ["N","NNE","NE","ENE","E","ESE","SE","SSE","S","SSW","SW","WSW","W","WNW","NW","NNW"][Math.round(d/22.5)%16];
+const hr12 = h => (h%12||12)+(h<12?"am":"pm");
+const fmtH = t => hr12(+t.slice(11,13));
+const fmtT = t => { const h=+t.slice(11,13), m=t.slice(14,16); return (h%12||12)+":"+m+(h<12?"am":"pm"); };
+const fmtM = m => { const h=Math.floor(m/60)%24, mm=m%60; return (h%12||12)+":"+pad(mm)+(h<12?"am":"pm"); };
+const dayName = k => new Date(k+"T12:00").toLocaleDateString(undefined,{weekday:"short"});
+const mins = t => +t.slice(11,13)*60 + +t.slice(14,16);
+function nowAt(off){ const d = new Date(Date.now() + (off||0)*1000); return {date:d.toISOString().slice(0,10), min:d.getUTCHours()*60+d.getUTCMinutes()}; }
+function windType(wdir){
+  const c = Math.cos((wdir - SPOTS[spotIdx].face) * Math.PI/180);
+  return c > .5 ? "onshore (bumpy)" : c < -.5 ? "offshore (clean)" : "cross-shore";
+}
+function exposure(dir){
+  const d = (dir - SPOTS[spotIdx].face) * Math.PI/180;
+  return 0.25 + 0.75 * Math.max(0, Math.cos(d));
+}
+// ---------- per-beach settings (starting values in SPOTS, your changes saved in this browser) ----------
+const DEF_CFG = {tide:"auto", flat:1, wave:[1,3], far:40, wind:8};
+let userCfg = {}; try{ userCfg = JSON.parse(store.get("sc15cfg")||"{}"); }catch(e){ userCfg = {}; }
+function cfgOf(i){ const sp = SPOTS[i]; return {...DEF_CFG, ...(sp.cfg||{}), slope: sp.slope || 0.07, ...(userCfg[sp.name]||{})}; }
+function breakDist(ft){ const sl = cfgOf(spotIdx).slope || 0.07; return Math.max(5, Math.round(ft/0.78/sl/5)*5); }
+function moon(dateKey){
+  const days = (Date.parse(dateKey+"T12:00:00Z") - Date.parse("2000-01-06T18:14:00Z"))/864e5, P = 29.530588, p = ((days % P)+P)%P;
+  const ph = [[1.85,"New moon","🌑"],[5.54,"Waxing crescent","🌒"],[9.23,"First quarter","🌓"],[12.92,"Waxing gibbous","🌔"],[16.61,"Full moon","🌕"],[20.3,"Waning gibbous","🌖"],[23.99,"Last quarter","🌗"],[27.68,"Waning crescent","🌘"],[99,"New moon","🌑"]].find(x=>p<x[0]);
+  return {name:ph[1], icon:ph[2], spring: p<2 || p>27.5 || Math.abs(p-14.77)<2};
+}
+const uvName = u => u==null ? "" : u<3?"low":u<6?"moderate":u<8?"high":u<11?"very high":"extreme";
+
+// ---------- wave size at the sand ----------
+// Longer-period waves grow more as they reach the beach; short wind chop barely does (breaker-height formula, scaled so an 8 s wave stays the same).
+const shoal = T => T==null ? 1 : Math.max(.7, Math.min(1.3, Math.pow(T/8, .4)));
+function shoreFactor(x){   // k: offshore height -> shorebreak height, f: how open the beach is to this sea, clean: share of the energy that is real swell
+  const ok = v => v!=null && isFinite(v);
+  if (ok(x.sw) && ok(x.ww) && x.sw + x.ww > .02){
+    const es = (x.sw*exposure(ok(x.swD)?x.swD:x.dir)*shoal(x.swT))**2, ew = (x.ww*exposure(ok(x.wwD)?x.wwD:x.dir)*shoal(x.wwT))**2;
+    const raw = Math.hypot(x.sw, x.ww), f = Math.hypot(x.sw*exposure(ok(x.swD)?x.swD:x.dir), x.ww*exposure(ok(x.wwD)?x.wwD:x.dir))/raw;
+    return {k: Math.sqrt(es+ew)/raw, f, clean: es+ew>0 ? es/(es+ew) : .5};
+  }
+  return {k: exposure(x.dir)*shoal(x.period), f: exposure(x.dir), clean: x.period>=8 ? .7 : x.period>=6 ? .5 : .3};
+}
+// ---------- scoring (0-10 per hour). Each part has a maximum; some conditions put a cap on the total ----------
+const PART = {tide:"Tide", waves:"Waves", close:"Break distance", wind:"Wind", period:"Period", swell:"Swell quality", steep:"Wave shape"};
+const TIDE_TARGET = {low:0, lowmid:.25, mid:.5};
+const TIDE_NAME = {auto:"Based on beach steepness", low:"Low", lowmid:"Low to mid (incoming)", mid:"Mid", any:"Any tide"};
+const maxParts = () => mode==="flat" ? {tide:4,waves:3,wind:2.5,period:.5} : {waves:2.5,close:2,steep:1.5,wind:2,tide:1.25,swell:.75};
+const clamp01 = x => Math.max(0, Math.min(1, x));
+function tideTarget(C){   // "auto": steep beaches skim best around mid tide, flat beaches nearer low tide. Flatland always wants low.
+  if (C.tide !== "auto") return TIDE_TARGET[C.tide] ?? 0;
+  if (mode==="flat") return 0;
+  return C.slope >= .075 ? .45 : C.slope >= .055 ? .3 : .15;
+}
+function steepness(h, C){   // surf-similarity number at the beach face (the face is about twice the average nearshore slope)
+  const T = h.swT!=null && (h.clean ?? 0) >= .5 ? h.swT : h.period, H = Math.max(.05, h.wave), L0 = 1.56*Math.max(3, T||6)**2;
+  return (C.slope*2) / Math.sqrt(H/L0);
+}
+const shapeWord = xi => xi < .3 ? "soft and crumbly" : xi < .6 ? "a little soft" : xi <= 2.5 ? "steep and pitching, the good kind for skimming" : "surging up the sand more than pitching";
+function windScore(h, C, mx){   // glassy or light offshore = full points; onshore chop loses points fastest; gusts count
+  const g = h.gust!=null ? Math.max(h.wind, h.gust*.7) : h.wind, c = Math.cos((h.wdir - SPOTS[spotIdx].face) * Math.PI/180);
+  const limit = c > .5 ? C.wind+4 : c < -.5 ? C.wind+14 : C.wind+8;   // wind where it stops being skimmable
+  return g <= 4 ? mx : mx * clamp01(1 - (g-4)/Math.max(3, limit-4));
+}
+function score(h, tideRel, range){
+  if (h.noWave) return {total:0, parts:{tide:0, waves:0, close:0, wind:0, period:0, swell:0, steep:0}, cap:"there is no wave data for this beach"};
+  const C = cfgOf(spotIdx), ft = h.wave*3.281, dist = breakDist(ft), P = {}; let cap = 10, why = "";
+  const tideFit = C.tide==="any" ? .85 : Math.max(0, 1 - Math.abs(tideRel - tideTarget(C)) / (mode==="flat" ? .75 : .55));
+  if (mode==="flat"){
+    const m = C.flat, swing = Math.max(.4, Math.min(1, range/4));   // bigger tide swings uncover more sand
+    P.tide = tideFit*4*swing;
+    P.waves = ft<=m*.7 ? 3 : ft<=m*1.5 ? 3 - 1.5*(ft-m*.7)/(m*.8) : ft<=m*3 ? 1.5*(1-(ft-m*1.5)/(m*1.5)) : 0;
+    P.wind = windScore(h, C, 2.5);
+    P.period = h.period<10 ? .5 : .25;
+    if (ft>m*3){ cap = 4; why = "waves are too big for flatland"; }
+  } else {
+    const [lo, hi] = C.wave, F = C.far;
+    const span = hi-lo, a = lo + span*.25, b = hi - span*.2;   // full points in the sweet spot, a little less at the edges of the range
+    P.waves = ft>=a && ft<=b ? 3 : ft>=lo && ft<a ? 2.4 + .6*(ft-lo)/(a-lo) : ft>b && ft<=hi ? 3 - .6*(ft-b)/(hi-b)
+      : ft<lo ? 2.4*clamp01((ft-.3)/(lo-.3))**1.3 : Math.max(.4, 2.4 - 2*(ft-hi)/2.5); P.waves *= 2.5/3;
+    P.close = dist<=F*.75 ? 2 : 2*clamp01((F*2-dist)/(F*1.25));
+    P.wind = windScore(h, C, 2);
+    P.tide = tideFit*1.25;
+    const pT = h.swT!=null && (h.clean ?? 0) >= .5 ? h.swT : h.period;   // clean swell with a long period = punchy, well-shaped shorebreak
+    const perF = pT>=11 ? 1 : pT>=5 ? .2 + .8*(pT-5)/6 : .2, cleanF = clamp01(((h.clean ?? .5) - .25)/.55);
+    P.swell = .75*(.45*perF + .55*cleanF);
+    // Wave shape: skim waves need to pitch steep right where they break. The surf-similarity (Iribarren) number
+    // compares the beach face slope with the wave's steepness: low = mushy, spilling waves; mid = steep, wedgy,
+    // plunging waves (best); very high = waves surge up the sand without breaking.
+    const xi = steepness(h, C);
+    P.steep = xi < .3 ? .2 : xi < .6 ? .2 + 1.3*(xi-.3)/.3 : xi <= 2.5 ? 1.5 : xi <= 4 ? 1.5 - 1.1*(xi-2.5)/1.5 : .4;
+    if (ft<lo*.5){ cap = 4; why = "the shorebreak is too small to ride"; }
+    else if (ft<lo*.75){ cap = 6; why = "the shorebreak is on the small side"; }
+    else if (ft>hi+2){ cap = 5; why = "the waves are big and heavy"; }
+    // Waves you can't reach aren't skimmable, however clean they are: cap the score by how far out they break
+    if (xi < .3 && cap > 6.5){ cap = 6.5; why = "the waves crumble instead of pitching, so they're soft to ride"; }
+    if (dist > F*2 && cap > 3.5){ cap = 3.5; why = `the waves break about ${dist} ft out, too far to reach`; }
+    else if (dist > F*1.5 && cap > 5){ cap = 5; why = `the waves break about ${dist} ft out, a long run to reach`; }
+    else if (dist > F*1.15 && cap > 6.5){ cap = 6.5; why = `the waves break about ${dist} ft out, a bit far to reach`; }
+  }
+  let raw = Object.values(P).reduce((x,y)=>x+y, 0);
+  const pop = h.pop ?? 0;   // rain or storms take points off
+  if (pop > 30){ raw -= Math.min(2, (pop-30)/25); if (pop>=80 && cap>5){ cap = 5; why = `there's a ${Math.round(pop)}% chance of rain or storms`; } else if (!why && pop>=50) why = `there's a ${Math.round(pop)}% chance of rain`; }
+  const total = Math.max(0, Math.min(10, raw, cap));
+  return {total, parts:P, cap: (raw>cap || (pop>=50 && why.includes("rain"))) ? why : ""};
+}
+function whyHtml(b){
+  const mx = maxParts();
+  return `<p class="why-t">How the score adds up</p><div class="chips">` + Object.keys(mx).map(k=>`<span><b>${b.parts[k].toFixed(1)}</b> / ${mx[k]} ${PART[k]}</span>`).join("") + `</div>` + (b.cap ? `<p class="note">Held down because ${b.cap}.</p>` : "");
+}
+const color = s => s>=8?"#D2425A":s>=6.5?"#3E9B63":s>=4.5?"#A39C8E":"#C0564F";   // meter colors: W Skim, Good, Fair, Skip it
+const gradeOf = s => s>=8?"w":s>=6.5?"good":s>=4.5?"fair":"skip";
+const chip = (s, txt) => `<span class="chip g-${gradeOf(s)}">${txt==null ? (s>=8?"W ":"")+s.toFixed(1) : txt}</span>`;
+const arrow = deg => `<svg class="arw" viewBox="0 0 24 24" aria-hidden="true" style="transform:rotate(${(deg+180)%360}deg)"><path d="M12 3l6.5 11h-4.6v7h-3.8v-7H5.5z" fill="currentColor"/></svg>`;   // points where it is heading
+const label = s => s>=8?"W Skim":s>=6.5?"Good":s>=4.5?"Fair":"Skip it";
+
+const units = t => (t||"").replace(/\b(\d+(?:\.\d+)?)\s*(feet|foot)\b/gi, "$1 ft").replace(/\b(feet|foot)\b/gi, "ft").replace(/\b(\d+)\s*degrees\b/gi, "$1°F").replace(/\b(\d+) to (\d+)°F/g, "$1 to $2°F");
+const SKEL = '<span class="sk big"></span><span class="sk w80"></span><span class="sk w50"></span>';
+// ---------- National Weather Service surf zone forecast ----------
+function parseHeights(str){
+  const first = str.split(/\.\s/)[0], nums = (first.match(/\d+(?:\.\d+)?/g)||[]).map(Number), low = first.toLowerCase();
+  if (!nums.length) return /flat|calm/.test(low) ? [0,0] : null;
+  if (nums.length>=2) return [nums[0], nums[1]];
+  return /or less|less than/.test(low) ? [0, nums[0]] : [nums[0], nums[0]];
+}
+function pickLine(str, sub){
+  const lines = (str||"").split("\n").map(x=>x.trim()).filter(Boolean);
+  if (!lines.length) return "";
+  const labeled = lines.length>1 && lines.some(l=>/\.{2,}/.test(l) || / - /.test(l));
+  let line = labeled ? ((sub && lines.find(l=>l.toLowerCase().includes(sub.toLowerCase()))) || lines[0]) : lines.join(" ");
+  if (labeled) line = line.replace(/^.*?(\.{2,}|\s-\s)\s*/, "");
+  return line.trim();
+}
+const MON = {Jan:0,Feb:1,Mar:2,Apr:3,May:4,Jun:5,Jul:6,Aug:7,Sep:8,Oct:9,Nov:10,Dec:11};
+function srfAgeHours(text){   // hours since the office issued this forecast (some offices only issue in summer)
+  const m = text.match(/\b(\d{1,2})(\d{2}) (AM|PM) ([A-Z]{3}) [A-Za-z]{3} ([A-Za-z]{3}) (\d{1,2}) (\d{4})/); if (!m) return 0;
+  const off = {EST:-5,EDT:-4,CST:-6,CDT:-5,MST:-7,MDT:-6,PST:-8,PDT:-7}[m[4]] ?? -5, h = (+m[1] % 12) + (m[3]==="PM" ? 12 : 0);
+  return (Date.now() - Date.UTC(+m[7], MON[m[5]] ?? 0, +m[6], h - off, +m[2])) / 3600e3;
+}
+function parseSrf(text, key, sub){
+  if (srfAgeHours(text) > 36) throw new Error("stale");
+  // Cut each block down to its own zone (the first block also carries the office header, e.g. "National Weather Service Miami FL",
+  // which used to make the Miami-Dade beaches match the Palm Beach block)
+  const zoneOf = b => { const z = b.search(/^[A-Z]{2}Z\d{3}/m); return z>=0 ? b.slice(z) : b; };
+  const k = key.toLowerCase(), blocks = text.split("$$").map(zoneOf), headOf = b => b.split(/\n(?=\.[A-Z][A-Z \/]*\.\.\.)/)[0];
+  const blk = blocks.find(b => headOf(b).toLowerCase().includes(k)) || blocks.find(b => b.toLowerCase().includes(k));
+  if (!blk) throw new Error("no NWS zone found");
+  const parts = blk.split(/\n(?=\.[A-Z][A-Z \/]*\.\.\.)/).slice(1).map(p => {
+    const hd = p.match(/^\.([A-Z][A-Z \/]*?)\.\.\./); if (!hd) return null;
+    const fields = {}; let cur = null;
+    p.slice(hd[0].length).split("\n").forEach(line => {
+      const m = line.match(/^([A-Z][A-Za-z \*\/]*?)\.{2,}\s*(.*)$/);
+      if (m){ cur = m[1].replace(/\*+$/,"").trim().toLowerCase(); fields[cur] = m[2]; }
+      else if (cur && line.trim()) fields[cur] += "\n" + line;
+    });
+    const sh = pickLine(fields["surf height"], sub), h = sh ? parseHeights(sh) : null;
+    if (!h) return null;
+    const first = s => (s||"").split(/\.\s/)[0].replace(/\.$/,"").trim();
+    const wt = first(pickLine(fields["water temperature"], sub));
+    return {name:hd[1], lo:h[0], hi:h[1], text:units(first(sh)), rip:first(pickLine(fields["rip current risk"], sub)), water: /missing/i.test(wt) ? "" : units(wt)};
+  }).filter(Boolean);
+  if (!parts.length) throw new Error("no surf heights listed");
+  return {parts};
+}
+function nwsDay(di, dateKey, i){
+  const n = nwsCache[i]; if (!n) return null;
+  const wd = new Date(dateKey+"T12:00").toLocaleDateString("en-US",{weekday:"long"}).toUpperCase();
+  const today = n.parts.find(p => /^(TODAY|REST OF TODAY|THIS AFTERNOON|THIS MORNING|THIS EVENING|TONIGHT)$/.test(p.name));
+  return (di===0 ? today : null) || n.parts.find(p => p.name===wd) || null;
+}
+async function srfText(sp){
+  const o = sp.nws.office, c = nwsText[o];
+  if (c && Date.now()-c.ts < 30*60e3) return c.p;
+  const p = (async () => {
+    try{
+      const list = await (await fetchT(`https://api.weather.gov/products/types/SRF/locations/${o}`, 9000)).json();
+      if (!list["@graph"] || !list["@graph"].length) throw new Error("none");
+      return (await (await fetchT(list["@graph"][0]["@id"], 9000)).json()).productText;
+    }catch(e){
+      if (/^https?:$/.test(location.protocol)){
+        try{ const t = await (await fetchT(`/api/nws?file=${encodeURIComponent(sp.nws.file)}`, 8000)).text(); if (/surf zone forecast/i.test(t)) return t; }catch(e2){}
+      }
+      return await getText("https://tgftp.nws.noaa.gov/data/raw/fz/" + sp.nws.file);
+    }
+  })();
+  nwsText[o] = {ts:Date.now(), p}; p.catch(()=>{ delete nwsText[o]; });
+  return p;
+}
+async function nwsFor(i){
+  const sp = SPOTS[i]; if (!sp.nws) return;
+  if (nwsCache[i] !== undefined && Date.now()-nwsTs[i] < 30*60e3) return;
+  try{ nwsCache[i] = parseSrf(await srfText(sp), sp.nws.key, sp.nws.sub); nwsTs[i] = Date.now(); }
+  catch(e){
+    nwsCache[i] = e && e.message==="stale" ? {stale:true, parts:[]} : null; nwsTs[i] = Date.now() - (nwsCache[i] ? 0 : 25*60e3);
+    if (sp.nws.alt){ try{ const r = parseSrf(await srfText({nws:sp.nws.alt}), sp.nws.alt.key, sp.nws.alt.sub); r.note = sp.nws.alt.label; nwsCache[i] = r; }catch(e2){} }
+  }
+}
+async function loadNws(i, my){ await nwsFor(i); if (my === loadId && dataSpot === i) render(); }
+
+// ---------- build the days with scores ----------
+const NEAR_SCALE = {nwps:.8, cdip:1.6};
+function build(c){
+  const i = spotIdx, now = nowAt(c.off), nowH = Math.floor(now.min/60), days = {};
+  c.data.forEach(h => (days[h.t.slice(0,10)] ||= []).push(h));
+  return Object.keys(days).slice(0,5).map((k, di) => {
+    const all = days[k], lo = Math.min(...all.map(x=>x.tide)), hi = Math.max(...all.map(x=>x.tide));
+    const sun = c.sun[k] || {sr:390, ss:1170}, first = Math.ceil(sun.sr/60), last = Math.floor(sun.ss/60);
+    let dl = all.filter(x => { const h=+x.t.slice(11,13); return h>=first && h<=last; }); if (!dl.length) dl = all;
+    const sfs = new Map(all.map(x => [x, shoreFactor(x)]));
+    // Shorebreak size: when the nearshore model (NOAA NWPS / CDIP) covers this hour, it leads, because it already knows how much
+    // of the swell actually reaches this beach. The offshore models keep a smaller say.
+    // NEAR_SCALE puts each model on the same size scale as the NWS surf heights the scores were tuned on (measured over 550 beach-days, Nov 2026):
+    // NWPS (20 m depth) runs about 25% bigger than NWS breaking heights in Florida, CDIP (10 m depth) about 1.6x smaller in California.
+    const nW = BAHAMAS_SHADOW.includes(SPOTS[i].region) ? .85 : .75, nA = NEAR_SCALE[c.nearK] || 1;
+    const shore = x => { const old = x.wave*sfs.get(x).k; return x.nh!=null ? nW*nA*x.nh*shoal(x.nT ?? x.period) + (1-nW)*old : old; };
+    const nd = nwsDay(di, k, i), ourMid = dl.reduce((a,x)=>a+shore(x)*3.281, 0)/dl.length, nearDay = dl.filter(x=>x.nh!=null).length >= dl.length*.6;
+    let corr = 1; if (useNws && nd && ourMid>0.2) corr = Math.max(.5, Math.min(2.5, (((nd.lo+nd.hi)/2)||.5)/ourMid));
+    if (nearDay) corr = Math.sqrt(corr);   // with a nearshore model on board, the NWS surf forecast only nudges halfway
+    const hrs = dl.map(x => {
+      const sf = sfs.get(x), y = {...x, wave:shore(x)*corr, f:sf.f, clean:sf.clean, corr};
+      const sc = score(y, hi===lo?.5:(x.tide-lo)/(hi-lo), hi-lo);
+      return {...y, s: sc.total, parts: sc.parts, cap: sc.cap};
+    });
+    const raw = hrs.map(x => x.s);   // a single great hour doesn't make a great day: it needs a neighbor close behind
+    hrs.forEach((x, k) => { const nb = Math.max(k>0 ? raw[k-1] : 0, k<raw.length-1 ? raw[k+1] : 0);
+      if (x.s > nb + .6){ x.s = nb + .6; if (!x.cap) x.cap = "the good conditions only last about an hour"; } });
+    const isToday = k === now.date, left = isToday ? hrs.filter(x => +x.t.slice(11,13) >= nowH) : hrs;
+    const pool = left.length ? left : hrs, over = isToday && !left.length;
+    return {date:k, isToday, nowMin:now.min, nowHour:nowH, all, hrs, pool, best: pool.reduce((a,b)=>b.s>a.s?b:a, pool[0]), over, sun, nws:nd, ourMid, corr, nearDay};
+  });
+}
+function bestWindow(d){
+  const top = d.best.s, P = d.pool; let a = P.indexOf(d.best), b = a;
+  const i0 = a;
+  while (a>0 && P[a-1].s >= top-.75) a--;
+  while (b<P.length-1 && P[b+1].s >= top-.75) b++;
+  while (b-a > 4){ if (i0-a > b-i0) a++; else b--; }
+  return [P[a], P[b]];
+}
+const winText = (a,b) => hr12(+a.t.slice(11,13)) + " to " + hr12(+b.t.slice(11,13)+1);
+
+// ---------- beach report ----------
+function report(d){
+  const nm = SPOTS[spotIdx].name.split(",")[0], b = d.best, [wa,wb] = bestWindow(d), today = d.isToday;
+  const ft = x => x.wave*3.281, sz = d.pool.map(ft), lo = Math.min(...sz), hi = Math.max(...sz), bf = ft(b);
+  const size = hi-lo < .4 ? `about ${hi.toFixed(1)} ft` : `${lo.toFixed(1)} to ${hi.toFixed(1)} ft`;
+  const subj = today ? "It's" : dayName(d.date)+" looks like";
+  const kind = b.s>=8 ? "a W Skim day" : b.s>=6.5 ? "a good day" : b.s>=4.5 ? "a fair day" : "a rough day for skimming";
+  const p1 = d.over ? `Daylight is over at ${nm} for today (sunset was ${fmtM(d.sun.ss)}). Looking back, the best part of the day was ${fmtH(b.t)}.`
+    : `${subj} ${kind} at ${nm}.${b.cap ? ` It is held back because ${b.cap}.` : ""} Your best window is ${winText(wa,wb)}.`;
+  const modeNote = mode==="flat"
+    ? (bf<1.5 ? "That's small and mellow, which is what flatland riders want: thin sheets of water to run on." : bf<3 ? "That's a bit bigger than ideal for flatland, so wait for gaps between sets." : "That's too big for flatland, with heavy waves hitting the sand.")
+    : (bf<.8 ? "That's pretty small for wave riding, so expect soft, mushy waves." : bf<=3.5 ? "That's a good size for wave riding." : "That's big and heavy, so watch for closeouts.");
+  const shield = b.f < .5 ? " This beach is partly blocked from the swell, so it's smaller than the open ocean." : "";
+  const sea = b.clean==null ? "" : b.clean >= .7 ? ` It's mostly clean swell${b.swT ? ` (${Math.round(b.swT)} seconds apart)` : ""}, so the shorebreak should have shape.` : b.clean < .35 ? " It's mostly short wind chop, so expect messy, crumbly waves." : "";
+  const shp = mode==="wave" && !b.noWave ? ` On this beach the waves should be ${shapeWord(steepness(b, cfgOf(spotIdx)))}.` : "";
+  const ww = b.wind<5?"barely moving":b.wind<10?"a light breeze":b.wind<15?"a moderate breeze":b.wind<20?"pretty breezy":"strong";
+  const wt = windType(b.wdir), tail = wt.startsWith("onshore") ? "blowing in off the ocean, so the water looks choppy" : wt.startsWith("offshore") ? "blowing off the land, which keeps the waves clean" : "blowing along the beach";
+  const half = Math.floor(d.hrs.length/2), avg = a => a.reduce((x,y)=>x+y.wind,0)/a.length, w1 = avg(d.hrs.slice(0,half)), w2 = avg(d.hrs.slice(half));
+  const trend = w2-w1>4 ? " It picks up later in the day." : w1-w2>4 ? " It dies down later in the day." : "";
+  const nd = d.nws, nwsLine = nd ? ` NWS forecasters call for ${nd.text.toLowerCase()} of surf and a ${(nd.rip||"unknown").toLowerCase()} rip current risk.${/high/i.test(nd.rip||"")?" Stay close to a lifeguard.":""}` : "";
+  const p2 = `The shorebreak is ${size}${d.corr!==1?" (adjusted toward the NWS forecast)":""}, breaking about ${breakDist(bf)} ft out from the water's edge. ${modeNote}${sea}${shp}${shield} Wind is ${ww} at ${Math.round(b.wind)} mph from the ${compass(b.wdir)}, ${tail}.${trend}${nwsLine}`;
+  const lows = cur.hilo.filter(p=>p.t.slice(0,10)===d.date && p.type==="L"), lowH = d.hrs.reduce((x,y)=>y.tide<x.tide?y:x), mo = moon(d.date);
+  const tideTxt = lows.length ? `Low tide is at ${lows.map(p=>fmtT(p.t)+" ("+(+p.v).toFixed(1)+" ft)").join(" and ")}.` : `The tide is lowest around ${fmtH(lowH.t)}.`;
+  const wet = b.water==null ? "" : b.water>=78 ? "warm enough to skip the wetsuit" : b.water>=70 ? "comfortable for most people" : b.water>=62 ? "chilly, so a spring suit helps" : "cold, so wear a wetsuit";
+  const temps = b.air==null ? "" : ` Air is around ${Math.round(b.air)}°F${b.water==null ? "." : ` and the water is ${Math.round(b.water)}°F, ${wet}.`}`;
+  const moonTxt = mo.spring ? ` The moon is close to new or full, so the tides swing bigger than usual and uncover more sand.` : "";
+  const p3 = `${tideTxt} Skimming is best near low tide, when the most wet sand is showing.${moonTxt}${temps}`;
+  const uvMax = Math.max(...d.hrs.map(x=>x.uv||0)), uvH = d.hrs.find(x=>(x.uv||0)===uvMax), rain = d.pool.reduce((x,y)=>(y.pop||0)>(x.pop||0)?y:x, d.pool[0]);
+  const bits = [];
+  if (uvMax>0) bits.push(`UV peaks at ${Math.round(uvMax)} (${uvName(uvMax)}) around ${fmtH(uvH.t)}${uvMax>=6?", so bring sunscreen and reapply":""}.`);
+  if ((rain.pop||0)>=30) bits.push(`There's up to a ${Math.round(rain.pop)}% chance of rain around ${fmtH(rain.t)}.`);
+  bits.push(`Sunrise is ${fmtM(d.sun.sr)} and sunset is ${fmtM(d.sun.ss)}.`);
+  return [p1, p2, p3, bits.join(" ")];
+}
+
+// ---------- tide chart: smooth curve, high/low labels, hover to read any time ----------
+function monoInterp(xs, ys){
+  const n = xs.length, d = [], m = [];
+  for (let i=0;i<n-1;i++) d[i] = (ys[i+1]-ys[i])/(xs[i+1]-xs[i]);
+  m[0] = d[0]; m[n-1] = d[n-2];
+  for (let i=1;i<n-1;i++) m[i] = d[i-1]*d[i] <= 0 ? 0 : (d[i-1]+d[i])/2;
+  for (let i=0;i<n-1;i++){
+    if (d[i]===0){ m[i]=m[i+1]=0; continue; }
+    const a=m[i]/d[i], b=m[i+1]/d[i], h=a*a+b*b;
+    if (h>9){ const t=3/Math.sqrt(h); m[i]=t*a*d[i]; m[i+1]=t*b*d[i]; }
+  }
+  return x => {
+    let i = 0; while (i < n-2 && x > xs[i+1]) i++;
+    const h = xs[i+1]-xs[i], t = (x-xs[i])/h, t2=t*t, t3=t2*t;
+    return (2*t3-3*t2+1)*ys[i] + (t3-2*t2+t)*h*m[i] + (-2*t3+3*t2)*ys[i+1] + (t3-t2)*h*m[i+1];
+  };
+}
+function tideChart(d, next){
+  const W=Math.max(340, Math.round($("tide").clientWidth||560)), H=Math.round(Math.min(330, Math.max(270, W*0.28))), L=30, R=14, T=46, B=32, pw=W-L-R, ph=H-T-B;
+  let ex = cur.hilo.filter(p=>p.t.slice(0,10)===d.date).map(p=>({m:mins(p.t), v:+p.v, type:p.type}));
+  if (!ex.length) d.all.forEach((p,i,a)=>{ if(i&&i<a.length-1){
+    if(p.tide>=a[i-1].tide&&p.tide>a[i+1].tide) ex.push({m:mins(p.t),v:p.tide,type:"H"});
+    if(p.tide<=a[i-1].tide&&p.tide<a[i+1].tide) ex.push({m:mins(p.t),v:p.tide,type:"L"}); }});
+  const near = m => ex.some(e=>Math.abs(e.m-m)<40);
+  const pts = d.all.map(p=>({m:mins(p.t),v:p.tide})).filter(p=>!near(p.m));
+  if (next) pts.push({m:1440, v:next.all[0].tide});
+  ex.forEach(e=>pts.push({m:e.m, v:e.v}));
+  pts.sort((a,b)=>a.m-b.m);
+  const m0 = pts[0].m, m1 = pts[pts.length-1].m, f = monoInterp(pts.map(p=>p.m), pts.map(p=>p.v));
+  const samples = []; for (let m=m0; m<m1; m+=10) samples.push([m,f(m)]); samples.push([m1,f(m1)]);
+  const vs = samples.map(p=>p[1]), rng = Math.max(...vs)-Math.min(...vs), lo = Math.min(...vs)-Math.max(1, rng*.32), hi = Math.max(...vs)+Math.max(.8, rng*.22);
+  const X = m => L + pw*m/1440, Y = v => T + ph*(1-(v-lo)/(hi-lo));
+  const line = samples.map((p,i)=>(i?"L":"M")+X(p[0]).toFixed(1)+" "+Y(p[1]).toFixed(1)).join(" ");
+  const area = line + ` L${X(m1).toFixed(1)} ${T+ph} L${X(m0).toFixed(1)} ${T+ph} Z`;
+  window._tc = {f, X, Y, W, L, pw, T, ph, m0, m1};
+  let s = `<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="Tide chart for the day">
+    <defs><pattern id="night" width="9" height="9" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="9" height="9" fill="#F2EFE8"/><rect width="3.5" height="9" fill="#e2dccf"/></pattern></defs>
+    <rect x="${X(0)}" y="${T}" width="${X(d.sun.sr)-X(0)}" height="${ph}" fill="url(#night)"/>
+    <rect x="${X(d.sun.ss)}" y="${T}" width="${X(1440)-X(d.sun.ss)}" height="${ph}" fill="url(#night)"/>`;
+  const step = hi-lo > 5 ? 2 : 1;
+  for (let v=Math.ceil(lo); v<=hi; v+=step) if (Y(v)>T && Y(v)<T+ph)
+    s += `<line x1="${L}" x2="${W-R}" y1="${Y(v)}" y2="${Y(v)}" stroke="#ddd7ca" stroke-dasharray="2 4"/><text x="${L-6}" y="${Y(v)+4}" font-size="11" font-weight="600" fill="#4a4740" text-anchor="end">${v}</text>`;
+  for (let m=0; m<=1440; m+=180){ const h=m/60%24, lab=h===0?"12a":h===12?"12p":(h%12)+(h<12?"a":"p");
+    s += `<text x="${X(m)}" y="${H-10}" font-size="11" font-weight="600" fill="#4a4740" text-anchor="${m===0?"start":m===1440?"end":"middle"}">${lab}</text>`; }
+  s += `<path d="${area}" fill="#BDE8FF"/><path d="${line}" fill="none" stroke="#000" stroke-width="3" stroke-linejoin="round"/><line x1="${L}" x2="${W-R}" y1="${T+ph}" y2="${T+ph}" stroke="#000" stroke-width="2"/>`;
+  ex.forEach(p=>{
+    const x=X(p.m), y=Y(p.v), up=p.type==="H", y1=up?y-26:y+18, y2=up?y-13:y+31;
+    const an = x<L+40 ? "start" : x>W-R-40 ? "end" : "middle", tx = an==="start"?x-4:an==="end"?x+4:x;
+    s += `<circle cx="${x}" cy="${y}" r="${up?5:7}" fill="${up?"#000":"#E8FF3A"}" stroke="#000" stroke-width="2.5"/>
+      <text x="${tx}" y="${y1}" font-size="13" font-weight="800" fill="#000" text-anchor="${an}">${fmtT(`2000-01-01T${pad(Math.floor(p.m/60))}:${pad(p.m%60)}`)}</text>
+      <text x="${tx}" y="${y2}" font-size="11" font-weight="600" fill="#4a4740" text-anchor="${an}">${up?"High":"Low"} ${p.v.toFixed(1)} ft</text>`; });
+  if (d.isToday){ const m=d.nowMin;
+    if (m>=m0 && m<=m1) s += `<line x1="${X(m)}" x2="${X(m)}" y1="${T}" y2="${T+ph}" stroke="#FF4F5E" stroke-width="2.5" stroke-dasharray="5 4"/><text x="${X(m)}" y="${T-7}" font-size="12" font-weight="800" fill="#000" text-anchor="middle">now</text>`; }
+  s += `<g id="scr" style="display:none;pointer-events:none"><line stroke="#000" stroke-width="2"/><circle r="7" fill="#fff" stroke="#000" stroke-width="3"/>
+    <rect rx="6" width="112" height="46" fill="#000"/><text class="t1" font-size="14" font-weight="800" fill="#E8FF3A"></text><text class="t2" font-size="11" font-weight="600" fill="#F2EFE8"></text></g>`;
+  return s + "</svg>";
+}
+function attachTide(){
+  const svg = $("tide").querySelector("svg"), c = window._tc; if (!svg || !c) return;
+  const g = svg.querySelector("#scr"), ln = g.querySelector("line"), dot = g.querySelector("circle"), box = g.querySelector("rect"), t1 = g.querySelector(".t1"), t2 = g.querySelector(".t2");
+  const move = e => {
+    const r = svg.getBoundingClientRect(), x = (e.clientX - r.left) * c.W / r.width;
+    const m = Math.max(c.m0, Math.min(c.m1, (x - c.L) / c.pw * 1440)), v = c.f(m);
+    const rising = c.f(Math.min(c.m1, m+15)) >= c.f(Math.max(c.m0, m-15)), px = c.X(m), py = c.Y(v);
+    const tot = Math.round(m), h = Math.floor(tot/60)%24, mm = tot%60;
+    ln.setAttribute("x1",px); ln.setAttribute("x2",px); ln.setAttribute("y1",c.T); ln.setAttribute("y2",c.T+c.ph);
+    dot.setAttribute("cx",px); dot.setAttribute("cy",py);
+    const bx = px + 118 > c.W ? px - 118 : px + 10, by = c.T + 4;
+    box.setAttribute("x",bx); box.setAttribute("y",by);
+    t1.setAttribute("x",bx+10); t1.setAttribute("y",by+19); t2.setAttribute("x",bx+10); t2.setAttribute("y",by+35);
+    t1.textContent = (h%12||12)+":"+pad(mm)+(h<12?"am":"pm");
+    t2.textContent = v.toFixed(1)+" ft, "+(rising?"rising":"falling");
+    g.style.display = "";
+  };
+  svg.onpointermove = move; svg.onpointerdown = move; svg.onpointerleave = () => { g.style.display = "none"; };
+}
+
+// ---------- rendering ----------
+const ripLevel = r => /high/i.test(r) ? ["#E5484D","High"] : /mod/i.test(r) ? ["#E0A030","Moderate"] : ["#4CAF7A","Low"];
+function ripBadge(d){
+  const nd = d.nws;
+  if (nd && nd.rip){ const [c] = ripLevel(nd.rip); return `<span class="tag"><i class="dot" style="background:${c}"></i>Rip current risk: ${nd.rip}</span>`; }
+  return SPOTS[spotIdx].nws ? "" : `<span class="tag"><i class="dot" style="background:#A8A296"></i>Rip current risk: ask a lifeguard</span>`;
+}
+function nwsHtml(d){
+  const sp = SPOTS[spotIdx], n = nwsCache[spotIdx], head = `<h3>National Weather Service</h3>`;
+  if (!sp.nws) return `<div class="kv">${head}<p class="note">No NWS surf forecast is published for this beach.</p></div>`;
+  if (n === undefined) return `<div class="kv">${head}${SKEL}</div>`;
+  if (n === null) return `<div class="kv">${head}<p class="note">The NWS forecast could not load right now.</p></div>`;
+  if (n.stale) return `<div class="kv">${head}<p class="note">The NWS only issues surf forecasts for this area in summer, so there isn't a current one. The score uses the wave models only.</p></div>`;
+  const nd = d.nws; if (!nd) return `<div class="kv">${head}<p class="note">No NWS surf height listed for this day.</p></div>`;
+  const nm = (nd.lo+nd.hi)/2, gap = Math.abs(d.ourMid-nm) > Math.max(.5, nm*.3);
+  const row = (k, v, e) => v ? `<div class="r"><dt>${k}</dt><dd>${v}${e?`<em>${e}</em>`:""}</dd></div>` : "";
+  return `<dl class="kv">${head}` + [
+    row("Forecasters say", nd.text),
+    row("Rip current risk", nd.rip),
+    row("Our model says", d.ourMid.toFixed(1)+" ft", gap ? "disagrees with the NWS" : "close to the NWS"),
+    row("Used for the score", (d.ourMid*d.corr).toFixed(1)+" ft", useNws ? (d.corr!==1 ? "adjusted x"+d.corr.toFixed(2) : "no change needed") : "adjustment off"),
+    row("Water temp", nd.water)].join("") +
+    `<label class="tog"><input type="checkbox" ${useNws?"checked":""} onchange="useNws=this.checked;render()"> Match our numbers to the NWS surf height</label></dl>`;
+}
+function render(){
+  if (!cur) return;
+  const D = build(cur), d = D[selDay] || D[0], b = d.best, [wa,wb] = bestWindow(d), sp = SPOTS[spotIdx], rp = report(d);
+  $("spotname").textContent = sp.name;
+  if (location.pathname !== "/"){ const t = `${sp.name} Skimboarding Forecast Today | ${SITE_NAME}`; document.title = t.length > 62 ? `${sp.name} Skimboarding Forecast | ${SITE_NAME}` : t; }   // same titles the server writes
+  const sm = $("seoMore"); if (sm && sm.dataset.slug !== slug(sp.name)) sm.remove();   // the server-written beach guide only matches the beach the page opened on
+  if ($("seoText")) $("seoText").textContent = seoLine(sp);
+  const dl = d.isToday ? "Today" : new Date(d.date+"T12:00").toLocaleDateString(undefined,{weekday:"long",month:"short",day:"numeric"});
+  $("best").innerHTML = `<p class="dateline">${dl}, ${mode==="flat"?"flatland":"wave riding"}</p><p class="lede">${rp[0]}</p>
+    <div class="tags">${ripBadge(d)}</div>${presentedHTML(sp)}`;
+  $("heroScore").innerHTML = `<div class="num anton">${b.s.toFixed(1)}<span class="of">/ 10</span></div>
+    <div class="meter"><i style="width:${Math.max(4,b.s*10)}%;background:${color(b.s)}"></i></div>
+    ${b.s>=8 ? `<span class="wbadge"><b>W</b>Skim</span>` : `<span class="grade g-${gradeOf(b.s)}">${label(b.s)}</span>`}
+    <button class="cfglink" onclick="openCfg()">Beach settings${userCfg[sp.name]?' <span class="custom">custom</span>':""}</button>`;
+  // conditions strip (missing values are left out)
+  const st = (k, v, u, s2) => v==null || v==="" ? "" : `<div class="st"><span class="k">${k}</span><span class="v">${v}${u?`<small>${u}</small>`:""}</span><span class="s">${s2||"&nbsp;"}</span></div>`;
+  $("stath").textContent = `${d.over?"Conditions were":"Conditions"} at ${fmtH(b.t)}${d.isToday?"":", "+dayName(d.date)}`;
+  $("stats").innerHTML = [
+    st("Shorebreak", (b.wave*3.281).toFixed(1), "ft", `breaks ~${breakDist(b.wave*3.281)} ft out`),
+    st("Wind", `${arrow(b.wdir)}${Math.round(b.wind)}`, "mph "+compass(b.wdir), windType(b.wdir)),
+    st("Tide", b.tide.toFixed(1), "ft", "at "+fmtH(b.t)),
+    st("Swell", `${arrow(b.dir)}${b.period.toFixed(0)}`, "s", "from "+compass(b.dir)),
+    st("Air", b.air==null?null:Math.round(b.air), "°F"),
+    st("Water", b.water==null?null:Math.round(b.water), "°F"),
+    st("UV", b.uv==null?null:Math.round(b.uv), "", uvName(b.uv)),
+    st("Rain", b.pop==null?null:Math.round(b.pop), "%")].join("");
+  // hour by hour
+  const inWin = h => !d.over && h.t>=wa.t && h.t<=wb.t;
+  $("hourtitle").textContent = `Hour by hour, ${d.isToday?"today":dayName(d.date)}`;
+  $("hours").innerHTML = `<div class="hc lab"><span>Time</span><span>Score</span><span>Shorebreak</span><span>Wind (mph)</span><span>Tide</span></div>` +
+    d.hrs.map(h => { const past = d.isToday && +h.t.slice(11,13) < d.nowHour;
+      return `<div class="hc${past?" past":""}${inWin(h)?" win":""}"><span class="ht">${fmtH(h.t)}</span><span>${chip(h.s)}</span><span>${(h.wave*3.281).toFixed(1)} ft</span><span>${arrow(h.wdir)}${Math.round(h.wind)}</span><span>${h.tide.toFixed(1)} ft</span></div>`; }).join("");
+  // tide (chart unchanged)
+  const mo = moon(d.date);
+  $("tidetitle").textContent = `Tide, ${d.isToday?"today":dayName(d.date)}`;
+  $("sunmoon").innerHTML = `<span>Sunrise ${fmtM(d.sun.sr)}</span><span>Sunset ${fmtM(d.sun.ss)}</span><span>${mo.icon} ${mo.name}${mo.spring?", bigger tides":""}</span>`;
+  $("tide").innerHTML = tideChart(d, D[selDay+1]); attachTide();
+  // next 5 days
+  $("days").innerHTML = D.map((x,i)=>`<button class="day${i===selDay?" sel":""}" onclick="selDay=${i};render()"><span class="dn">${i===0?"Today":dayName(x.date)}</span>${x.over?`<span class="chip g-fair">Done</span>`:chip(x.best.s)}<small>${x.over?"Daylight over":"Best at "+fmtH(x.best.t)}</small>${x.nws?`<small>NWS ${x.nws.text.toLowerCase()}</small>`:""}</button>`).join("");
+  // report + second opinions
+  $("report").innerHTML = rp.slice(1).map(p=>`<p>${p}</p>`).join("");
+  howWas(d);
+  $("nws").innerHTML = nwsHtml(d);
+  const nn = nwsCache[spotIdx];
+  $("about").innerHTML = [
+    "Shorebreak size and break distance are estimates from the wave models, the NWS surf height and each beach's slope. They get better as we tune each beach with your session logs and \"How was it?\" reports.",
+    cur.near ? `Wave size here leans on ${cur.near}, which forecasts the waves right off this beach, so it already knows about islands, reefs and headlands blocking swell.` : "",
+    sp.local ? "This beach's slope is tuned from a local skimmer's report. The sandbars shift, so some stretches break closer in than others." : sp.usgs ? "This beach's slope is measured by the USGS (lidar and satellite surveys of the beach face)." : "",
+    d.corr!==1 ? `Wave sizes for this day were adjusted toward the National Weather Service surf height (x${d.corr.toFixed(2)}).` : "",
+    cur.disagree ? "The two wave models disagree on this forecast right now, so treat the size with extra caution." : "",
+    "The NWS surf height is the height of breaking waves, written by forecasters for a whole stretch of coast. Treat it as a second opinion.",
+    nn && nn.note ? `This beach isn't in an NWS feed the site can read, so the NWS numbers come from the nearest zone (${nn.note}).` : "",
+    "Buoys sit miles offshore and usually read bigger than the waves at the beach. Small differences are normal.",
+    "Tide times come from NOAA predictions for the nearest tide station, which can be a few miles from the beach.",
+    "Data: " + (cur.src||"") + "."].filter(Boolean).map(t=>`<li>${t}</li>`).join("");
+  const hourNow = d.isToday ? (d.hrs.find(x=>+x.t.slice(11,13)===d.nowHour) || b) : b;
+  snap = {spot:sp.name, mode, score:hourNow.s, shore:hourNow.wave*3.281, dist:breakDist(hourNow.wave*3.281), tide:hourNow.tide, wind:hourNow.wind, wdir:compass(hourNow.wdir), nws:d.nws?d.nws.text:"", rip:d.nws?d.nws.rip:"", date:d.date, min:d.isToday?d.nowMin:null};
+  renderLog(); refreshLists(); updLabel();
+}
+
+// ---------- compare all beaches ----------
+function withSpot(i, fn){ const sv = spotIdx; spotIdx = i; try{ return fn(); } finally{ spotIdx = sv; } }
+function quickFrom(D){
+  const over = D[0].over, d = over ? (D[1]||D[0]) : D[0];
+  return {s:d.best.s, t:d.best.t, ft:d.best.wave*3.281, tomorrow:over, rip:d.nws?d.nws.rip:""};
+}
+function quick(i){ const c = fcCache[i]; if (!c) return null; try{ return withSpot(i, () => quickFrom(build(c))); }catch(e){ return null; } }
+function wWindows(D){           // every run of 8+ hours still ahead, per day
+  const out = []; let best = null;
+  D.forEach((d, di) => {
+    if (d.over) return;
+    let run = null;
+    d.pool.forEach((h, k) => {
+      if (!best || h.s > best.s) best = {s:h.s, t:h.t, di};
+      if (h.s >= 8){ if (!run) run = {di, date:d.date, a:h, b:h, max:h.s, live: d.isToday && k === 0 && +h.t.slice(11,13) === d.nowHour}; else { run.b = h; run.max = Math.max(run.max, h.s); } }
+      if ((h.s < 8 || k === d.pool.length-1) && run){ out.push(run); run = null; }
+    });
+  });
+  return {out, best};
+}
+const dayLabel = (di, date) => di===0 ? "Today" : di===1 ? "Tomorrow" : dayName(date);
+function refreshLists(){
+  const region = curRegion();
+  const all = SPOTS.map((sp,i) => ({i, sp})).filter(x => x.sp.region===region).map(({i, sp}) => { const c = fcCache[i]; let q = null, w = null;
+    if (c) try{ withSpot(i, () => { const D = build(c); q = quickFrom(D); w = wWindows(D); }); }catch(e){}
+    return {i, sp, q, w}; });
+  $("ranktitle").textContent = region + " beaches"; $("findtitle").textContent = "W Skim in " + region + ", next 5 days";
+  $("tiles").innerHTML = all.slice().sort((a,b)=>(b.q?b.q.s:-1)-(a.q?a.q.s:-1)).map((x,n) => x.q
+    ? `<button class="rk${x.i===spotIdx?" sel":""}" onclick="pick(${x.i})"><span class="rk-n">${n+1}</span><span class="rk-name">${x.sp.name}</span><span>${chip(x.q.s)}</span><span class="rk-l">${label(x.q.s)}</span><span class="rk-d">Best ${fmtH(x.q.t)}${x.q.tomorrow?" tomorrow":""}, ${x.q.ft.toFixed(1)} ft</span><span class="rk-r">${x.q.rip?"Rip risk "+x.q.rip.toLowerCase():""}</span></button>`
+    : `<button class="rk" onclick="pick(${x.i})"><span class="rk-n"></span><span class="rk-name">${x.sp.name}</span><span class="sk" style="width:44px;height:22px;margin:0"></span></button>`).join("");
+  const loaded = all.filter(x=>x.q).length, left = all.length - loaded;
+  $("tilenote").textContent = left ? `Loading ${left} more` : `Ranked by best remaining time, ${mode==="flat"?"flatland":"wave riding"}`;
+  // W Skim finder
+  const runs = []; let top = null;
+  all.forEach(x => { if (!x.w) return; x.w.out.forEach(r => runs.push({...r, i:x.i, sp:x.sp}));
+    if (x.w.best && (!top || x.w.best.s > top.s)) top = {...x.w.best, i:x.i, sp:x.sp}; });
+  // banner: "W SKIM NOW" while a W is on at a beach in this area, otherwise "W SKIM TODAY" with the beaches and start times still ahead today
+  // (this area first, then the best W's anywhere else, from confirmW)
+  const elsewhere = [];
+  wConfirm.forEach(i => { if (SPOTS[i].region === region || !fcCache[i]) return;
+    try{ withSpot(i, () => wWindows(build(fcCache[i])).out.forEach(r => elsewhere.push({...r, i, sp:SPOTS[i]}))); }catch(e){} });
+  const todayRuns = runs.concat(elsewhere).filter(r => r.di===0), liveRuns = todayRuns.filter(r => r.live), tape = $("wtape");
+  const pickRuns = (liveRuns.length ? liveRuns : todayRuns).slice().sort((a,b) => (b.i===spotIdx) - (a.i===spotIdx) || (b.sp.region===region) - (a.sp.region===region) || b.max - a.max || a.a.t.localeCompare(b.a.t))
+    .filter((r, n, arr) => arr.findIndex(x => x.i===r.i) === n).slice(0, 4);
+  tape.hidden = !pickRuns.length;
+  tape.dataset.go = pickRuns.length && pickRuns[0].sp.region !== region ? String(pickRuns[0].i) : "";
+  // the banner text stays the classic "W SKIM ★ W SKIM ★"; tapping it opens the best W (or the W Skim list when it's in this area)
+  tape.setAttribute("aria-label", pickRuns.length ? (liveRuns.length ? "W Skim happening now at " : "W Skim today at ") + pickRuns.map(r => r.sp.name.split(",")[0]).join(", ") + (tape.dataset.go ? ". Tap to open " + pickRuns[0].sp.name : ". Tap to see every W Skim") : "W Skim");
+  runs.sort((a,b) => a.date.localeCompare(b.date) || a.a.t.localeCompare(b.a.t) || b.max-a.max);
+  const shown = runs.slice(0, 12);
+  $("finder").innerHTML = runs.length
+    ? shown.map(r => `<button class="fd" onclick="pick(${r.i},${r.di})"><span class="fd-d">${dayLabel(r.di, r.date)}</span><span class="fd-t">${winText(r.a, r.b)}</span><span class="fd-n">${r.sp.name}</span>${chip(r.max)}</button>`).join("")
+    : left ? `<p class="fd-none">Checking ${left} more beaches for W Skim…</p>`
+    : (top ? `<p class="fd-none">No W Skim in the next 5 days. Best coming up: <button onclick="pick(${top.i},${top.di})">${dayLabel(top.di, top.t.slice(0,10))} ${fmtH(top.t)} at ${top.sp.name.split(",")[0]}</button> ${chip(top.s)}</p>`
+           : `<p class="fd-none">Checking every beach in ${region}…</p>`);
+  $("findnote").textContent = runs.length > shown.length ? `Showing the first ${shown.length} of ${runs.length}` : (left ? `Checking ${left} more beaches` : `${mode==="flat"?"Flatland":"Wave riding"}, all ${all.length} beaches here. Other regions are in the beach menu.`);
+  drawList();
+}
+// ---------- favorite beaches (starred ones show first in the beach menu, saved on this device) ----------
+let favs = []; try{ favs = JSON.parse(store.get("sc19fav")||"[]").filter(n => SPOTS.some(sp => sp.name===n)); }catch(e){ favs = []; }
+const isFav = i => favs.includes(SPOTS[i].name);
+function toggleFav(i, ev){ if (ev) ev.stopPropagation(); const n = SPOTS[i].name;
+  favs = isFav(i) ? favs.filter(x => x!==n) : [...favs, n]; store.set("sc19fav", JSON.stringify(favs));
+  const lst = $("drawer"), y = lst.scrollTop; drawList(); lst.scrollTop = y; }
+function drawList(q){
+  q = q || SPOTS.map((sp,i)=>({i, sp, q:quick(i)}));
+  const term = (($("q") && $("q").value) || "").toLowerCase().trim();
+  const row = x => `<div class="row ${x.i===spotIdx?"sel":""}"><button class="pk ${x.i===spotIdx?"sel":""}" onclick="pick(${x.i})"><span>${x.sp.name}</span>${x.q?chip(x.q.s):""}</button><button class="star ${isFav(x.i)?"on":""}" onclick="toggleFav(${x.i},event)" aria-pressed="${isFav(x.i)}" aria-label="${isFav(x.i)?"Remove":"Add"} ${x.sp.name} ${isFav(x.i)?"from":"to"} favorites" title="${isFav(x.i)?"Remove from favorites":"Add to favorites"}">${isFav(x.i)?"★":"☆"}</button></div>`;
+  const match = x => !term || x.sp.name.toLowerCase().includes(term) || x.sp.region.toLowerCase().includes(term) || (term.length>2 && "favorites".startsWith(term) && isFav(x.i));
+  const favItems = favs.map(n => q.find(x => x.sp.name===n)).filter(x => x && match(x));
+  const html = (favItems.length ? `<h3 class="dg">Favorites</h3>` + favItems.map(row).join("") : "") + REGIONS.map(r => { const items = q.filter(x => x.sp.region===r && !isFav(x.i) && match(x));
+    return items.length ? `<h3 class="dg" data-r="${r}">${r}</h3>` + items.map(row).join("") : ""; }).join("");
+  $("list").innerHTML = html || `<p class="note" style="padding:0 20px">No beaches match "${term.replace(/</g,"&lt;")}".</p>`;
+  watchMenu();
+}
+let wantDay = null;
+// ---------- sponsors ----------
+// Add a sponsor here and it shows as "Presented by" on its beaches. Beaches with no sponsor
+// show an empty "Your shop here" spot that links to the sponsor page.
+//   regions: every beach in that group (e.g. "Treasure Coast")   beaches: exact beach names
+//   logo: optional image file uploaded next to index.html (e.g. "sponsors/ohana.png")
+//   partner: true also lists the sponsor in the Partners section at the bottom of every page
+//   (partnerLogo = a bigger logo for that section, about = one short line under it)
+const SPONSORS = [
+  // {name:"Shop Name", url:"https://shopwebsite.com", logo:"", regions:["Treasure Coast"], beaches:[]},
+  {name:"Rayon Law", url:"https://www.rayonlaw.com/?utm_source=skimcast&utm_medium=sponsor", logo:"/sponsors/rayon-law-mark.png", regions:[], beaches:["Miami Beach, FL"],
+   partner:true, partnerLogo:"/sponsors/rayon-law-logo.png", about:"Estate planning attorney · Miami & South Florida"},
+];
+function drawPartners(){
+  const list = SPONSORS.filter(s => s.partner);
+  if (!list.length) return;
+  $("partnerList").innerHTML = list.map(s => `<a class="partner" href="${escA(s.url)}" target="_blank" rel="noopener sponsored" onclick="countHit('c')"><img src="${escA(s.partnerLogo||s.logo)}" alt="${escA(s.name)}"><span class="partner-d">${escA(s.about||"")}</span></a>`).join("");
+  $("partners").hidden = false;
+}
+
+// ---------- verse of the day ----------
+// One verse per day (same for everyone, changes at midnight Eastern), from the World English Bible (public domain).
+const VERSES = [["Matthew 22:37","Jesus said to him, ‘You shall love the Lord your God with all your heart, with all your soul, and with all your mind.’"],["Psalm 62:1","My soul rests in God alone. My salvation is from him."],["Psalm 4:8","In peace I will both lay myself down and sleep, for you, the LORD alone, make me live in safety."],["Philippians 4:6","In nothing be anxious, but in everything, by prayer and petition with thanksgiving, let your requests be made known to God."],["Isaiah 41:10","Don’t you be afraid, for I am with you. Don’t be dismayed, for I am your God. I will strengthen you. Yes, I will help you. Yes, I will uphold you with the right hand of my righteousness."],["John 14:6","Jesus said to him, I am the way, the truth, and the life. No one comes to the Father, except through me."],["1 John 3:18","My little children, let’s not love in word only, or with the tongue only, but in deed and truth."],["Psalm 46:10","Be still, and know that I am God. I will be exalted among the nations. I will be exalted in the earth."],["Micah 6:8","He has shown you, O man, what is good. What does the LORD require of you, but to act justly, to love mercy, and to walk humbly with your God?"],["Acts 1:8","But you will receive power when the Holy Spirit has come upon you. You will be witnesses to me in Jerusalem, in all Judea and Samaria, and to the uttermost parts of the earth."],["Psalm 42:11","Why are you in despair, my soul? Why are you disturbed within me? Hope in God! For I shall still praise him, the saving help of my countenance, and my God."],["Matthew 6:34","Therefore don’t be anxious for tomorrow, for tomorrow will be anxious for itself. Each day’s own evil is sufficient."],["Isaiah 26:3","You will keep whoever’s mind is steadfast in perfect peace, because he trusts in you."],["Lamentations 3:22-23","It is because of the LORD’s loving kindnesses that we are not consumed, because his compassion doesn’t fail. They are new every morning. Great is your faithfulness."],["Psalm 37:4","Also delight yourself in the LORD, and he will give you the desires of your heart."],["Hebrews 13:5","Be free from the love of money, content with such things as you have, for he has said, “I will in no way leave you, neither will I in any way forsake you.”"],["Job 12:7-8","But ask the animals, now, and they shall teach you; the birds of the sky, and they shall tell you. Or speak to the earth, and it shall teach you. The fish of the sea shall declare to you."],["Psalm 100:4","Enter into his gates with thanksgiving, into his courts with praise. Give thanks to him, and bless his name."],["Psalm 23:1","The LORD is my shepherd: I shall lack nothing."],["1 Peter 5:7","casting all your worries on him, because he cares for you."],["2 Timothy 1:7","For God didn’t give us a spirit of fear, but of power, love, and self-control."],["James 1:19","So, then, my beloved brothers, let every man be swift to hear, slow to speak, and slow to anger;"],["Psalm 30:5","For his anger is but for a moment. His favor is for a lifetime. Weeping may stay for the night, but joy comes in the morning."],["1 Corinthians 13:13","But now faith, hope, and love remain—these three. The greatest of these is love."],["Proverbs 16:9","A man’s heart plans his course, but the LORD directs his steps."],["Romans 8:31","What then shall we say about these things? If God is for us, who can be against us?"],["Psalm 119:105","Your word is a lamp to my feet, and a light for my path."],["Psalm 118:24","This is the day that the LORD has made. We will rejoice and be glad in it!"],["Proverbs 17:17","A friend loves at all times; and a brother is born for adversity."],["Luke 1:37","For nothing spoken by God is impossible."],["Matthew 5:9","Blessed are the peacemakers, for they shall be called children of God."],["Proverbs 27:17","Iron sharpens iron; so a man sharpens his friend’s countenance."],["Psalm 86:5","For you, Lord, are good, and ready to forgive; abundant in loving kindness to all those who call on you."],["Joshua 1:9","Haven’t I commanded you? Be strong and courageous. Don’t be afraid. Don’t be dismayed, for the LORD your God is with you wherever you go."],["Matthew 28:20","teaching them to observe all things that I commanded you. Behold, I am with you always, even to the end of the age. Amen."],["Colossians 3:23","And whatever you do, work heartily, as for the Lord, and not for men,"],["John 15:13","Greater love has no one than this, that someone lay down his life for his friends."],["John 10:10","The thief only comes to steal, kill, and destroy. I came that they may have life, and may have it abundantly."],["1 Peter 3:15","But sanctify the Lord God in your hearts; and always be ready to give an answer to everyone who asks you a reason concerning the hope that is in you, with humility and fear:"],["Romans 12:2","Don’t be conformed to this world, but be transformed by the renewing of your mind, so that you may prove what is the good, well-pleasing, and perfect will of God."],["Matthew 11:28","Come to me, all you who labor and are heavily burdened, and I will give you rest."],["1 Peter 4:8","And above all things be earnest in your love among yourselves, for love covers a multitude of sins."],["Psalm 51:10","Create in me a clean heart, O God. Renew a right spirit within me."],["1 John 1:9","If we confess our sins, he is faithful and righteous to forgive us the sins, and to cleanse us from all unrighteousness."],["2 Peter 3:9","The Lord is not slow concerning his promise, as some count slowness; but is patient with us, not wishing that any should perish, but that all should come to repentance."],["Colossians 3:2","Set your mind on the things that are above, not on the things that are on the earth."],["2 Corinthians 5:17","Therefore if anyone is in Christ, he is a new creation. The old things have passed away. Behold, all things have become new."],["John 3:16","For God so loved the world, that he gave his one and only Son, that whoever believes in him should not perish, but have eternal life."],["Psalm 31:24","Be strong, and let your heart take courage, all you who hope in the LORD."],["Proverbs 4:23","Keep your heart with all diligence, for out of it is the wellspring of life."],["Psalm 24:1","The earth is the LORD’s, with its fullness; the world, and those who dwell therein."],["Psalm 147:3","He heals the broken in heart, and binds up their wounds."],["Philippians 4:13","I can do all things through Christ, who strengthens me."],["Romans 15:13","Now may the God of hope fill you with all joy and peace in believing, that you may abound in hope, in the power of the Holy Spirit."],["Philippians 4:19","My God will supply every need of yours according to his riches in glory in Christ Jesus."],["Deuteronomy 31:6","Be strong and courageous. Don’t be afraid or scared of them; for the LORD your God himself is who goes with you. He will not fail you nor forsake you."],["John 14:27","Peace I leave with you. My peace I give to you; not as the world gives, give I to you. Don’t let your heart be troubled, neither let it be fearful."],["Psalm 107:29","He makes the storm a calm, so that its waves are still."],["2 Corinthians 9:7","Let each man give according as he has determined in his heart; not grudgingly, or under compulsion; for God loves a cheerful giver."],["Isaiah 54:10","For the mountains may depart, and the hills be removed; but my loving kindness will not depart from you, and my covenant of peace will not be removed, says the LORD who has mercy on you."],["Revelation 21:4","He will wipe away every tear from their eyes. Death will be no more; neither will there be mourning, nor crying, nor pain, any more. The first things have passed away."],["Isaiah 60:1","Arise, shine; for your light has come, and the LORD’s glory has risen on you."],["Mark 10:27","Jesus, looking at them, said, “With men it is impossible, but not with God, for all things are possible with God.”"],["Psalm 145:18","The LORD is near to all those who call on him, to all who call on him in truth."],["Galatians 6:9","Let us not be weary in doing good, for we will reap in due season, if we don’t give up."],["Matthew 14:27","But immediately Jesus spoke to them, saying, “Cheer up! It is I! Don’t be afraid.”"],["Psalm 116:1","I love the LORD, because he listens to my voice, and my cries for mercy."],["2 Corinthians 4:16","Therefore we don’t faint, but though our outward man is decaying, yet our inward man is renewed day by day."],["Isaiah 30:15","For thus said the Lord the LORD, the Holy One of Israel, “You will be saved in returning and rest. Your strength will be in quietness and in confidence.” You refused,"],["Hebrews 4:16","Let us therefore draw near with boldness to the throne of grace, that we may receive mercy, and may find grace for help in time of need."],["Psalm 46:1","God is our refuge and strength, a very present help in trouble."],["John 16:33","I have told you these things, that in me you may have peace. In the world you have oppression; but cheer up! I have overcome the world."],["Jeremiah 17:7","Blessed is the man who trusts in the LORD, and whose confidence is in the LORD."],["Ephesians 2:8","for by grace you have been saved through faith, and that not of yourselves; it is the gift of God,"],["Exodus 15:2","Yah is my strength and song. He has become my salvation. This is my God, and I will praise him; my father’s God, and I will exalt him."],["Romans 8:28","We know that all things work together for good for those who love God, to those who are called according to his purpose."],["Proverbs 11:25","The liberal soul shall be made fat. He who waters shall be watered also himself."],["Psalm 27:1","The LORD is my light and my salvation. Whom shall I fear? The LORD is the strength of my life. Of whom shall I be afraid?"],["Jude 1:24","Now to him who is able to keep them from stumbling, and to present you faultless before the presence of his glory in great joy,"],["Ecclesiastes 4:9","Two are better than one, because they have a good reward for their labor."],["Isaiah 43:16","The LORD, who makes a way in the sea, and a path in the mighty waters says:"],["Ruth 1:16","Ruth said, Don’t urge me to leave you, and to return from following you, for where you go, I will go; and where you stay, I will stay. Your people will be my people, and your God my God."],["Psalm 34:8","Oh taste and see that the LORD is good. Blessed is the man who takes refuge in him."],["Hebrews 11:1","Now faith is assurance of things hoped for, proof of things not seen."],["Hebrews 13:8","Jesus Christ is the same yesterday, today, and forever."],["Ephesians 6:10","Finally, be strong in the Lord, and in the strength of his might."],["Luke 6:31","As you would like people to do to you, do exactly so to them."],["Isaiah 55:8","“For my thoughts are not your thoughts, and your ways are not my ways,” says the LORD."],["1 Corinthians 16:14","Let all that you do be done in love."],["Isaiah 40:31","But those who wait for the LORD will renew their strength. They will mount up with wings like eagles. They will run, and not be weary. They will walk, and not faint."],["Philippians 4:7","And the peace of God, which surpasses all understanding, will guard your hearts and your thoughts in Christ Jesus."],["Mark 9:23","Jesus said to him, “If you can believe, all things are possible to him who believes.”"],["Galatians 5:22-23","But the fruit of the Spirit is love, joy, peace, patience, kindness, goodness, faith, gentleness, and self-control. Against such things there is no law."],["John 15:5","I am the vine. You are the branches. He who remains in me, and I in him, the same bears much fruit, for apart from me you can do nothing."],["Psalm 121:1-2","I will lift up my eyes to the hills. Where does my help come from? My help comes from the LORD, who made heaven and earth."],["1 Thessalonians 5:16-18","Rejoice always. Pray without ceasing. In everything give thanks, for this is the will of God in Christ Jesus toward you."],["Matthew 5:16","Even so, let your light shine before men; that they may see your good works, and glorify your Father who is in heaven."],["Psalm 32:8","I will instruct you and teach you in the way which you shall go. I will counsel you with my eye on you."],["James 1:5","But if any of you lacks wisdom, let him ask of God, who gives to all liberally and without reproach; and it will be given to him."],["1 Corinthians 13:4","Love is patient and is kind; love doesn’t envy. Love doesn’t brag, is not proud,"],["Psalm 73:26","My flesh and my heart fails, but God is the strength of my heart and my portion forever."],["Nahum 1:7","The LORD is good, a stronghold in the day of trouble; and he knows those who take refuge in him."],["Matthew 7:7","Ask, and it will be given you. Seek, and you will find. Knock, and it will be opened for you."],["James 4:8","Draw near to God, and he will draw near to you. Cleanse your hands, you sinners; and purify your hearts, you double-minded."],["Romans 6:23","For the wages of sin is death, but the free gift of God is eternal life in Christ Jesus our Lord."],["Luke 12:7","But the very hairs of your head are all counted. Therefore don’t be afraid. You are of more value than many sparrows."],["Matthew 8:27","The men marveled, saying, “What kind of man is this, that even the wind and the sea obey him?”"],["Psalm 89:9","You rule the pride of the sea. When its waves rise up, you calm them."],["Proverbs 3:24","When you lie down, you will not be afraid. Yes, you will lie down, and your sleep will be sweet."],["Isaiah 40:29","He gives power to the weak. He increases the strength of him who has no might."],["Matthew 6:33","But seek first God’s Kingdom, and his righteousness; and all these things will be given to you as well."],["Matthew 19:26","Looking at them, Jesus said, “With men this is impossible, but with God all things are possible.”"],["1 Timothy 4:12","Let no man despise your youth; but be an example to those who believe, in word, in your way of life, in love, in spirit, in faith, and in purity."],["Mark 4:39","He awoke, and rebuked the wind, and said to the sea, “Peace! Be still!” The wind ceased, and there was a great calm."],["Psalm 56:3","When I am afraid, I will put my trust in you."],["2 Thessalonians 3:3","But the Lord is faithful, who will establish you, and guard you from the evil one."],["1 Corinthians 15:58","Therefore, my beloved brothers, be steadfast, immovable, always abounding in the Lord’s work, because you know that your labor is not in vain in the Lord."],["Romans 5:8","But God commends his own love toward us, in that while we were yet sinners, Christ died for us."],["John 21:6","He said to them, “Cast the net on the right side of the boat, and you will find some.” They cast it therefore, and now they weren’t able to draw it in for the multitude of fish."],["Psalm 8:3-4","When I consider your heavens, the work of your fingers, the moon and the stars, which you have ordained; what is man, that you think of him? What is the son of man, that you care for him?"],["Psalm 150:6","Let everything that has breath praise Yah! Praise Yah!"],["Titus 3:5","not by works of righteousness which we did ourselves, but according to his mercy, he saved us through the washing of regeneration and renewing by the Holy Spirit,"],["Isaiah 9:6","For to us a child is born. To us a son is given; and the government will be on his shoulders. His name will be called Wonderful, Counselor, Mighty God, Everlasting Father, Prince of Peace."],["1 Chronicles 16:11","Seek the LORD and his strength. Seek his face forever more."],["Colossians 3:15","And let the peace of God rule in your hearts, to which also you were called in one body; and be thankful."],["Genesis 28:15","Behold, I am with you, and will keep you, wherever you go, and will bring you again into this land. For I will not leave you, until I have done that which I have spoken of to you."],["Ecclesiastes 3:1","For everything there is a season, and a time for every purpose under heaven:"],["John 8:12","Again, therefore, Jesus spoke to them, saying, “I am the light of the world. He who follows me will not walk in the darkness, but will have the light of life.”"],["Ephesians 4:32","And be kind to one another, tender hearted, forgiving each other, just as God also in Christ forgave you."],["Hebrews 10:23","let us hold fast the confession of our hope without wavering; for he who promised is faithful."],["Zephaniah 3:17","The LORD, your God, is among you, a mighty one who will save. He will rejoice over you with joy. He will calm you in his love. He will rejoice over you with singing."],["Psalm 33:7","He gathers the waters of the sea together as a heap. He lays up the deeps in storehouses."],["Psalm 18:2","The LORD is my rock, my fortress, and my deliverer; my God, my rock, in whom I take refuge; my shield, and the horn of my salvation, my high tower."],["Proverbs 19:21","There are many plans in a man’s heart, but the LORD’s counsel will prevail."],["Romans 10:9","that if you will confess with your mouth that Jesus is Lord, and believe in your heart that God raised him from the dead, you will be saved."],["Jeremiah 29:11","For I know the thoughts that I think toward you,” says the LORD, “thoughts of peace, and not of evil, to give you hope and a future."],["Psalm 136:1","Give thanks to the LORD, for he is good; for his loving kindness endures forever."],["Isaiah 12:2","Behold, God is my salvation. I will trust, and will not be afraid; for Yah, the LORD, is my strength and song; and he has become my salvation."],["John 1:5","The light shines in the darkness, and the darkness hasn’t overcome it."],["Proverbs 3:5-6","Trust in the LORD with all your heart, and don’t lean on your own understanding. In all your ways acknowledge him, and he will make your paths straight."],["1 John 4:19","We love him, because he first loved us."],["Proverbs 22:1","A good name is more desirable than great riches, and loving favor is better than silver and gold."],["Psalm 40:1","I waited patiently for the LORD. He turned to me, and heard my cry."],["Mark 11:24","Therefore I tell you, all things whatever you pray and ask for, believe that you have received them, and you shall have them."],["Proverbs 18:10","The LORD’s name is a strong tower: the righteous run to him, and are safe."],["Genesis 1:1","In the beginning, God created the heavens and the earth."],["Psalm 91:1","He who dwells in the secret place of the Most High will rest in the shadow of the Almighty."],["Deuteronomy 31:8","The LORD himself is who goes before you. He will be with you. He will not fail you nor forsake you. Don’t be afraid. Don’t be discouraged."],["Romans 8:1","There is therefore now no condemnation to those who are in Christ Jesus, who don’t walk according to the flesh, but according to the Spirit."],["John 11:25","Jesus said to her, I am the resurrection and the life. He who believes in me will still live, even if he dies."],["Psalm 65:5","By awesome deeds of righteousness, you answer us, God of our salvation. You who are the hope of all the ends of the earth, of those who are far away on the sea;"],["2 Samuel 22:31","As for God, his way is perfect. The LORD’s word is tested. He is a shield to all those who take refuge in him."],["Isaiah 48:18","Oh that you had listened to my commandments! Then your peace would have been like a river, and your righteousness like the waves of the sea."],["Psalm 143:8","Cause me to hear your loving kindness in the morning, for I trust in you. Cause me to know the way in which I should walk, for I lift up my soul to you."],["Numbers 6:24-26","The LORD bless you, and keep you. The LORD make his face to shine on you, and be gracious to you. The LORD lift up his face toward you, and give you peace."],["Proverbs 16:3","Commit your deeds to the LORD, and your plans shall succeed."],["Exodus 14:14","The LORD will fight for you, and you shall be still."],["Psalm 16:8","I have set the LORD always before me. Because he is at my right hand, I shall not be moved."],["Ephesians 3:20","Now to him who is able to do exceedingly abundantly above all that we ask or think, according to the power that works in us,"],["Revelation 3:20","Behold, I stand at the door and knock. If anyone hears my voice and opens the door, then I will come in to him, and will dine with him, and he with me."],["Psalm 93:4","Above the voices of many waters, the mighty breakers of the sea, the LORD on high is mighty."],["Matthew 5:14","You are the light of the world. A city located on a hill can’t be hidden."],["Psalm 19:1","The heavens declare the glory of God. The expanse shows his handiwork."],["Ephesians 2:10","For we are his workmanship, created in Christ Jesus for good works, which God prepared before that we would walk in them."],["Philippians 1:6","being confident of this very thing, that he who began a good work in you will complete it until the day of Jesus Christ."],["Psalm 90:12","So teach us to count our days, that we may gain a heart of wisdom."],["Psalm 55:22","Cast your burden on the LORD, and he will sustain you. He will never allow the righteous to be moved."],["Habakkuk 3:19","The LORD, the Lord, is my strength. He makes my feet like deer’s feet, and enables me to go in high places. For the music director, on my stringed instruments."],["James 1:17","Every good gift and every perfect gift is from above, coming down from the Father of lights, with whom can be no variation, nor turning shadow."],["Psalm 139:14","I will give thanks to you, for I am fearfully and wonderfully made. Your works are wonderful. My soul knows that very well."],["Job 38:11","and said, ‘Here you may come, but no further. Here your proud waves shall be stayed?’"],["Romans 12:12","rejoicing in hope; enduring in troubles; continuing steadfastly in prayer;"],["Psalm 95:4-5","In his hand are the deep places of the earth. The heights of the mountains are also his. The sea is his, and he made it. His hands formed the dry land."],["1 John 4:18","There is no fear in love; but perfect love casts out fear, because fear has punishment. He who fears is not made perfect in love."],["Psalm 28:7","The LORD is my strength and my shield. My heart has trusted in him, and I am helped. Therefore my heart greatly rejoices. With my song I will thank him."],["Psalm 103:2","Praise the LORD, my soul, and don’t forget all his benefits;"],["Psalm 84:11","For the LORD God is a sun and a shield. The LORD will give grace and glory. He withholds no good thing from those who walk blamelessly."],["2 Corinthians 5:7","for we walk by faith, not by sight."],["Proverbs 15:1","A gentle answer turns away wrath, but a harsh word stirs up anger."],["John 13:34","A new commandment I give to you, that you love one another. Just as I have loved you, you also love one another."]];
+function drawVerse(){
+  try{
+    const d = new Intl.DateTimeFormat("en-CA",{timeZone:"America/New_York",year:"numeric",month:"2-digit",day:"2-digit"}).format(new Date());
+    const n = Math.floor(Date.UTC(+d.slice(0,4), +d.slice(5,7)-1, +d.slice(8,10)) / 86400e3);
+    const [ref, text] = VERSES[n % VERSES.length];
+    $("votd").innerHTML = `<span class="votd-k">Verse of the day</span><q>${escA(text)}</q><cite>${escA(ref)}</cite>`;
+  }catch(e){}
+}
+function sponsorFor(sp){ return SPONSORS.find(s => (s.beaches||[]).includes(sp.name)) || SPONSORS.find(s => (s.regions||[]).includes(sp.region)) || null; }
+const escA = s => String(s||"").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+function presentedHTML(sp){
+  const s = sponsorFor(sp);
+  if (s) return `<a class="pres" href="${escA(s.url)}" target="_blank" rel="noopener sponsored" onclick="countHit('c')"><span class="pres-k">Presented by</span>${s.logo?`<img src="${escA(s.logo)}" alt="">`:""}<span class="pres-n">${escA(s.name)}</span></a>`;
+  return `<a class="pres empty" href="sponsor.html"><span class="pres-k">Presented by</span><span class="pres-n">Your shop here</span><span class="pres-go">Sponsor SkimCast →</span></a>`;
+}
+
+// ---------- visitor counter ----------
+// One small ping per visit (and per beach you switch to). No names, IP addresses or cookies are kept.
+// Not counted: local test copies, automated browsers, and any device marked "don't count me" on stats.html.
+// ---------- "How was it?": riders rate today's session in one tap. Saved on our server so every report sharpens the forecast ----------
+const HW = [[1,"Trash"],[2,"Fun"],[3,"W Skim"]], hwSeen = {};
+function hwKey(){ return "sc_hw_" + slug(SPOTS[spotIdx].name) + "_" + new Date().toLocaleDateString("en-CA"); }
+async function hwLoad(sl){
+  const c = hwSeen[sl]; if (c && Date.now()-c.ts < 5*60e3) return c.list;
+  try{ const r = await fetchT("/api/report?s=" + sl, 8000), j = await r.json(); hwSeen[sl] = {ts:Date.now(), list:j.reports||[]}; return hwSeen[sl].list; }catch(e){ return []; }
+}
+function hwCounts(list){
+  const day = new Date().toLocaleDateString("en-CA"), today = list.filter(x => new Date(x.ts).toLocaleDateString("en-CA") === day);
+  if (!today.length) return "No reports yet today. Be the first.";
+  const n = k => today.filter(x=>x.r===k).length, parts = HW.map(([k,t]) => n(k) ? `${n(k)} said ${t}` : "").filter(Boolean);
+  return `Riders today: ${parts.join(", ")}.`;
+}
+function howWas(d){
+  const el = $("howwas"); if (!el) return;
+  if (!d.isToday || !onSite()){ el.innerHTML = ""; return; }
+  const sl = slug(SPOTS[spotIdx].name), mine = +(store.get(hwKey())||0), nm = SPOTS[spotIdx].name.split(",")[0];
+  el.innerHTML = `<div class="howwas"><h3>Skimmed ${escA(nm)} today? How was it?</h3><p>One tap. Real reports are how SkimCast gets more accurate.</p>
+    <div class="hw-b">${HW.map(([k,t]) => `<button type="button" data-r="${k}" class="${mine===k?"on":""}" aria-pressed="${mine===k}">${t}</button>`).join("")}</div>
+    <div class="hw-c" id="hwc" aria-live="polite">${mine ? "Thanks, your report is in." : ""}</div></div>`;
+  el.querySelectorAll("button[data-r]").forEach(b => b.onclick = () => hwSend(+b.dataset.r));
+  hwLoad(sl).then(list => { const c = $("hwc"); if (c && slug(SPOTS[spotIdx].name)===sl) c.textContent = (mine ? "Thanks, your report is in. " : "") + hwCounts(list); });
+}
+async function hwSend(r){
+  const sl = slug(SPOTS[spotIdx].name), fs = snap && snap.spot===SPOTS[spotIdx].name ? +snap.score.toFixed(1) : null;
+  store.set(hwKey(), String(r));
+  document.querySelectorAll("#howwas button[data-r]").forEach(b => { const on = +b.dataset.r===r; b.classList.toggle("on", on); b.setAttribute("aria-pressed", on); });
+  const c = $("hwc"); if (c) c.textContent = "Saving...";
+  try{
+    const res = await fetch("/api/report", {method:"POST", headers:{"content-type":"application/json"}, body: JSON.stringify({s:sl, r, m:mode, fs})});
+    if (!res.ok) throw new Error("save failed");
+    delete hwSeen[sl]; const list = await hwLoad(sl);
+    if (c) c.textContent = "Thanks, your report is in. " + hwCounts(list);
+  }catch(e){ if (c) c.textContent = "Couldn't save that right now. Try again in a minute."; }
+}
+function countHit(t){
+  try {
+    if (!/^https?:$/.test(location.protocol) || /^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname) || navigator.webdriver) return;
+    if (store.get("sc_nocount") === "1") return;
+    const today = new Date().toLocaleDateString("en-CA"), body = {t, s: slug(SPOTS[spotIdx].name)};
+    if (t === "v") { body.u = store.get("sc_seen") !== today ? 1 : 0; body.n = store.get("sc_first") ? 0 : 1; store.set("sc_seen", today); if (body.n) store.set("sc_first", today); }
+    fetch("/api/hit", {method:"POST", body: JSON.stringify(body), keepalive:true, headers:{"content-type":"application/json"}}).catch(()=>{});
+  } catch(e){}
+}
+
+function seoLine(sp){ return `Skimboarding forecast for ${sp.name}: a skim score with shorebreak size, how far out the waves break, tide, wind and the best time to skim today and the next 5 days. Updated through the day from NOAA, the National Weather Service and marine forecast models. One of ${SPOTS.length} beaches on ${SITE_NAME}.`; }
+function pick(i, day){ if (i !== spotIdx) setTimeout(() => countHit("b"), 0); spotIdx = i; wantDay = day==null ? null : day; setOpen(false); closeCfg(); store.set("sc10spot", slug(SPOTS[i].name)); try{ history.replaceState(null,"","/"+slug(SPOTS[i].name)); }catch(e){} load(); window.scrollTo({top:0, behavior:"smooth"}); }
+
+// ---------- data ----------
+async function fetchT(url, ms){
+  const c = new AbortController(), t = setTimeout(()=>c.abort(), ms);
+  try{ const r = await fetch(url, {signal:c.signal}); if(!r.ok) throw new Error("HTTP "+r.status); return r; }
+  finally{ clearTimeout(t); }
+}
+async function getText(url){        // NOAA text files block direct browser reads, so fall back to relays
+  try{ return await (await fetchT(url, 3000)).text(); }catch(e){}
+  const px = []; if (PROXY_URL) px.push(PROXY_URL + encodeURIComponent(url));
+  px.push("https://api.allorigins.win/raw?url=" + encodeURIComponent(url), "https://corsproxy.io/?" + encodeURIComponent(url));
+  return await Promise.any(px.map(async u => { const t = await (await fetchT(u, 9000)).text(); if (!t || t.length < 20) throw new Error("empty"); return t; }));
+}
+async function noaaTides(st, interval, bd){
+  if (onSite()){
+    try{ const j = await (await fetchT(`/api/tide?station=${encodeURIComponent(st)}&interval=${interval}&begin=${bd}`, 9000)).json();
+      if (j && j.predictions) return j.predictions.map(p => ({t:p.t.replace(" ","T"), v:+p.v, type:p.type})); }catch(e){}
+  }
+  const j = await (await fetchT(`https://api.tidesandcurrents.noaa.gov/api/prod/datagetter?product=predictions&application=skimcast&station=${st}&begin_date=${bd}&range=168&datum=MLLW&time_zone=lst_ldt&units=english&interval=${interval}&format=json`, 9000)).json();
+  return j.predictions.map(p => ({t:p.t.replace(" ","T"), v:+p.v, type:p.type}));
+}
+async function buoyText(id){         // our own Netlify relay first (works once the site is on Netlify), then public relays
+  if (/^https?:$/.test(location.protocol)){
+    try{ const t = await (await fetchT(`/api/buoy?id=${encodeURIComponent(id)}`, 7000)).text(); if (t.startsWith("#YY")) return t; }catch(e){}
+  }
+  return getText(`https://www.ndbc.noaa.gov/data/realtime2/${id}.txt`);
+}
+async function noaaBuoy(id){          // newest row that has each value (waves and wind are often reported on different rows)
+  const lines = (await buoyText(id)).trim().split("\n");
+  const hd = lines[0].replace("#","").trim().split(/\s+/), rows = lines.slice(2, 26).map(l=>l.trim().split(/\s+/));
+  const pick = k => { const ix = hd.indexOf(k); for (const r of rows){ const x = r[ix]; if (x!==undefined && x!=="MM") return {v:+x, r}; } return null; };
+  const stamp = r => r ? Date.UTC(+r[hd.indexOf("YY")], +r[hd.indexOf("MM")]-1, +r[hd.indexOf("DD")], +r[hd.indexOf("hh")], +r[hd.indexOf("mm")]) : null;
+  const wv = pick("WVHT"), dp = pick("DPD"), mw = pick("MWD"), ws = pick("WSPD"), wd = pick("WDIR"), wt = pick("WTMP");
+  return {wave:wv&&wv.v, period:dp&&dp.v, mwd:mw&&mw.v, wind:ws&&ws.v, wdir:wd&&wd.v, wtemp:wt&&wt.v, waveAt:stamp(wv&&wv.r), anyAt:stamp(rows[0])};
+}
+async function nwsBuoyWind(id){      // api.weather.gov mirrors wind from many buoys and allows browser reads
+  const p = (await (await fetchT(`https://api.weather.gov/stations/${id}/observations/latest`, 6000)).json()).properties;
+  if (!p.windSpeed || p.windSpeed.value==null) throw new Error("no wind");
+  return {mph:p.windSpeed.value*0.621371, dir:p.windDirection && p.windDirection.value};
+}
+async function coopsWater(st){
+  const j = await (await fetchT(`https://api.tidesandcurrents.noaa.gov/api/prod/datagetter?product=water_temperature&application=skimcast&station=${st}&date=latest&units=english&time_zone=lst_ldt&format=json`, 6000)).json();
+  return +j.data[0].v;
+}
+async function coopsWind(st){
+  const j = await (await fetchT(`https://api.tidesandcurrents.noaa.gov/api/prod/datagetter?product=wind&application=skimcast&station=${st}&date=latest&units=english&time_zone=lst_ldt&format=json`, 6000)).json();
+  const p = j.data[0]; return {mph:+p.s*1.15078, dir:+p.d};
+}
+const tideDate = () => { const d0 = new Date(Date.now()-8*3600e3); return `${d0.getUTCFullYear()}${pad(d0.getUTCMonth()+1)}${pad(d0.getUTCDate())}`; };
+const jgetDirect = u => fetchT(u, 12000).catch(e => new Promise(r => setTimeout(r, /429/.test(e.message) ? 2500 : 300)).then(() => fetchT(u, 12000))).then(r => r.json());
+const onSite = () => /^https?:$/.test(location.protocol);
+// Weather goes through our own server first: it keeps one shared copy for every visitor (faster, and the
+// weather service can't block busy days). If that fails, the browser asks the weather service directly.
+async function jget(u){
+  if (onSite() && /^https:\/\/(marine-)?api\.open-meteo\.com\/v1\//.test(u)){
+    try{ const r = await fetchT("/api/om?u=" + encodeURIComponent(u), 15000); return await r.json(); }catch(e){}
+  }
+  return jgetDirect(u);
+}
+// Nearshore wave models, through our own server: NOAA's NWPS (Florida, East and Gulf coasts) and CDIP/Scripps (California).
+// They forecast the waves right off each beach, including islands, reefs and the Bahamas blocking swell.
+async function nearFor(i){
+  if (!onSite()) throw new Error("offline");
+  const r = await fetchT("/api/near?s=" + slug(SPOTS[i].name), 12000); if (!r.ok) throw new Error("no nearshore");
+  const j = await r.json(); if (!j.t || !j.t.length) throw new Error("no nearshore"); return j;
+}
+const MARINE = "wave_height,wave_period,wave_direction,swell_wave_height,swell_wave_period,swell_wave_direction,wind_wave_height,wind_wave_period,wind_wave_direction,sea_level_height_msl,sea_surface_temperature";
+const WEATHER = "wind_speed_10m,wind_direction_10m,wind_gusts_10m,temperature_2m,uv_index,precipitation_probability";
+const omUrls = (lat, lon) => { const q = `latitude=${lat}&longitude=${lon}&timezone=auto&forecast_days=5`; return [
+  `https://marine-api.open-meteo.com/v1/marine?${q}&hourly=${MARINE}`,
+  `https://marine-api.open-meteo.com/v1/marine?${q}&hourly=wave_height,wave_period&models=ncep_gfswave025`,
+  `https://api.open-meteo.com/v1/forecast?${q}&hourly=${WEATHER}&daily=sunrise,sunset&wind_speed_unit=mph&temperature_unit=fahrenheit`]; };
+function buildForecast(m0, g0, w, tR, hR, sp, nR){
+  const m = m0.hourly, wh = w.hourly, tm = {}, wmap = {}, gmap = {};
+  if (tR.status==="fulfilled") tR.value.forEach(p => tm[p.t] = p.v);
+  let tideSrc = Object.keys(tm).length > 24 ? "tides: NOAA predictions" : "";
+  if (!tideSrc && hR.status==="fulfilled" && hR.value.length >= 2){      // smooth curve through the high and low times
+    const hl = hR.value.map(p => ({x:Date.parse(p.t+":00Z"), v:+p.v})).sort((a,b)=>a.x-b.x), n = hl.length;
+    hl.unshift({x:hl[0].x-(hl[1].x-hl[0].x), v:hl[1].v}); hl.push({x:hl[n].x+(hl[n].x-hl[n-1].x), v:hl[n-1].v});
+    m0.hourly.time.forEach(t => { const x = Date.parse(t+":00Z");
+      for (let k=0; k<hl.length-1; k++){ const a = hl[k], b = hl[k+1];
+        if (x>=a.x && x<=b.x){ tm[t] = (a.v+b.v)/2 + (a.v-b.v)/2*Math.cos(Math.PI*(x-a.x)/(b.x-a.x)); break; } } });
+    tideSrc = "tides: NOAA high and low predictions";
+  }
+  wh.time.forEach((t,k) => wmap[t] = k);
+  let gOk = false;
+  if (g0 && g0.hourly && g0.hourly.time){
+    const gh = g0.hourly, kh = Object.keys(gh).find(k=>k.startsWith("wave_height")), kp = Object.keys(gh).find(k=>k.startsWith("wave_period"));
+    gh.time.forEach((t,k) => gmap[t] = {h: kh?gh[kh][k]:null, p: kp?gh[kp][k]:null});
+    gOk = !!kh && Math.max(0, ...gh[kh].filter(x=>x!=null)) >= .05;   // a model that says 0 ft everywhere has no real data here
+    if (!gOk) Object.keys(gmap).forEach(t => gmap[t] = {});
+  }
+  const mOk = m.wave_height.some(x => x!=null && x>0);
+  // Behind the Bahamas (Palm Beach to Miami) the coarse GFS wave model can't see the islands blocking east swell, so lean on the detailed model there
+  const wA = sp && BAHAMAS_SHADOW.includes(sp.region) ? .8 : .5;
+  let gap = 0, n2 = 0; const blend = (a,b,d=0) => (a!=null && b!=null) ? a*wA + b*(1-wA) : (a ?? b ?? d);
+  const comp = (k, key) => m[key] && m[key][k]!=null ? m[key][k] : null;
+  const data = m.time.map((t,k) => {
+    const k2 = wmap[t], g = gmap[t] || {}, a = m.wave_height[k];
+    if (gOk && a!=null && g.h!=null && Math.max(a,g.h)>.15){ gap += Math.abs(a-g.h)/((a+g.h)/2); n2++; }
+    const wv = blend(mOk ? a : null, g.h, null);
+    return {t, wave: wv ?? 0, noWave: wv==null, period:blend(mOk ? m.wave_period[k] : null, g.p, 6), dir:m.wave_direction[k]??0,
+      sw: mOk ? comp(k,"swell_wave_height") : null, swT: comp(k,"swell_wave_period"), swD: comp(k,"swell_wave_direction"),
+      ww: mOk ? comp(k,"wind_wave_height") : null, wwT: comp(k,"wind_wave_period"), wwD: comp(k,"wind_wave_direction"),
+      wind: k2==null?0:(wh.wind_speed_10m[k2]??0), gust: k2==null||!wh.wind_gusts_10m?null:wh.wind_gusts_10m[k2], wdir: k2==null?0:(wh.wind_direction_10m[k2]??0),
+      air: k2==null?null:wh.temperature_2m[k2], uv: k2==null?null:wh.uv_index[k2], pop: k2==null?null:wh.precipitation_probability[k2],
+      water: !m.sea_surface_temperature || m.sea_surface_temperature[k]==null ? null : m.sea_surface_temperature[k]*1.8+32,
+      tide: tm[t]!==undefined ? tm[t] : (m.sea_level_height_msl[k]??0)*3.281};
+  });
+  // Line the nearshore model up with our hours (it may be every hour or every 3 hours, in UTC)
+  const nr = nR && nR.status==="fulfilled" ? nR.value : null, off = w.utc_offset_seconds||0; let nN = 0;
+  if (nr) data.forEach(x => {
+    const ts = Date.parse(x.t+":00Z")/1000 - off; let k = 0;
+    while (k < nr.t.length-1 && nr.t[k+1] <= ts) k++;
+    const t0 = nr.t[k], t1 = nr.t[k+1];
+    if (ts === t0){ x.nh = nr.h[k]; x.nT = nr.p[k]; }
+    else if (t1!=null && ts > t0 && ts < t1 && t1-t0 <= 3.5*3600){ const a = (ts-t0)/(t1-t0); x.nh = nr.h[k]*(1-a) + nr.h[k+1]*a; x.nT = a<.5 ? nr.p[k] : nr.p[k+1]; }
+    if (x.nh!=null && !(x.nh>=0 && x.nh<15)){ delete x.nh; delete x.nT; }
+    if (x.nh!=null) nN++;
+  });
+  const nearSrc = nr && nN >= 12 ? nr.src : "";
+  const sun = {}; (w.daily.time||[]).forEach((day,k) => { const sr = w.daily.sunrise[k], ss = w.daily.sunset[k]; if (sr && ss) sun[day] = {sr:mins(sr), ss:mins(ss)}; });
+  return {ts:Date.now(), off:w.utc_offset_seconds||0, data, sun, hilo: hR.status==="fulfilled" ? hR.value : [], disagree: n2>0 && gap/n2>.4,
+    noWaves: !mOk && !gOk,
+    near: nearSrc, nearK: !nearSrc ? "" : /^CDIP/.test(nearSrc) ? "cdip" : "nwps",
+    src:(nearSrc ? "waves right off the beach: " + nearSrc + ", offshore waves: " : "") + (mOk && gOk ? "waves: two Open-Meteo models blended" : mOk || gOk ? "waves: one Open-Meteo model (the other has no data for this spot)" : "waves: no wave data for this spot") + ", wind and weather: Open-Meteo, " + (tideSrc || "tides: modeled (NOAA tides failed)") + ", buoys and surf forecast: NOAA"};
+}
+async function fetchForecast(i){       // one beach: 3 weather requests + 2 tide requests
+  const s = SPOTS[i], bd = tideDate(), [u1,u2,u3] = omUrls(s.lat, s.lon);
+  const [mR, gR, wR, tR, hR, nR] = await Promise.allSettled([jget(u1), jget(u2), jget(u3), noaaTides(s.tide,"h",bd), noaaTides(s.tide,"hilo",bd), nearFor(i)]);
+  if (mR.status!=="fulfilled" || wR.status!=="fulfilled") throw (mR.reason || wR.reason || new Error("forecast failed"));
+  return buildForecast(mR.value, gR.status==="fulfilled" ? gR.value : null, wR.value, tR, hR, s, nR);
+}
+async function fetchBatch(idxs){       // many beaches: Open-Meteo takes a list of locations, so this is only 3 weather requests in total
+  const [u1,u2,u3] = omUrls(idxs.map(k=>SPOTS[k].lat).join(","), idxs.map(k=>SPOTS[k].lon).join(",")), arr = r => Array.isArray(r) ? r : [r], bd = tideDate();
+  const [mR, gR, wR] = await Promise.allSettled([jget(u1), jget(u2), jget(u3)]);
+  if (mR.status!=="fulfilled" || wR.status!=="fulfilled") throw (mR.reason || wR.reason || new Error("forecast failed"));
+  const M = arr(mR.value), W = arr(wR.value), G = gR.status==="fulfilled" ? arr(gR.value) : [];
+  let n = 0;
+  await Promise.all([0,1,2].map(async () => { while (n < idxs.length){
+    const j = n++, k = idxs[j], s = SPOTS[k];
+    if (fresh(k)) continue;   // already have a recent forecast for this beach
+    const [tR, hR, nR] = await Promise.allSettled([noaaTides(s.tide,"h",bd), noaaTides(s.tide,"hilo",bd), nearFor(k)]);
+    try{ fcCache[k] = buildForecast(M[j], G[j]||null, W[j], tR, hR, s, nR); persist(); }catch(e){}
+    try{ await nwsFor(k); }catch(e){}
+    refreshLists();
+  } }));
+}
+function persist(){ const o = {}; Object.keys(fcCache).forEach(i => o[SPOTS[i].name] = fcCache[i]); store.set("sc16fc", JSON.stringify(o)); }
+function restore(){ try{ const o = JSON.parse(store.get("sc16fc")||"{}"); SPOTS.forEach((sp,i) => { const c = o[sp.name]; if (c && c.data && Date.now()-c.ts < STALE) fcCache[i] = c; }); }catch(e){} }
+async function forecastFor(i, force){
+  const c = fcCache[i]; if (!force && c && Date.now()-c.ts < TTL) return c;
+  if (inflight[i]) return inflight[i];
+  return inflight[i] = fetchForecast(i).then(r => { fcCache[i] = r; persist(); return r; }).finally(() => { delete inflight[i]; });
+}
+async function loadBuoy(i, my){
+  const s = SPOTS[i], c = buoyCache[i];
+  if (c && Date.now()-c.ts < TTL){ $("buoy").innerHTML = c.html; buoyNow = c.b; return; }
+  $("buoy").innerHTML = `<div class="kv"><h3>${s.buoy ? `Buoy ${s.buoy}, measured` : "Measured nearby"}</h3>${SKEL}</div>`;
+  const ago = t => { if (!t) return ""; const m = Math.round((Date.now()-t)/60000); return m<90 ? m+" min ago" : Math.round(m/60)+" hr ago"; };
+  const [bR, nwR, cwR, wtR] = await Promise.allSettled([s.buoy ? noaaBuoy(s.buoy) : Promise.reject(new Error("no buoy")), s.buoy ? nwsBuoyWind(s.buoy) : Promise.reject(new Error("no buoy")), coopsWind(s.tide), coopsWater(s.tide)]);
+  const b = bR.status==="fulfilled" ? bR.value : null;
+  let w = null, wsrc = "";
+  if (b && b.wind != null){ w = {mph:b.wind*2.237, dir:b.wdir}; wsrc = "measured at buoy"; }
+  else if (nwR.status==="fulfilled"){ w = nwR.value; wsrc = "measured at buoy (NWS feed)"; }
+  else if (cwR.status==="fulfilled"){ w = cwR.value; wsrc = "measured at NOAA tide station"; }
+  else { try{ const r = fcCache[i] || await forecastFor(i), k = nowAt(r.off), key = `${k.date}T${pad(Math.floor(k.min/60))}:00`, h = r.data.find(x=>x.t===key) || r.data[0]; w = {mph:h.wind, dir:h.wdir}; wsrc = "forecast (no wind sensor nearby)"; }catch(e2){} }
+  const wtxt = w ? Math.round(w.mph) + " mph" + (w.dir!=null && !isNaN(w.dir) ? " " + compass(w.dir) : "") : null;
+  let wtemp = null, wtsrc = "";
+  if (b && b.wtemp != null){ wtemp = b.wtemp*1.8+32; wtsrc = "measured at buoy"; }
+  else if (wtR.status==="fulfilled" && !isNaN(wtR.value)){ wtemp = wtR.value; wtsrc = "measured at NOAA tide station"; }
+  let check = "";
+  try{
+    const r = fcCache[i] || await forecastFor(i), k = nowAt(r.off), key = `${k.date}T${pad(Math.floor(k.min/60))}:00`, h = r.data.find(x=>x.t===key) || r.data[0];
+    if (b && b.wave != null){
+      const mf = h.wave*3.281, bf = b.wave*3.281, df = mf-bf;
+      check = (Math.abs(df)>0.5 && Math.abs(df)/Math.max(bf,.5)>.35)
+        ? `<p class="flag">Heads up: the forecast is running ${df>0?"high":"low"}. The model says ${mf.toFixed(1)} ft offshore and the buoy is measuring ${bf.toFixed(1)} ft.</p>`
+        : `<p class="okline">The forecast matches the buoy (model ${mf.toFixed(1)} ft, buoy ${bf.toFixed(1)} ft).</p>`;
+    }
+  }catch(e){}
+  const row = (k, v, e) => v==null ? "" : `<div class="r"><dt>${k}</dt><dd>${v}${e?`<em>${e}</em>`:""}</dd></div>`;
+  const html = `<dl class="kv"><h3>${s.buoy ? `Buoy ${s.buoy}, measured` : "Measured nearby"}</h3>` + [
+      row("Waves", b&&b.wave!=null ? (b.wave*3.281).toFixed(1)+" ft" : null, b ? ago(b.waveAt) : ""),
+      row("Period", b&&b.period!=null ? b.period+" s" : null),
+      row("Swell from", b&&b.mwd!=null ? compass(b.mwd)+" "+Math.round(b.mwd)+"°" : null),
+      row("Wind", wtxt, wsrc),
+      row("Water temp", wtemp==null ? null : Math.round(wtemp)+"°F", wtsrc)].join("") + `</dl>${check}${b ? "" : `<p class="note">${s.buoy ? "Live wave readings are unavailable right now." : "No wave buoy close enough to this beach, so waves come from the forecast models only."}</p>`}`;
+  if (b) buoyCache[i] = {ts:Date.now(), html, b};
+  if (my === loadId){ $("buoy").innerHTML = html; buoyNow = b; }
+}
+// Beaches load one region at a time (the region you're on first, then any region you scroll to in the
+// beach menu), so a visit never asks the weather service for all 300 beaches at once.
+const curRegion = () => SPOTS[spotIdx].region;
+const inRegion = r => SPOTS.map((s,k) => s.region===r ? k : -1).filter(k => k>=0);
+const fresh = k => fcCache[k] && Date.now()-fcCache[k].ts < TTL;
+const regionDone = {}, regionQueue = []; let regionBusy = false;
+function loadRegion(r, front){
+  if (regionDone[r] && Date.now()-regionDone[r] < TTL) return;
+  if (regionQueue.includes(r)) return;
+  front ? regionQueue.unshift(r) : regionQueue.push(r);
+  runRegions();
+}
+async function runRegions(){
+  if (regionBusy) return; regionBusy = true;
+  while (regionQueue.length){
+    const r = regionQueue.shift(), all = inRegion(r), q = all.filter(k => k!==spotIdx && !fresh(k));
+    try{ if (q.length) await fetchBatch(all); regionDone[r] = Date.now(); }   // always the whole region, so every visitor shares one cached copy
+    catch(e){ regionBusy = false; setTimeout(() => loadRegion(r), 60e3); return; }   // weather service busy: try again in a minute
+    inRegion(r).forEach(k => { if (k!==spotIdx) nwsFor(k).then(refreshLists); });
+  }
+  regionBusy = false;
+}
+function prefetch(){ loadRegion(curRegion(), true); }
+// ---------- W Skim anywhere: a light scan of all 300 beaches for today, so the banner shows a W wherever it is ----------
+// One wave request and one wind request cover every beach (today only, modeled tides). The most promising beaches
+// are then loaded with the full forecast (NOAA tides, both wave models, NWS), so the banner matches the beach pages.
+const SCAN_MARINE = "wave_height,wave_period,wave_direction,swell_wave_height,swell_wave_period,swell_wave_direction,wind_wave_height,wind_wave_period,wind_wave_direction,sea_level_height_msl";
+let scanFc = {}, scanTs = 0, scanBusy = false, wConfirm = [];
+async function wScan(){
+  if (scanBusy || Date.now()-scanTs < 30*60e3) return; scanBusy = true;
+  try{
+    const q = `latitude=${SPOTS.map(x=>x.lat).join(",")}&longitude=${SPOTS.map(x=>x.lon).join(",")}&timezone=auto&forecast_days=1`;
+    const [M, W] = await Promise.all([jget(`https://marine-api.open-meteo.com/v1/marine?${q}&hourly=${SCAN_MARINE}`),
+      jget(`https://api.open-meteo.com/v1/forecast?${q}&hourly=${WEATHER}&daily=sunrise,sunset&wind_speed_unit=mph&temperature_unit=fahrenheit`)]);
+    const arr = r => Array.isArray(r) ? r : [r], MM = arr(M), WW = arr(W), no = {status:"rejected"};
+    SPOTS.forEach((sp, i) => { try{ if (MM[i] && WW[i]) scanFc[i] = buildForecast(MM[i], null, WW[i], no, no, sp); }catch(e){} });
+    scanTs = Date.now();
+  }catch(e){ setTimeout(() => { scanBusy = false; wScan(); }, 5*60e3); return; }   // weather service busy: try again in a few minutes
+  scanBusy = false; confirmW();
+}
+let confirmBusy = false;
+async function confirmW(){
+  if (confirmBusy || !scanTs) return; confirmBusy = true;
+  try{
+    const region = curRegion(), cand = [];
+    Object.keys(scanFc).forEach(k => { const i = +k; if (SPOTS[i].region === region) return;
+      try{ const d = withSpot(i, () => build(scanFc[i]))[0]; if (d && !d.over && d.best.s >= 7.3) cand.push({i, s:d.best.s}); }catch(e){} });
+    cand.sort((a,b) => b.s - a.s);
+    wConfirm = cand.slice(0, 8).map(x => x.i);
+    for (const i of wConfirm){ if (!fresh(i)){ try{ await forecastFor(i, false); }catch(e){} try{ await nwsFor(i); }catch(e){} refreshLists(); } }
+  } finally { confirmBusy = false; }
+  refreshLists();
+}
+function tapeGo(){ const g = $("wtape").dataset.go; if (g) pick(+g, 0); else goFinder(); }
+let prefetchedRegion = null;
+// Menu: when a region's heading scrolls into view, load that region so its ratings show up.
+let menuObs = null;
+function watchMenu(){
+  if (!("IntersectionObserver" in window)) return;
+  if (!menuObs) menuObs = new IntersectionObserver(es => es.forEach(e => {
+    if (e.isIntersecting && document.body.classList.contains("open")) loadRegion(e.target.dataset.r);
+  }), {root:$("drawer"), rootMargin:"0px 0px 200px 0px"});
+  menuObs.disconnect();
+  document.querySelectorAll("#list h3.dg[data-r]").forEach(h => menuObs.observe(h));
+}
+async function load(force){
+  const my = ++loadId, i = spotIdx, c = fcCache[i], age = c ? Date.now()-c.ts : Infinity;
+  loadBuoy(i, my); loadNws(i, my);
+  const apply = (r, keep) => { cur = r; dataSpot = i; if (!keep){ selDay = 0; const D = build(r); if (wantDay!=null && D[wantDay]) selDay = wantDay; else if (D[0] && D[0].over && D[1]) selDay = 1; wantDay = null; } render(); };
+  if (c && age < STALE) apply(c, false); else { cur = null; ["best","report"].forEach(k => $(k).innerHTML = SKEL); $("heroScore").innerHTML = '<span class="sk big" style="width:180px;height:72px;margin-left:auto"></span>'; $("stats").innerHTML = ""; $("stath").textContent = ""; }
+  if (!c || age >= TTL || force){
+    try{ const r = await forecastFor(i, true); if (my !== loadId) return; apply(r, !!c && age < STALE); }
+    catch(e){
+      if (my !== loadId || (c && age < STALE)) return;
+      cur = null; ["tide","hours","days","report","nws","stats","sunmoon","about","heroScore"].forEach(k=>$(k).innerHTML=""); $("stath").textContent = "";
+      $("best").innerHTML = `<p class="lede">The forecast could not load.</p><p class="dateline">No fake data is shown. ${/429/.test((e&&e.message)||"") ? "The free weather service is limiting requests from this connection right now. Wait a minute, then press Try again." : "Check your internet, or open this file in Chrome or Safari."}</p><button class="btn" onclick="load(true)">Try again</button>`;
+    }
+  }
+  if (force || prefetchedRegion !== curRegion()){ prefetchedRegion = curRegion(); prefetch(); confirmW(); }
+  if (force){ scanTs = 0; } setTimeout(wScan, force ? 500 : 3000);
+}
+function updLabel(){ if (!cur) return; const m = Math.round((Date.now()-cur.ts)/60000); $("upd").textContent = m<1 ? "Updated just now" : `Updated ${m} min ago`; }
+
+// ---------- session log: what you saw vs what the site said ----------
+function loadLogs(){ try{ logs = JSON.parse(store.get("sc10logs")||"[]"); }catch(e){ logs = []; } }
+function renderLog(){
+  if (!snap) return;
+  const keep = ["lg_rate","lg_shore","lg_dist","lg_tide","lg_notes"].map(k => $(k) ? $(k).value : "");
+  $("logform").innerHTML = `<p class="lead">Tell us what you actually saw. It's how the scores get tuned. The site says right now: <b>${snap.score.toFixed(1)}/10</b>, shorebreak ${snap.shore.toFixed(1)} ft breaking ~${snap.dist} ft out, tide ${snap.tide.toFixed(1)} ft, wind ${Math.round(snap.wind)} mph ${snap.wdir}${snap.nws?", NWS "+snap.nws.toLowerCase():""}.</p>
+    <div class="form">
+      <label>Your rating (1-10)<input id="lg_rate" type="number" min="1" max="10" step="0.5"></label>
+      <label>Shorebreak you saw (ft)<input id="lg_shore" type="number" min="0" step="0.5"></label>
+      <label>How far out it broke (ft)<input id="lg_dist" type="number" min="0" step="5"></label>
+      <label>Tide you saw<select id="lg_tide"><option value="">-</option><option>Low</option><option>Mid</option><option>High</option></select></label>
+      <label class="wide">Notes<input id="lg_notes" type="text" placeholder="Anything else: crowd, sand, wind, sets"></label></div>
+    <button class="btn" onclick="saveLog()">Save session</button><button class="btn alt" onclick="copyLogs()">Copy all to send to Claude</button><button class="btn alt" onclick="downloadLogs()">Download CSV</button>
+    <p class="note" id="logmsg"></p>`;
+  ["lg_rate","lg_shore","lg_dist","lg_tide","lg_notes"].forEach((k,n)=>{ if (keep[n]) $(k).value = keep[n]; });
+  const rows = logs.slice().reverse().slice(0,8).map(l=>`<tr><td>${l.ts}</td><td>${l.spot.split(",")[0]}</td><td>${l.site.score.toFixed(1)} / ${l.me.rate||"-"}</td><td>${l.site.shore.toFixed(1)} / ${l.me.shore||"-"} ft</td><td>${l.site.dist} / ${l.me.dist||"-"} ft</td></tr>`).join("");
+  $("logsaved").innerHTML = `<h3 style="margin:0 0 8px;font-size:1rem;font-weight:800">Saved sessions (${logs.length})</h3>` + (rows ? `<table class="log"><tr><th>When</th><th>Beach</th><th>Score site / you</th><th>Shorebreak site / you</th><th>Distance site / you</th></tr>${rows}</table><button class="btn alt" onclick="clearLogs()">Clear all</button>` : `<p class="note">Nothing saved yet. Log what you saw after a session, then send the copied list so the scores can be tuned.</p>`);
+}
+function saveLog(){
+  if (!snap) return;
+  const v = id => $(id).value.trim(), ts = snap.date + " " + (snap.min!=null ? fmtM(snap.min) : "");
+  const me = {rate:v("lg_rate"), shore:v("lg_shore"), dist:v("lg_dist"), tide:v("lg_tide"), notes:v("lg_notes")};
+  if (!me.rate && !me.shore && !me.dist){ $("logmsg").textContent = "Enter at least a rating or what you saw first."; return; }
+  logs.push({ts, spot:snap.spot, mode:snap.mode, site:{score:snap.score, shore:snap.shore, dist:snap.dist, tide:snap.tide, wind:snap.wind, wdir:snap.wdir, nws:snap.nws, rip:snap.rip}, me});
+  store.set("sc10logs", JSON.stringify(logs)); ["lg_rate","lg_shore","lg_dist","lg_tide","lg_notes"].forEach(k=>$(k).value=""); renderLog(); $("logmsg").textContent = "Saved.";
+}
+const logLine = l => `${l.spot} | ${l.ts} | ${l.mode} | SITE: score ${l.site.score.toFixed(1)}, shorebreak ${l.site.shore.toFixed(1)} ft, ${l.site.dist} ft out, tide ${l.site.tide.toFixed(1)} ft, wind ${Math.round(l.site.wind)} mph ${l.site.wdir}, NWS ${l.site.nws||"n/a"} | ME: rating ${l.me.rate||"-"}, shorebreak ${l.me.shore||"-"} ft, ${l.me.dist||"-"} ft out, tide ${l.me.tide||"-"}, notes: ${l.me.notes||"-"}`;
+function copyLogs(){
+  const t = logs.map(logLine).join("\n"); if (!t){ $("logmsg").textContent = "Nothing to copy yet."; return; }
+  const done = () => { $("logmsg").textContent = "Copied. Paste it into your chat with Claude."; };
+  if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(t).then(done, () => { prompt("Copy this:", t); });
+  else prompt("Copy this:", t);
+}
+function downloadLogs(){
+  if (!logs.length){ $("logmsg").textContent = "Nothing to download yet."; return; }
+  const q = s => '"' + String(s==null?"":s).replace(/"/g,'""') + '"', head = ["beach","when","mode","site_score","site_shore_ft","site_dist_ft","site_tide_ft","site_wind_mph","site_nws","my_rating","my_shore_ft","my_dist_ft","my_tide","notes"];
+  const csv = [head.join(",")].concat(logs.map(l=>[l.spot,l.ts,l.mode,l.site.score.toFixed(1),l.site.shore.toFixed(1),l.site.dist,l.site.tide.toFixed(1),Math.round(l.site.wind),l.site.nws,l.me.rate,l.me.shore,l.me.dist,l.me.tide,l.me.notes].map(q).join(","))).join("\n");
+  const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([csv], {type:"text/csv"})); a.download = "skimcast-sessions.csv"; a.click();
+}
+function clearLogs(){ if (confirm("Delete all saved sessions?")){ logs = []; store.set("sc10logs","[]"); renderLog(); } }
+
+function goFinder(){ const h = $("findtitle"); if (h) h.scrollIntoView({behavior:"smooth", block:"start"}); }
+// ---------- beach settings panel ----------
+const SLOPES = [[0.045,"Gentle (wide, flat beach)"],[0.06,"Medium"],[0.08,"Steep"],[0.1,"Very steep"]];
+function openCfg(){
+  const sp = SPOTS[spotIdx], C = cfgOf(spotIdx), base = {...DEF_CFG, ...(sp.cfg||{}), slope: sp.slope||0.07};
+  const near = SLOPES.reduce((a,b)=>Math.abs(b[0]-C.slope)<Math.abs(a[0]-C.slope)?b:a)[0];
+  $("cfgp").innerHTML = `<button class="x" onclick="closeCfg()" aria-label="Close">×</button>
+    <h2>Beach settings</h2><p class="note" style="margin:0">${sp.name}. Changes apply right away and are saved on this device.</p>
+    <label>Best tide for skimming<select id="cf_tide">${Object.keys(TIDE_NAME).map(k=>`<option value="${k}"${C.tide===k?" selected":""}>${TIDE_NAME[k]}</option>`).join("")}</select></label>
+    <label>Flatland is best when waves are under (ft)<input id="cf_flat" type="number" min="0.5" max="4" step="0.5" value="${C.flat}"></label>
+    <div class="pair"><label>Wave riding: ideal from (ft)<input id="cf_wlo" type="number" min="0.5" max="6" step="0.5" value="${C.wave[0]}"></label>
+      <label>to (ft)<input id="cf_whi" type="number" min="1" max="8" step="0.5" value="${C.wave[1]}"></label></div>
+    <label>Full points when waves break within (ft)<small>Wave riding only</small><input id="cf_far" type="number" min="10" max="80" step="5" value="${C.far}"></label>
+    <label>Wind is fine up to (mph)<input id="cf_wind" type="number" min="3" max="25" step="1" value="${C.wind}"></label>
+    <label>Beach steepness<small>Steeper beaches break closer to the sand</small><select id="cf_slope">${SLOPES.map(([v,t])=>`<option value="${v}"${v===near?" selected":""}>${t}</option>`).join("")}</select></label>
+    <button class="btn" onclick="copyCfg()">Copy settings to send to Claude</button><button class="btn alt" onclick="resetCfg()">Reset to starting values</button>
+    <p class="note" id="cfmsg">Starting values: ${TIDE_NAME[base.tide].toLowerCase()} tide, flatland under ${base.flat} ft, wave riding ${base.wave[0]} to ${base.wave[1]} ft, close within ${base.far} ft, wind up to ${base.wind} mph.</p>`;
+  ["cf_tide","cf_flat","cf_wlo","cf_whi","cf_far","cf_wind","cf_slope"].forEach(k => { $(k).onchange = saveCfg; $(k).oninput = saveCfg; });
+  document.body.classList.add("cfg");
+}
+function closeCfg(){ document.body.classList.remove("cfg"); }
+function saveCfg(){
+  const sp = SPOTS[spotIdx], num = (k, lo, hi, d) => { const v = parseFloat($(k).value); return isNaN(v) ? d : Math.min(hi, Math.max(lo, v)); };
+  const base = cfgOf(spotIdx); let wlo = num("cf_wlo",.5,6,base.wave[0]), whi = num("cf_whi",1,8,base.wave[1]); if (whi < wlo) [wlo, whi] = [whi, wlo];
+  userCfg[sp.name] = {tide:$("cf_tide").value, flat:num("cf_flat",.5,4,base.flat), wave:[wlo,whi], far:num("cf_far",10,80,base.far), wind:num("cf_wind",3,25,base.wind), slope:+$("cf_slope").value};
+  store.set("sc15cfg", JSON.stringify(userCfg)); render();
+}
+function resetCfg(){ delete userCfg[SPOTS[spotIdx].name]; store.set("sc15cfg", JSON.stringify(userCfg)); render(); openCfg(); $("cfmsg").textContent = "Back to the starting values."; }
+const cfgLine = i => { const sp = SPOTS[i], C = cfgOf(i), sl = SLOPES.reduce((a,b)=>Math.abs(b[0]-C.slope)<Math.abs(a[0]-C.slope)?b:a)[1];
+  return `${sp.name}: best tide ${TIDE_NAME[C.tide].toLowerCase()}, flatland under ${C.flat} ft, wave riding ${C.wave[0]} to ${C.wave[1]} ft, close within ${C.far} ft, wind up to ${C.wind} mph, steepness ${sl.toLowerCase()}`; };
+function copyCfg(){
+  const idx = SPOTS.map((sp,i)=>userCfg[sp.name]?i:-1).filter(i=>i>=0); if (!idx.includes(spotIdx)) idx.unshift(spotIdx);
+  const t = "SkimCast beach settings:\n" + idx.map(cfgLine).join("\n");
+  const done = () => { $("cfmsg").textContent = "Copied. Paste it into your chat with Claude."; };
+  if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(t).then(done, () => prompt("Copy this:", t)); else prompt("Copy this:", t);
+}
+document.addEventListener("keydown", e => { if (e.key==="Escape"){ closeCfg(); setOpen(false); } });
+
+// ---------- start ----------
+function setMode(m){ mode = m; $("flat").classList.toggle("on", m==="flat"); $("wave").classList.toggle("on", m==="wave"); store.set("sc15mode", m); if (cur) render(); else refreshLists(); confirmW(); }
+$("flat").onclick = () => setMode("flat"); $("wave").onclick = () => setMode("wave");
+$("refresh").onclick = () => { Object.keys(buoyCache).forEach(k=>delete buoyCache[k]); load(true); };
+(function init(){
+  restore(); loadLogs();
+  const m = store.get("sc15mode"); if (m==="flat"){ mode = "flat"; $("wave").classList.remove("on"); $("flat").classList.add("on"); }
+  const want = decodeURIComponent(location.pathname.replace(/^\/|\/$/g,"")) || (location.hash||"").replace("#","") || store.get("sc10spot"), k = SPOTS.findIndex(s=>slug(s.name)===want); if (k>=0) spotIdx = k;
+  drawVerse(); drawPartners(); drawList(); load(); countHit("v");
+  if (store.get("sc_nocount") === "1") $("statsLink").hidden = false;   // owner-only Stats link (devices marked "don't count me" on stats.html)
+  if ("serviceWorker" in navigator && /^https?:$/.test(location.protocol)) navigator.serviceWorker.register("sw.js").catch(()=>{});
+  setInterval(updLabel, 30000);
+  setInterval(() => { if (!document.hidden) load(true); }, 10*60e3);
+  let rt; window.addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(render, 150); });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>SkimCast Visitor Stats</title>
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="icon" href="favicon-48.png" sizes="48x48" type="image/png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@400;500;600;800&display=swap" rel="stylesheet">
+<style>
+/* Same look as the forecast: dark top, warm paper below; coral bars for daily visitors */
+:root{
+  --bg:#F2EFE8; --surface:#FFFFFF; --ink:#24221E; --mute:#6A655C; --line:#DCD7CC; --grid:#ECE8E0;
+  --dark:#1D1C1A; --dline:#3A3733; --on:#F2EFE8; --onmute:#A8A296; --coral:#D2425A; --coral-soft:#F6E1E4;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+body{margin:0;font:1rem/1.5 'Archivo',system-ui,sans-serif;background:var(--bg);color:var(--ink);font-variant-numeric:tabular-nums}
+.wrap{max-width:1000px;margin:0 auto;padding-inline:24px}
+.top{background:var(--dark);color:var(--on)}
+.bar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-block:14px;border-bottom:1px solid var(--dline)}
+.brand{display:inline-block;font-family:'Anton',Impact,sans-serif;font-size:1.75rem;letter-spacing:.04em;line-height:1;color:var(--on);text-decoration:none}
+.brand svg{display:block;width:100%;height:.24em;overflow:visible;margin-top:2px}
+.back{color:var(--onmute);font-weight:600;font-size:.9rem;text-decoration:none}
+.hero{padding-block:40px 32px}
+h1{font-family:'Anton',Impact,sans-serif;font-weight:400;font-size:clamp(2.2rem,6vw,3.6rem);line-height:1;margin:0}
+.sub{margin:10px 0 0;color:var(--onmute)}
+.tiles{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1px;background:var(--dline);border:1px solid var(--dline);border-radius:12px;overflow:hidden;margin-top:26px}
+.tile{background:var(--dark);padding:16px 18px}
+.tile:last-child{grid-column:1/-1}
+@media(min-width:800px){.tiles{grid-template-columns:repeat(5,minmax(0,1fr))}.tile:last-child{grid-column:auto}}
+.tile .k{display:block;font-size:.8rem;font-weight:600;color:var(--onmute)}
+.tile .v{display:block;font-family:'Anton',Impact,sans-serif;font-size:2.4rem;line-height:1.1;margin-top:4px}
+.tile .s{display:block;font-size:.78rem;color:var(--onmute)}
+main section{padding-block:40px 0}
+h2{font-size:1.15rem;font-weight:800;margin:0 0 4px}
+.note{font-size:.85rem;color:var(--mute);margin:0 0 14px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px 16px 10px}
+.chart{position:relative}
+.chart svg{display:block;width:100%;height:auto}
+.chart text{font:12px 'Archivo',system-ui,sans-serif;fill:var(--mute)}
+.chart .gl{stroke:var(--grid);stroke-width:1}
+.chart .base{stroke:var(--line);stroke-width:1}
+.chart rect.hit{fill:transparent;cursor:default}
+.tip{position:absolute;pointer-events:none;background:var(--dark);color:var(--on);font-size:.82rem;padding:7px 10px;border-radius:8px;white-space:nowrap;transform:translate(-50%,-110%);box-shadow:0 4px 14px rgba(0,0,0,.18)}
+.tip b{display:block;font-size:.95rem}
+.beaches{display:grid;gap:8px;margin:0;padding:0;list-style:none}
+.beaches li{display:grid;grid-template-columns:minmax(0,190px) minmax(0,1fr) 3.5em;gap:12px;align-items:center;font-size:.95rem}
+.beaches .nm{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.beaches .tr{height:10px;background:var(--grid);border-radius:4px;overflow:hidden}
+.beaches .tr i{display:block;height:100%;background:var(--coral);border-radius:0 4px 4px 0}
+.beaches .n{text-align:right;font-weight:700}
+details{margin-top:14px}
+summary{cursor:pointer;font-weight:700;font-size:.92rem}
+.tbl{overflow-x:auto;margin-top:10px}
+table{border-collapse:collapse;width:100%;font-size:.88rem;min-width:520px}
+th,td{padding:7px 10px;border-bottom:1px solid var(--line);text-align:right}
+th:first-child,td:first-child{text-align:left}
+th{font-weight:700;color:var(--mute);font-size:.8rem}
+.me{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between}
+.me p{margin:0;color:var(--mute);font-size:.92rem;max-width:60ch}
+.btn{padding:9px 16px;border-radius:999px;border:1px solid var(--ink);background:transparent;font:inherit;font-weight:700;cursor:pointer;color:var(--ink)}
+.btn.on{background:var(--ink);color:var(--bg)}
+.btn:focus-visible{outline:2px solid var(--coral);outline-offset:2px}
+.empty{padding:26px 6px;color:var(--mute);text-align:center}
+.err{background:var(--coral-soft);border-radius:10px;padding:12px 14px;color:#7A2232;margin-top:16px}
+footer{margin-top:56px;background:var(--dark);color:var(--onmute);font-size:.82rem}
+footer .wrap{padding-block:24px}
+@media(max-width:600px){.wrap{padding-inline:16px}.beaches li{grid-template-columns:minmax(0,1fr) 32% 3em}}
+</style>
+</head>
+<body>
+<div class="top"><div class="wrap">
+  <div class="bar">
+    <a class="brand" href="./" aria-label="SkimCast home">SKIMCAST<svg viewBox="0 0 100 10" preserveAspectRatio="none" aria-hidden="true"><path d="M1 6 Q36 1 99 6" stroke="#D2425A" fill="none" stroke-linecap="round" vector-effect="non-scaling-stroke" style="stroke-width:2.6px"/></svg></a>
+    <a class="back" href="./">← Back to the forecast</a>
+  </div>
+  <div class="hero">
+    <h1>Visitor stats</h1>
+    <p class="sub" id="sub">Loading the numbers…</p>
+    <div class="tiles" id="tiles">
+      <div class="tile"><span class="k">Visitors today</span><span class="v">–</span><span class="s">&nbsp;</span></div>
+      <div class="tile"><span class="k">Visitors, last 7 days</span><span class="v">–</span><span class="s">&nbsp;</span></div>
+      <div class="tile"><span class="k">Visitors, last 30 days</span><span class="v">–</span><span class="s">&nbsp;</span></div>
+      <div class="tile"><span class="k">New visitors, 30 days</span><span class="v">–</span><span class="s">&nbsp;</span></div>
+      <div class="tile"><span class="k">Sponsor link taps, 30 days</span><span class="v">–</span><span class="s">&nbsp;</span></div>
+    </div>
+    <div id="err"></div>
+  </div>
+</div></div>
+
+<main class="wrap">
+  <section>
+    <h2>Visitors per day</h2>
+    <p class="note">Last 30 days, Eastern time. Hover or tap a bar for the details.</p>
+    <div class="card"><div class="chart" id="chart"><div class="empty">Loading…</div></div>
+      <details><summary>Show as a table</summary><div class="tbl" id="table"></div></details></div>
+  </section>
+  <section>
+    <h2>Most viewed beaches</h2>
+    <p class="note">Beach page views in the last 30 days, including switching beaches in the menu. Handy for showing a shop how many people look at the beaches near them.</p>
+    <div class="card"><ul class="beaches" id="beaches"><li class="empty" style="display:block">Loading…</li></ul></div>
+  </section>
+  <section>
+    <div class="card me" style="padding:16px">
+      <p id="metext">Your own visits are counted too. Turn this on for each phone or computer you use so your numbers only show other people.</p>
+      <button class="btn" id="nocount" type="button" aria-pressed="false">Don't count my visits on this device</button>
+    </div>
+  </section>
+  <section style="padding-top:28px">
+    <p class="note">How it's counted: a "visitor" is one person on one device on one day, so someone who checks on 3 different days counts 3 times. "New visitors" counts each device once, the first time it opens SkimCast. No names, IP addresses or cookies are stored. Automated browsers and test copies aren't counted. Numbers can take about a minute to show up.</p>
+  </section>
+</main>
+<footer><div class="wrap">SkimCast visitor stats. Anyone with this page's link can see these totals.</div></footer>
+<script>
+(function(){
+  var $ = function(id){ return document.getElementById(id); };
+  function ls(k, v){ try { if (v === undefined) return localStorage.getItem(k); if (v === null) localStorage.removeItem(k); else localStorage.setItem(k, v); } catch(e){ return null; } }
+  function esc(s){ return String(s).replace(/[&<>"]/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[c]; }); }
+  function nice(slug){
+    if (!slug || slug === "none") return "Unknown";
+    var p = slug.split("-"), st = p.length > 1 && p[p.length-1].length === 2 ? p.pop().toUpperCase() : "";
+    var nm = p.map(function(w){ return w.length <= 2 && st && w === "sf" ? "SF" : w.charAt(0).toUpperCase() + w.slice(1); }).join(" ");
+    return st ? nm + ", " + st : nm;
+  }
+  function fmtDay(d, long){ var x = new Date(d + "T12:00:00"); return x.toLocaleDateString(undefined, long ? {weekday:"short", month:"short", day:"numeric"} : {month:"short", day:"numeric"}); }
+
+  // "don't count me" toggle
+  function drawMe(){ var on = ls("sc_nocount") === "1"; var b = $("nocount"); b.classList.toggle("on", on); b.setAttribute("aria-pressed", on); b.textContent = on ? "Not counting this device ✓" : "Don't count my visits on this device"; $("metext").textContent = on ? "This device is not counted. Tap again to start counting it." : "Your own visits are counted too. Turn this on for each phone or computer you use so your numbers only show other people."; }
+  $("nocount").addEventListener("click", function(){ ls("sc_nocount", ls("sc_nocount") === "1" ? null : "1"); drawMe(); });
+  drawMe();
+
+  function tiles(data){
+    var d = data.days, last = d[d.length-1] || {}, l7 = d.slice(-7), sum = function(a,k){ return a.reduce(function(s,x){ return s + (x[k]||0); }, 0); };
+    var t = [
+      ["Visitors today", last.visitors || 0, (last.visits||0) + " visits"],
+      ["Visitors, last 7 days", sum(l7, "visitors"), sum(l7, "visits") + " visits"],
+      ["Visitors, last 30 days", data.totals.visitors, data.totals.visits + " visits"],
+      ["New visitors, 30 days", data.totals.newVisitors, "first time on SkimCast"],
+      ["Sponsor link taps, 30 days", data.totals.sponsorClicks, "taps on a Presented by link"]
+    ];
+    $("tiles").innerHTML = t.map(function(x){ return '<div class="tile"><span class="k">'+esc(x[0])+'</span><span class="v">'+x[1].toLocaleString()+'</span><span class="s">'+esc(x[2])+'</span></div>'; }).join("");
+  }
+
+  function niceStep(m){ var raw = Math.max(1, m / 4), p = Math.pow(10, Math.floor(Math.log10(raw))), n = raw / p; return Math.max(1, (n <= 1 ? 1 : n <= 2 ? 2 : n <= 5 ? 5 : 10) * p); }
+  function chart(days){
+    var el = $("chart"), W = Math.max(280, Math.round(el.clientWidth || 600)), H = W < 500 ? 200 : 240, L = 36, R = 6, T = 10, B = 26;
+    var step = niceStep(Math.max.apply(null, days.map(function(d){ return d.visitors; }).concat([0]))), max = step * 4;
+    var n = days.length, slot = (W - L - R) / n, bw = Math.max(2, slot - 2), y = function(v){ return T + (H - T - B) * (1 - v / max); };
+    var s = '<svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="Bar chart of visitors per day for the last '+n+' days">';
+    [0, 1, 2, 3, 4].forEach(function(k){ var v = step * k, yy = y(v); s += '<line class="'+(k===0?'base':'gl')+'" x1="'+L+'" x2="'+(W-R)+'" y1="'+yy+'" y2="'+yy+'"/><text x="'+(L-8)+'" y="'+(yy+4)+'" text-anchor="end">'+v+'</text>'; });
+    days.forEach(function(d, i){
+      var x = L + i * slot + 1, h = (H - T - B) - (y(d.visitors) - T), yy = y(d.visitors), r = Math.min(4, bw/2, h);
+      s += '<rect class="hit" data-i="'+i+'" x="'+(L + i*slot)+'" y="'+T+'" width="'+slot+'" height="'+(H-T-B)+'"/>';
+      if (d.visitors > 0) s += '<path class="bm" data-i="'+i+'" fill="#D2425A" d="M'+x+' '+(yy+h)+'V'+(yy+r)+'Q'+x+' '+yy+' '+(x+r)+' '+yy+'H'+(x+bw-r)+'Q'+(x+bw)+' '+yy+' '+(x+bw)+' '+(yy+r)+'V'+(yy+h)+'Z"/>';
+      if ((n-1-i) % (W < 500 ? 10 : 7) === 0) s += '<text x="'+(i === n-1 ? L + (i+1)*slot : L + i*slot + slot/2)+'" y="'+(H-8)+'" text-anchor="'+(i === n-1 ? 'end' : 'middle')+'">'+fmtDay(d.date)+'</text>';
+    });
+    s += '</svg><div class="tip" id="tip" hidden></div>';
+    el.innerHTML = s;
+    var tip = $("tip"), svg = el.querySelector("svg");
+    function show(i){
+      var d = days[i]; if (!d) return;
+      el.querySelectorAll(".bm").forEach(function(p){ p.setAttribute("fill", +p.dataset.i === i ? "#B23149" : "#D2425A"); });
+      var box = svg.getBoundingClientRect(), sc = box.width / W, cx = (L + i*slot + slot/2) * sc, cy = Math.min(y(d.visitors), H - B - 4) * sc;
+      tip.innerHTML = '<b>'+esc(fmtDay(d.date, true))+'</b>'+d.visitors+' visitor'+(d.visitors===1?'':'s')+' · '+d.visits+' visit'+(d.visits===1?'':'s');
+      tip.style.left = Math.max(70, Math.min(box.width - 70, cx)) + "px"; tip.style.top = cy + "px"; tip.hidden = false;
+    }
+    function hide(){ tip.hidden = true; el.querySelectorAll(".bm").forEach(function(p){ p.setAttribute("fill", "#D2425A"); }); }
+    el.querySelectorAll(".hit").forEach(function(h){ var i = +h.dataset.i; h.addEventListener("mouseenter", function(){ show(i); }); h.addEventListener("click", function(){ show(i); }); });
+    svg.addEventListener("mouseleave", hide);
+    $("table").innerHTML = '<table><thead><tr><th>Day</th><th>Visitors</th><th>Visits</th><th>New visitors</th><th>Beach views</th><th>Sponsor taps</th></tr></thead><tbody>' +
+      days.slice().reverse().map(function(d){ return '<tr><td>'+esc(fmtDay(d.date, true))+'</td><td>'+d.visitors+'</td><td>'+d.visits+'</td><td>'+d.newVisitors+'</td><td>'+d.beachViews+'</td><td>'+d.sponsorClicks+'</td></tr>'; }).join("") + '</tbody></table>';
+  }
+
+  function beaches(list){
+    var el = $("beaches");
+    if (!list.length) { el.innerHTML = '<li class="empty" style="display:block">No beach views yet.</li>'; return; }
+    var top = list.slice(0, 12), max = top[0].views;
+    el.innerHTML = top.map(function(b){ return '<li><span class="nm">'+esc(nice(b.slug))+'</span><span class="tr"><i style="width:'+Math.max(2, b.views/max*100)+'%"></i></span><span class="n">'+b.views.toLocaleString()+'</span></li>'; }).join("");
+  }
+
+  fetch("/api/stats?days=30", {cache:"no-store"}).then(function(r){ return r.json().then(function(j){ if (!r.ok) throw new Error(j && j.error || ("HTTP " + r.status)); return j; }); }).then(function(data){
+    var first = data.days.find(function(d){ return d.visits > 0 || d.beachViews > 0; });
+    $("sub").textContent = data.totals.visits || data.totals.beachViews ? "Updated " + new Date().toLocaleTimeString([], {hour:"numeric", minute:"2-digit"}) + ". Counting since " + fmtDay(first.date, true) + "." : "No visits counted yet. Numbers show up about a minute after someone opens SkimCast.";
+    tiles(data); chart(data.days); beaches(data.beaches);
+    var rt; window.addEventListener("resize", function(){ clearTimeout(rt); rt = setTimeout(function(){ chart(data.days); }, 150); });
+  }).catch(function(e){
+    $("sub").textContent = "The numbers didn't load.";
+    $("err").innerHTML = '<div class="err">Couldn\'t load the stats right now ('+esc(e.message)+'). Refresh the page to try again.</div>';
+    $("chart").innerHTML = '<div class="empty">No data to show.</div>'; $("beaches").innerHTML = '<li class="empty" style="display:block">No data to show.</li>';
+  });
+})();
+</script>
+</body>
+</html>
