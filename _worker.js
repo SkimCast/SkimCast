@@ -649,7 +649,8 @@ async function ask(request, env) {
       headers: { "x-api-key": env.ANTHROPIC_API_KEY, "anthropic-version": "2023-06-01", "content-type": "application/json" },
       body: JSON.stringify({
         model: env.ASK_MODEL || "claude-haiku-5-5",
-        max_tokens: 350,
+        max_tokens: 1200,
+        thinking: { type: "disabled" },
         system: ASK_SYSTEM,
         messages: [...hist, { role: "user", content: `<forecast>\n${ctx || "(no forecast data was sent)"}\n</forecast>\n\nQuestion: ${q}` }]
       }),
