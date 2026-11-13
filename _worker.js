@@ -668,7 +668,7 @@ async function ask(request, env) {
   }
   const out = await r.json().catch(() => null);
   const answer = out && Array.isArray(out.content) ? out.content.filter((c) => c.type === "text").map((c) => c.text).join("").trim() : "";
-  if (!answer) return askJson({ error: "Something went wrong. Try again in a minute." }, 502);
+  if (!answer) return askJson({ error: "Something went wrong. Try again in a minute.", detail: "empty " + (out ? String(out.stop_reason) + " " + JSON.stringify(out.content || out.error || "").slice(0, 200) : "no json") }, 502);
   try {
     await d.prepare("INSERT INTO asks (day, who, ts) VALUES (?, ?, ?)").bind(day, who, Date.now()).run();
   } catch (e) {}
