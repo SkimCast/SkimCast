@@ -172,6 +172,31 @@ table.log{width:100%;border-collapse:collapse;font-size:.88rem}
 .log th{color:var(--mute);font-weight:600}
 .lead{margin:0 0 var(--s2);color:var(--mute)}
 
+/* Ask SkimCast */
+#asksec[hidden]{display:none}
+.ask{max-width:760px}
+.ask-sub{margin:0 0 var(--s2);color:var(--mute);max-width:60ch}
+.ask-sugs{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:var(--s2)}
+.ask-sugs button{padding:8px 12px;border:1px solid var(--line);border-radius:999px;background:var(--surface);color:var(--ink);font:inherit;font-size:.9rem;cursor:pointer;text-align:left}
+.ask-sugs button:hover{border-color:var(--coral)}
+.ask-log{display:flex;flex-direction:column;gap:12px;margin-bottom:var(--s2)}
+.ask-log:empty{display:none}
+.ask-q,.ask-a{padding:12px 14px;border-radius:12px;line-height:1.55;max-width:92%;overflow-wrap:anywhere}
+.ask-q{align-self:flex-end;background:var(--dark);color:var(--on);border-bottom-right-radius:4px}
+.ask-a{align-self:flex-start;background:var(--surface);border:1px solid var(--line);border-bottom-left-radius:4px}
+.ask-a p{margin:0 0 8px}.ask-a p:last-child{margin:0}.ask-a ul{margin:0 0 8px;padding-left:18px}
+.ask-a.err{background:var(--skip);color:var(--skip-t);border-color:transparent}
+.ask-a.wait{color:var(--mute)}
+.ask-a.wait i{display:inline-block;width:6px;height:6px;margin-right:4px;border-radius:50%;background:var(--mute);animation:askdot 1s infinite alternate}
+.ask-a.wait i:nth-child(2){animation-delay:.2s}.ask-a.wait i:nth-child(3){animation-delay:.4s}
+@keyframes askdot{from{opacity:.25}to{opacity:1}}
+.ask-form{display:flex;gap:8px}
+.ask-form input{flex:1;min-width:0;height:46px;padding:0 14px;border:1px solid var(--line);border-radius:10px;font:inherit;background:var(--surface);color:var(--ink)}
+.ask-form input:focus{border-color:var(--coral);outline:none}
+.ask-form .btn{margin:0;height:46px;padding:0 18px;flex:none}
+.ask-form .btn:disabled{opacity:.55;cursor:default}
+.ask-foot{margin:var(--s1) 0 0;font-size:var(--fs-sm);color:var(--mute)}
+@media(prefers-reduced-motion:reduce){.ask-a.wait i{animation:none}}
 /* about + footer */
 .about{margin:0;padding-left:18px;color:var(--mute);font-size:.92rem;line-height:1.6;max-width:90ch}.about li{margin:4px 0}
 footer{background:var(--dark);color:var(--onmute);margin-top:var(--s5)}
@@ -310,6 +335,15 @@ body.cfg #cfgp{transform:none} body.cfg #scrim{opacity:1;pointer-events:auto}
   <section class="sec first"><div class="wrap"><div class="head"><h2 class="h" id="hourtitle">Hour by hour</h2></div>
     <div class="hours" id="hours"></div>
     <div class="legend"><span class="chip g-w">W Skim 8+</span><span class="chip g-good">Good 6.5+</span><span class="chip g-fair">Fair 4.5+</span><span class="chip g-skip">Skip it</span></div></div></section>
+  <section class="sec" id="asksec"><div class="wrap"><div class="head"><h2 class="h">Ask SkimCast</h2><span class="note" style="margin:0">AI answers from this forecast</span></div>
+    <div class="ask">
+      <p class="ask-sub">Ask anything about skim conditions, like the best time to go, which beach looks best, or what the score means.</p>
+      <div class="ask-sugs" id="askSugs"></div>
+      <div class="ask-log" id="askLog" aria-live="polite"></div>
+      <form class="ask-form" id="askForm" autocomplete="off"><label for="askIn" class="sr-only" style="position:absolute;left:-9999px">Your question</label>
+        <input id="askIn" maxlength="300" placeholder="Ask about skimming here…"><button class="btn" id="askBtn" type="submit">Ask</button></form>
+      <p class="ask-foot" id="askFoot">AI answers can be wrong. Always check the water and lifeguard flags before you go in.</p>
+    </div></div></section>
   <section class="sec"><div class="wrap"><div class="two">
     <div><div class="head" style="border:0;padding:0;margin-bottom:var(--s2)"><h2 class="h">Beach report</h2></div><div id="report"></div><div id="howwas"></div></div>
     <aside class="side"><div id="nws"></div><div id="buoy"></div></aside></div></div></section>
@@ -1108,7 +1142,7 @@ function render(){
     "Data: " + (cur.src||"") + "."].filter(Boolean).map(t=>`<li>${t}</li>`).join("");
   const hourNow = d.isToday ? (d.hrs.find(x=>+x.t.slice(11,13)===d.nowHour) || b) : b;
   snap = {spot:sp.name, mode, score:hourNow.s, shore:hourNow.wave*3.281, dist:breakDist(hourNow.wave*3.281), tide:hourNow.tide, wind:hourNow.wind, wdir:compass(hourNow.wdir), nws:d.nws?d.nws.text:"", rip:d.nws?d.nws.rip:"", date:d.date, min:d.isToday?d.nowMin:null};
-  renderLog(); refreshLists(); updLabel();
+  renderLog(); refreshLists(); updLabel(); drawAskSugs();
 }
 
 // ---------- compare all beaches ----------
@@ -1632,11 +1666,77 @@ document.addEventListener("keydown", e => { if (e.key==="Escape"){ closeCfg(); s
 function setMode(m){ mode = m; $("flat").classList.toggle("on", m==="flat"); $("wave").classList.toggle("on", m==="wave"); store.set("sc15mode", m); if (cur) render(); else refreshLists(); confirmW(); }
 $("flat").onclick = () => setMode("flat"); $("wave").onclick = () => setMode("wave");
 $("refresh").onclick = () => { Object.keys(buoyCache).forEach(k=>delete buoyCache[k]); load(true); };
+// ---------- Ask SkimCast (AI answers; the question and this page's forecast go to /api/ask) ----------
+let askHist = [], askBusy = false;
+function askContext(){
+  if (!cur) return "";
+  const sp = SPOTS[spotIdx], D = build(cur), L = [];
+  const now = new Date().toLocaleString("en-US", {weekday:"long", month:"short", day:"numeric", hour:"numeric", minute:"2-digit"});
+  L.push(`Now: ${now} (visitor's clock).`);
+  L.push(`Beach the visitor is looking at: ${sp.name} (${sp.region}). Riding style picked: ${mode==="flat"?"flatland":"wave riding"}.${userCfg[sp.name]?" The visitor has custom beach settings.":""}`);
+  const spn = sponsorFor(sp); L.push(spn ? `Sponsor shown for this beach: ${spn.name}${spn.about?" ("+spn.about+")":""}.` : "No sponsor for this beach yet (shops can sponsor at skimcastapp.com/sponsor).");
+  D.forEach((d, di) => {
+    const lab = di===0 ? "Today" : di===1 ? "Tomorrow" : dayName(d.date);
+    L.push(`\n## ${sp.name.split(",")[0]}, ${lab} (${d.date}): best score ${d.best.s.toFixed(1)}/10 at ${fmtH(d.best.t)}${d.over?" (daylight is over)":d.isToday?" (best of the hours still ahead today)":""}`);
+    try{ L.push(report(d).join(" ")); }catch(e){}
+    if (di <= 1) L.push("Hours (time: score, shorebreak ft, wind mph from, tide ft): " +
+      d.hrs.map(h => `${fmtH(h.t)}: ${h.s.toFixed(1)}, ${(h.wave*3.281).toFixed(1)}, ${Math.round(h.wind)} ${compass(h.wdir)}, ${h.tide.toFixed(1)}`).join("; "));
+    else L.push("Hours: " + d.hrs.filter((h,k)=>k%2===0).map(h => `${fmtH(h.t)} ${h.s.toFixed(1)}`).join(", "));
+  });
+  const region = sp.region, rows = [], runs = [];
+  SPOTS.forEach((s, i) => { if (s.region !== region || !fcCache[i]) return;
+    try{ withSpot(i, () => { const BD = build(fcCache[i]), q = quickFrom(BD), w = wWindows(BD);
+      rows.push({s, q}); w.out.forEach(r => runs.push(`${s.name.split(",")[0]}: ${dayLabel(r.di, r.date)} ${winText(r.a, r.b)} (up to ${r.max.toFixed(1)})`));
+      const days = BD.map((x, di) => `${di===0?"Today":dayName(x.date)} ${x.over?"done":x.best.s.toFixed(1)+" at "+fmtH(x.best.t)}`).join(", ");
+      rows[rows.length-1].days = days; }); }catch(e){} });
+  rows.sort((a,b) => b.q.s - a.q.s);
+  if (rows.length){
+    L.push(`\n## Other ${region} beaches that are loaded (best score per day)`);
+    rows.slice(0, 25).forEach(r => L.push(`- ${r.s.name}: ${r.days}; shorebreak ~${r.q.ft.toFixed(1)} ft at the next best time${r.q.rip?`, rip risk ${r.q.rip.toLowerCase()}`:""}`));
+  }
+  L.push(runs.length ? `\n## W Skim windows (score 8+) in ${region}, next 5 days\n` + runs.slice(0, 20).join("\n") : `\nNo W Skim (8+) windows found in ${region} in the next 5 days among loaded beaches.`);
+  L.push(`\nHow SkimCast works: score out of 10 from shorebreak size, how close the waves break, wind, tide and swell. 8+ = W Skim, 6.5+ good, 4.5+ fair, below = skip it. Wave riding wants a punchy shorebreak close to the sand; flatland wants small, mellow water near low tide. Data from NOAA tides and buoys, the National Weather Service and marine forecast models.`);
+  return L.join("\n").slice(0, 13500);
+}
+function askFmt(t){
+  const lines = escA(t).replace(/\*\*(.+?)\*\*/g, "<b>$1</b>").split(/\n+/), out = []; let ul = null;
+  lines.forEach(l => { const m = l.match(/^\s*[-•*]\s+(.*)/);
+    if (m){ if (!ul){ ul = []; out.push(ul); } ul.push(m[1]); } else { ul = null; if (l.trim()) out.push(l); } });
+  return out.map(x => Array.isArray(x) ? "<ul>" + x.map(i => `<li>${i}</li>`).join("") + "</ul>" : `<p>${x}</p>`).join("");
+}
+function askBubble(cls, html){ const el = document.createElement("div"); el.className = cls; el.innerHTML = html; $("askLog").appendChild(el); return el; }
+function drawAskSugs(){
+  const sp = SPOTS[spotIdx], nm = sp.name.split(",")[0];
+  const sugs = [`When's the best time to skim ${nm} today?`, `Which ${sp.region} beach is best this weekend?`, "Is there a W Skim day coming up?", "How is the skim score worked out?"];
+  $("askSugs").innerHTML = sugs.map(s => `<button type="button">${escA(s)}</button>`).join("");
+  [...$("askSugs").children].forEach((b, k) => b.onclick = () => askGo(sugs[k]));
+}
+async function askGo(q){
+  q = (q || "").trim(); if (!q || askBusy) return;
+  if (!cur){ askBubble("ask-a err", "<p>The forecast is still loading. Try again in a few seconds.</p>"); return; }
+  askBusy = true; $("askBtn").disabled = true; $("askIn").value = "";
+  askBubble("ask-q", escA(q));
+  const wait = askBubble("ask-a wait", "<i></i><i></i><i></i> Checking the forecast…");
+  try{
+    const r = await fetch("/api/ask", {method:"POST", headers:{"content-type":"application/json"}, body: JSON.stringify({q, ctx: askContext(), hist: askHist})});
+    const j = await r.json().catch(() => ({}));
+    if (!r.ok || !j.answer){ wait.className = "ask-a err"; wait.innerHTML = `<p>${escA(j.error || "Something went wrong. Try again in a minute.")}</p>`; }
+    else {
+      wait.className = "ask-a"; wait.innerHTML = askFmt(j.answer);
+      askHist = askHist.concat([{role:"user", text:q}, {role:"assistant", text:j.answer}]).slice(-4);
+      if (typeof j.left === "number") $("askFoot").textContent = `${j.left} question${j.left===1?"":"s"} left today. AI answers can be wrong. Always check the water and lifeguard flags before you go in.`;
+    }
+  }catch(e){ wait.className = "ask-a err"; wait.innerHTML = "<p>Couldn't connect. Check your internet and try again.</p>"; }
+  askBusy = false; $("askBtn").disabled = false;
+}
+$("askForm").onsubmit = e => { e.preventDefault(); askGo($("askIn").value); };
+$("asksec").hidden = true;   // shown only once the site owner has switched Ask SkimCast on
+fetch("/api/ask").then(r => r.json()).then(j => { if (j && j.on) $("asksec").hidden = false; }).catch(() => {});
 (function init(){
   restore(); loadLogs();
   const m = store.get("sc15mode"); if (m==="flat"){ mode = "flat"; $("wave").classList.remove("on"); $("flat").classList.add("on"); }
   const want = decodeURIComponent(location.pathname.replace(/^\/|\/$/g,"")) || (location.hash||"").replace("#","") || store.get("sc10spot"), k = SPOTS.findIndex(s=>slug(s.name)===want); if (k>=0) spotIdx = k;
-  drawVerse(); drawPartners(); drawList(); load(); countHit("v");
+  drawVerse(); drawPartners(); drawList(); load(); countHit("v"); drawAskSugs();
   if (store.get("sc_nocount") === "1") $("statsLink").hidden = false;   // owner-only Stats link (devices marked "don't count me" on stats.html)
   if ("serviceWorker" in navigator && /^https?:$/.test(location.protocol)) navigator.serviceWorker.register("sw.js").catch(()=>{});
   setInterval(updLabel, 30000);
