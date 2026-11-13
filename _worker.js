@@ -660,6 +660,10 @@ async function ask(request, env) {
   }
   if (!r.ok) {
     const status = r.status === 429 || r.status === 529 ? 503 : 502;
+    let detail = "";
+    try { const e = await r.json(); detail = `${r.status} ${e && e.error ? e.error.type + ": " + e.error.message : ""}`.slice(0, 240); } catch (x) { detail = String(r.status); }
+    console.log("ask upstream error", detail);
+    return askJson({ error: status === 503 ? "Ask SkimCast is busy. Try again in a minute." : "Something went wrong. Try again in a minute.", detail }, status);
     return askJson({ error: status === 503 ? "Ask SkimCast is busy. Try again in a minute." : "Something went wrong. Try again in a minute." }, status);
   }
   const out = await r.json().catch(() => null);
