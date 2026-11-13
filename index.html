@@ -331,6 +331,9 @@ html.mv-lock,html.mv-lock body{overflow:hidden}
 .mv-chip{flex:none;border:1px solid #D6D1C6;background:rgba(255,255,255,.95);color:#24221E;font:600 .78rem 'Archivo',system-ui,sans-serif;padding:7px 11px;border-radius:999px;white-space:nowrap;cursor:pointer;box-shadow:0 1px 3px rgba(36,34,30,.08)}
 .mv-chip.mv-on{background:#1D1C1A;color:#F2EFE8;border-color:#1D1C1A}.mv-static{cursor:default}
 .mv-gap{width:4px;flex:none}
+.mv-days{display:flex;gap:6px;flex:none}
+@media (min-width:761px){.mv-top{max-width:none;align-items:flex-start}.mv-search{width:440px;max-width:calc(100vw - 90px)}.mv-row{max-width:calc(100vw - 90px)}}
+@media (max-width:760px){.mv-row{flex-wrap:wrap;row-gap:6px}.mv-days{width:100%}.mv-days .mv-chip{flex:1;padding:7px 4px}.mv-row>.mv-gap{display:none}}
 .mv-status{font-size:.72rem;color:#4A463F;background:rgba(255,255,255,.85);border-radius:999px;padding:3px 8px;white-space:nowrap}.mv-status:empty{display:none}
 #mapview button:focus-visible{outline:2px solid #D2425A;outline-offset:2px}
 .mv-zoom{position:absolute;z-index:5;right:max(12px,env(safe-area-inset-right,0px));top:calc(120px + env(safe-area-inset-top,0px));display:flex;flex-direction:column;gap:6px}
@@ -1810,6 +1813,6 @@ fetch("/api/ask").then(r => r.json()).then(j => { if (j && j.on) $("asksec").hid
   let rt; window.addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(render, 150); });
 })();
 </script>
-<script src="/map.js?v=1" defer></script>
+<script src="/map.js?v=2" defer></script>
 </body>
 </html>

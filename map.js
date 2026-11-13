@@ -1,4 +1,4 @@
-// SkimCast map view: a full-screen map of every beach, colored by today's score.
+// SkimCast map view: a full-screen map of every beach, colored by the score for the day you pick (today and the next 4 days).
 // Opened by the Map button on the top bar. Loads only when someone taps it, so the homepage stays fast.
 // Scores come from the same forecast the rest of the site uses (the quick all-beach scan, or the full forecast once a beach is loaded).
 // Map data: US states (US Census via us-atlas), countries (Natural Earth via world-atlas), close-up coastline (OpenStreetMap via geo-maps).
@@ -15,15 +15,39 @@ const hr = h => (h%12||12) + (h<12 ? "am" : "pm");
 const compass = d => ["N","NE","E","SE","S","SW","W","NW"][Math.round(((d%360)+360)%360/45)%8];
 
 let root, built = false, opening = null, pushed = false, coastReq = null;
+let day = 0, scan5 = {}, scan5Ts = 0, scan5Req = null, dates = [];
 let S = [], GEO = null, proj = null, map = null, sel = null, scores = new Map(), regs = [], gR, gB, rNodes, bNodes, sheet, ui, pollT = 0;
 
 function loadScript(src){ return new Promise((ok, no) => { const s = document.createElement("script"); s.src = src; s.onload = ok; s.onerror = () => no(new Error("Could not load the map library")); document.head.appendChild(s); }); }
 async function getJSON(u){ const r = await fetch(u); if (!r.ok) throw new Error("Could not load the map (" + r.status + ")"); return r.json(); }
 
 /* ---------- scores from the site's forecast ---------- */
+// Today uses the site's quick scan; the other days use the map's own 5-day scan (loaded once the map opens).
 function scoreOf(i){
-  const c = fcCache[i] || scanFc[i]; if (!c) return null;
-  try{ return withSpot(i, () => { const D = build(c), d = D[0].over && D[1] ? D[1] : D[0]; return {s: d.best.s, d, tomorrow: d !== D[0]}; }); }catch(e){ return null; }
+  const c = fcCache[i] || scan5[i] || (day === 0 ? scanFc[i] : null); if (!c) return null;
+  try{ return withSpot(i, () => { const D = build(c); if (!dates.length && D.length > 1) setDates(D);
+    const di = day === 0 && D[0].over && D[1] ? 1 : day, d = D[di]; if (!d) return null;
+    return {s: d.best.s, d, di, tomorrow: day === 0 && di === 1}; }); }catch(e){ return null; }
+}
+// One wave request and one wind request for all beaches, 5 days out. Same data the homepage scan uses, just more days.
+function scan5Load(){
+  if (scan5Req || Date.now() - scan5Ts < 30*60e3) return scan5Req;
+  const q = `latitude=${SPOTS.map(x=>x.lat).join(",")}&longitude=${SPOTS.map(x=>x.lon).join(",")}&timezone=auto&forecast_days=5`;
+  scan5Req = Promise.all([jget(`https://marine-api.open-meteo.com/v1/marine?${q}&hourly=${SCAN_MARINE}`),
+    jget(`https://api.open-meteo.com/v1/forecast?${q}&hourly=${WEATHER}&daily=sunrise,sunset&wind_speed_unit=mph&temperature_unit=fahrenheit`)])
+    .then(([M, W]) => { const arr = r => Array.isArray(r) ? r : [r], MM = arr(M), WW = arr(W), no = {status:"rejected"};
+      SPOTS.forEach((sp, i) => { try{ if (MM[i] && WW[i]) scan5[i] = buildForecast(MM[i], null, WW[i], no, no, sp); }catch(e){} });
+      scan5Ts = Date.now(); })
+    .catch(() => { if (day) setStatus("Couldn't load the other days. Try again in a minute."); })
+    .finally(() => { scan5Req = null; if (root && !root.hidden) poll(); });
+  return scan5Req;
+}
+function setDates(D){ dates = D.map(x => x.date); dayChips(); }
+function dayChips(){
+  const box = root && root.querySelector("#mvDays"); if (!box) return;
+  const t0 = new Date(); t0.setHours(12, 0, 0, 0);
+  const lab = k => dates[k] || new Date(t0.getTime() + k*864e5).toLocaleDateString("en-CA");
+  box.innerHTML = Array.from({length: 5}, (_, k) => `<button class="mv-chip${k === day ? " mv-on" : ""}" data-day="${k}" aria-pressed="${k === day}">${k === 0 ? "Today" : k === 1 ? "Tmrw" : dayName(lab(k))}</button>`).join("");
 }
 function rescore(){ scores = new Map(); S.forEach(p => { const q = scoreOf(p.i); if (q) scores.set(p.i, q); }); }
 const sOf = p => scores.has(p.i) ? scores.get(p.i).s : null;
@@ -39,7 +63,7 @@ function shell(){
     <span class="mv-brand">SKIMCAST<svg viewBox="0 0 100 10" preserveAspectRatio="none" aria-hidden="true"><path d="M1 6 Q36 1 99 6" stroke="#D2425A" fill="none" stroke-linecap="round" vector-effect="non-scaling-stroke" style="stroke-width:2.4px"/></svg></span>
     <input id="mvQ" type="search" placeholder="Search ${S.length} beaches" aria-label="Search beaches" autocomplete="off" list="mvList"><datalist id="mvList">${S.map(p => `<option value="${esc(p.name)}">`).join("")}</datalist>
     <button class="mv-chip" id="mvNear">◎ Near me</button></div>
-    <div class="mv-row"><span class="mv-chip mv-on mv-static">Today</span><span class="mv-gap"></span><button class="mv-chip" data-m="wave">Wave riding</button><button class="mv-chip" data-m="flat">Flatland</button><span class="mv-status" id="mvStatus"></span></div></div>
+    <div class="mv-row"><span class="mv-days" id="mvDays" role="group" aria-label="Day"></span><span class="mv-gap"></span><button class="mv-chip" data-m="wave">Wave riding</button><button class="mv-chip" data-m="flat">Flatland</button><span class="mv-status" id="mvStatus"></span></div></div>
   <div class="mv-zoom"><button aria-label="Zoom in" data-z="1.8">+</button><button aria-label="Zoom out" data-z="0.5556">−</button></div>
   <div class="mv-leg">${["w","good","fair","skip"].map(t => `<span><i style="background:${PIN[t]}"></i>${NAME[t]}</span>`).join("")}</div>
   <div class="mv-sheet" id="mvSheet" aria-live="polite"></div>`;
@@ -47,6 +71,8 @@ function shell(){
   sheet = root.querySelector("#mvSheet"); ui = root.querySelector(".mv-top");
   root.querySelector("#mvBack").onclick = () => close();
   root.querySelectorAll("[data-z]").forEach(b => b.onclick = () => map.top.transition().duration(250).call(map.zoom.scaleBy, +b.dataset.z));
+  root.querySelector("#mvDays").addEventListener("click", e => { const b = e.target.closest("[data-day]"); if (!b) return;
+    day = +b.dataset.day; dayChips(); scan5Load(); poll(); });
   root.querySelectorAll("[data-m]").forEach(b => b.onclick = () => { if (mode !== b.dataset.m){ setMode(b.dataset.m); } refresh(); });
   const q = root.querySelector("#mvQ");
   const go = () => { const v = q.value.trim().toLowerCase(); if (!v) return;
@@ -57,7 +83,7 @@ function shell(){
   root.querySelector("#mvNear").onclick = nearMe;
   sheet.addEventListener("click", e => {
     if (e.target.closest("[data-close]")){ sheet.classList.remove("open"); sel = null; layout(map.t); }
-    const f = e.target.closest("[data-go]"); if (f){ const i = +f.dataset.go; close(true); pick(i); }
+    const f = e.target.closest("[data-go]"); if (f){ const i = +f.dataset.go, di = f.dataset.di ? +f.dataset.di : (day || null); close(true); pick(i, di); }
     const s = e.target.closest("[data-fav]"); if (s){ toggleFav(+s.dataset.fav); s.textContent = isFav(+s.dataset.fav) ? "★ Saved" : "☆ Save"; }
   });
   document.addEventListener("keydown", e => { if (e.key === "Escape" && !root.hidden) close(); });
@@ -174,13 +200,15 @@ function layout(t){
   bNodes.select(".dot").attr("r", d => d === sel ? 8 : (k < 7 ? 4 : 5)).attr("display", d => big && d._v.show ? "none" : null);
   bNodes.select(".pill").attr("display", d => big && d._v.show ? null : "none").attr("stroke-width", d => d === sel ? 3.5 : 1.5).attr("transform", d => d === sel ? "scale(1.2)" : null);
   bNodes.select("text").attr("display", d => big && d._v.show ? null : "none");
+  if (big) bNodes.filter(d => d._v.show).raise();     // score pills sit on top of the small dots next to them
   if (sel) bNodes.filter(d => d === sel).raise();
 }
 
 /* ---------- beach card ---------- */
+const whenTxt = di => di === 0 ? "Today" : di === 1 ? "Tomorrow" : dates[di] ? new Date(dates[di] + "T12:00").toLocaleDateString(undefined, {weekday:"long"}) : "";
 function card(p){
   const q = scores.get(p.i), nm = esc(p.name.replace(/, [A-Z]{2}$/, "")), st = (p.name.match(/, ([A-Z]{2})$/) || [])[1] || "";
-  const head = (tag, sc) => `<div class="mv-grab"></div><div class="mv-r1"><div><div class="mv-nm">${nm}</div><div class="mv-rg">${esc(p.region)}${st ? " · " + st : ""} · ${q && q.tomorrow ? "Tomorrow" : "Today"}</div>${tag}</div>
+  const head = (tag, sc) => `<div class="mv-grab"></div><div class="mv-r1"><div><div class="mv-nm">${nm}</div><div class="mv-rg">${esc(p.region)}${st ? " · " + st : ""} · ${q ? whenTxt(q.di) : day === 0 ? "Today" : whenTxt(day)}</div>${tag}</div>
     <div class="mv-scw">${sc}<button class="mv-x" data-close aria-label="Close">×</button></div></div>`;
   if (!q) return `<div class="mv-card">${head("", "")}<p class="mv-best">Still loading this beach's score…</p><div class="mv-acts"><button class="mv-pri" data-go="${p.i}">Full forecast</button></div></div>`;
   const d = q.d, b = d.best, t = gradeOf(q.s), [wa, wb] = bestWindow(d);
@@ -192,7 +220,7 @@ function card(p){
     <p class="mv-best">Best window <b>${winText(wa, wb)}</b></p>
     <div class="mv-hrs" style="grid-template-columns:repeat(${d.hrs.length},1fr)" aria-label="Score by hour">${bars}</div><div class="mv-hrl"><span>${hr(h0)}</span><span>${hr(h1)}</span></div>
     <div class="mv-stats"><div>Shorebreak<b>${(b.wave*3.281).toFixed(1)} ft</b></div><div>Wind<b>${Math.round(b.wind)} mph ${compass(b.wdir)}</b></div><div>${lows.length ? "Tide" : "At best time"}<b>${tideTxt}</b></div></div>
-    <div class="mv-acts"><button class="mv-pri" data-go="${p.i}">Full forecast</button><button data-fav="${p.i}">${isFav(p.i) ? "★ Saved" : "☆ Save"}</button></div></div>`;
+    <div class="mv-acts"><button class="mv-pri" data-go="${p.i}" data-di="${q.di}">Full forecast</button><button data-fav="${p.i}">${isFav(p.i) ? "★ Saved" : "☆ Save"}</button></div></div>`;
 }
 function select(p, fly){
   sel = p; sheet.innerHTML = card(p); sheet.classList.add("open");
@@ -216,8 +244,9 @@ function refresh(){
   root.querySelectorAll("[data-m]").forEach(b => b.classList.toggle("mv-on", b.dataset.m === mode));
   const have = scores.size;
   setStatus(have < S.length ? (have ? `Loading scores… ${have}/${S.length}` : "Loading scores…") : "");
+  if (!dates.length) dayChips();
 }
-function poll(){ clearTimeout(pollT); if (root.hidden) return; refresh(); if (scores.size < S.length) pollT = setTimeout(poll, 1500); }
+function poll(){ clearTimeout(pollT); if (root.hidden) return; refresh(); if (scores.size < S.length && (day === 0 || scan5Req)) pollT = setTimeout(poll, 1500); }
 
 /* ---------- open / close ---------- */
 async function ensure(){
@@ -246,7 +275,7 @@ async function open(fromHash){
   btns.forEach(b => b.removeAttribute("aria-busy"));
   root.hidden = false; document.documentElement.classList.add("mv-lock");
   if (!fromHash && location.hash !== "#map"){ try{ history.pushState({map:1}, "", location.pathname + location.search + "#map"); pushed = true; }catch(e){} }
-  draw(); if (!scanTs) wScan(); poll();
+  draw(); if (!scanTs) wScan(); poll(); setTimeout(scan5Load, 2500);
   setTimeout(() => root.querySelector("#mvBack").focus({preventScroll:true}), 50);
 }
 function close(keepHistory){
