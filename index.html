@@ -305,6 +305,63 @@ body.cfg #cfgp{transform:none} body.cfg #scrim{opacity:1;pointer-events:auto}
   .bar{flex-wrap:wrap}
 }
 @media(prefers-reduced-motion:reduce){*{transition:none!important}.sk{animation:none}}
+/* ---------- Map button + map view (map.js) ---------- */
+.mapbtn{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:999px;border:1px solid var(--coral);background:transparent;color:var(--on);cursor:pointer;font-weight:700;font-size:.9rem;font-family:inherit}
+.mapbtn:hover{background:#2a2825}.mapbtn[aria-busy="true"]{opacity:.6;cursor:progress}
+.mapbtn svg{flex:none}
+#mapBtnM{display:none;margin-left:auto}
+@media(max-width:760px){#mapBtnM{display:inline-flex}#mapBtn{display:none}}
+html.mv-lock,html.mv-lock body{overflow:hidden}
+#mapview{position:fixed;inset:0;z-index:60;background:#BFDCE8;color:#24221E;font-family:'Archivo',system-ui,sans-serif}
+#mapview .mv-map{position:absolute;inset:0;overflow:hidden;touch-action:none}
+#mapview .mv-svg{position:absolute;inset:0;display:block}
+#mapview text{font-family:'Archivo',system-ui,sans-serif}
+.mv-mk{cursor:pointer}.mv-mk text{font-weight:800;pointer-events:none}
+.mv-top{position:absolute;z-index:5;top:calc(12px + env(safe-area-inset-top,0px));left:max(12px,env(safe-area-inset-left,0px));right:max(12px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:8px;max-width:440px}
+.mv-search{display:flex;gap:8px;align-items:center;background:rgba(255,255,255,.97);border:1px solid #D6D1C6;border-radius:14px;padding:6px 6px 6px 8px;box-shadow:0 4px 14px rgba(36,34,30,.12)}
+.mv-search:focus-within{border-color:#D2425A;box-shadow:0 0 0 2px #D2425A,0 4px 14px rgba(210,66,90,.18)}
+.mv-search input{flex:1;min-width:0;background:none;border:0;color:#24221E;font:inherit;font-size:16px;padding:6px 0;caret-color:#D2425A}
+.mv-search input:focus{outline:none}.mv-search input::placeholder{color:#7A746A}
+.mv-back{flex:none;width:34px;height:34px;border-radius:10px;border:0;background:none;color:#24221E;display:grid;place-items:center;cursor:pointer}
+.mv-back:hover{background:#F2EFE8}
+.mv-brand{font-family:'Anton',Impact,sans-serif;font-size:1.15rem;letter-spacing:.04em;line-height:1;color:#1D1C1A;display:inline-block}
+.mv-brand svg{display:block;width:100%;height:.24em;overflow:visible;margin-top:2px}
+@media(max-width:380px){.mv-brand{display:none}}
+.mv-row{display:flex;gap:6px;align-items:center;overflow-x:auto;scrollbar-width:none}.mv-row::-webkit-scrollbar{display:none}
+.mv-chip{flex:none;border:1px solid #D6D1C6;background:rgba(255,255,255,.95);color:#24221E;font:600 .78rem 'Archivo',system-ui,sans-serif;padding:7px 11px;border-radius:999px;white-space:nowrap;cursor:pointer;box-shadow:0 1px 3px rgba(36,34,30,.08)}
+.mv-chip.mv-on{background:#1D1C1A;color:#F2EFE8;border-color:#1D1C1A}.mv-static{cursor:default}
+.mv-gap{width:4px;flex:none}
+.mv-status{font-size:.72rem;color:#4A463F;background:rgba(255,255,255,.85);border-radius:999px;padding:3px 8px;white-space:nowrap}.mv-status:empty{display:none}
+#mapview button:focus-visible{outline:2px solid #D2425A;outline-offset:2px}
+.mv-zoom{position:absolute;z-index:5;right:max(12px,env(safe-area-inset-right,0px));top:calc(120px + env(safe-area-inset-top,0px));display:flex;flex-direction:column;gap:6px}
+.mv-zoom button{width:38px;height:38px;border-radius:10px;border:1px solid #D6D1C6;background:#fff;color:#24221E;font-size:1.2rem;font-weight:700;line-height:1;cursor:pointer;box-shadow:0 1px 3px rgba(36,34,30,.1)}
+.mv-leg{position:absolute;z-index:4;left:max(12px,env(safe-area-inset-left,0px));bottom:calc(12px + env(safe-area-inset-bottom,0px));display:flex;gap:10px;font-size:.7rem;color:#4A463F;background:rgba(255,255,255,.94);border:1px solid #D6D1C6;border-radius:999px;padding:6px 12px}
+.mv-leg i{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:4px;vertical-align:-1px;box-shadow:0 0 0 1px #1D1C1A}
+.mv-sheet{position:absolute;z-index:6;left:0;right:0;bottom:0;transform:translateY(105%);transition:transform .32s cubic-bezier(.2,.8,.2,1)}
+.mv-sheet.open{transform:none}
+@media(min-width:701px){.mv-sheet{left:auto;right:16px;bottom:16px;width:360px}.mv-card{border-radius:16px!important;border-bottom:1px solid #DCD7CC!important}.mv-grab{display:none}}
+.mv-card{background:#fff;color:#24221E;border:1px solid #DCD7CC;border-bottom:0;border-radius:20px 20px 0 0;padding:14px 16px calc(18px + env(safe-area-inset-bottom,0px));box-shadow:0 -6px 30px rgba(36,34,30,.18)}
+.mv-grab{width:40px;height:4px;border-radius:4px;background:#DCD7CC;margin:-4px auto 10px}
+.mv-r1{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
+.mv-nm{font-weight:800;font-size:1.05rem;line-height:1.2}
+.mv-rg{font-size:.75rem;color:#6A655C}
+.mv-scw{display:flex;align-items:flex-start}
+.mv-sc{font-family:'Anton',Impact,sans-serif;font-size:2.6rem;line-height:.9;text-align:right}
+.mv-sc small{font-family:'Archivo',sans-serif;font-size:.75rem;color:#6A655C;font-weight:600;margin-left:3px}
+.mv-x{border:0;background:none;color:#6A655C;font-size:1.4rem;line-height:1;padding:0 0 0 8px;cursor:pointer}
+.mv-tier{display:inline-block;font-size:.68rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;padding:3px 8px;border-radius:999px;margin-top:4px}
+.mv-t-w{background:#FF2E63;color:#fff}.mv-t-good{background:#1ED67A;color:#1D1C1A}.mv-t-fair{background:#E8FF3A;color:#1D1C1A;box-shadow:inset 0 0 0 1.5px #1D1C1A}.mv-t-skip{background:#E2DFD8;color:#4A463F}
+.mv-best{font-size:.85rem;margin:10px 0 6px}
+.mv-hrs{display:grid;gap:3px;align-items:end;height:46px}
+.mv-hrs i{display:block;border-radius:3px 3px 1px 1px;min-height:3px}
+.mv-hrl{display:flex;justify-content:space-between;font-size:.62rem;color:#6A655C;margin-top:3px}
+.mv-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px;font-size:.72rem;color:#6A655C}
+.mv-stats b{display:block;color:#24221E;font-size:.9rem;font-weight:700}
+.mv-acts{display:flex;gap:8px;margin-top:12px}
+.mv-acts button{flex:1;border-radius:10px;padding:10px;font:700 .85rem 'Archivo',sans-serif;border:1px solid #DCD7CC;background:none;color:#24221E;cursor:pointer}
+.mv-acts .mv-pri{background:#D2425A;border-color:#D2425A;color:#fff}
+.mv-toast{position:fixed;z-index:70;left:50%;bottom:24px;transform:translateX(-50%);background:#1D1C1A;color:#F2EFE8;padding:10px 16px;border-radius:10px;font-size:.9rem;max-width:90vw}
+@media(prefers-reduced-motion:reduce){.mv-sheet{transition:none}}
 </style>
 </head>
 <body>
@@ -312,7 +369,8 @@ body.cfg #cfgp{transform:none} body.cfg #scrim{opacity:1;pointer-events:auto}
   <div class="bar">
     <button id="menu" aria-label="Choose a beach"><svg width="20" height="20" viewBox="0 0 22 22" fill="none" stroke="#F2EFE8" stroke-width="2" stroke-linecap="round"><path d="M3 6h16M3 11h16M3 16h16"/></svg></button>
     <span id="brand" aria-label="SkimCast"><span id="brandTxt">SKIMCAST</span><svg viewBox="0 0 100 10" preserveAspectRatio="none" aria-hidden="true"><path d="M1 6 Q36 1 99 6" stroke="#D2425A" fill="none" stroke-linecap="round" vector-effect="non-scaling-stroke" style="stroke-width:2.6px"/></svg></span>
-    <div class="tools"><span id="upd"></span><button id="refresh" aria-label="Refresh data">Refresh</button>
+    <button class="mapbtn" id="mapBtnM" aria-label="Open the beach map"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#D2425A" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>Map</button>
+    <div class="tools"><span id="upd"></span><button class="mapbtn" id="mapBtn" aria-label="Open the beach map"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#D2425A" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>Map</button><button id="refresh" aria-label="Refresh data">Refresh</button>
       <div class="controls" role="group" aria-label="Riding style"><button id="wave" class="on">Wave riding</button><button id="flat">Flatland</button></div></div>
   </div>
 </div>
@@ -1752,5 +1810,6 @@ fetch("/api/ask").then(r => r.json()).then(j => { if (j && j.on) $("asksec").hid
   let rt; window.addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(render, 150); });
 })();
 </script>
+<script src="/map.js?v=1" defer></script>
 </body>
 </html>
