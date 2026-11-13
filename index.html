@@ -1679,9 +1679,17 @@ function askContext(){
     const lab = di===0 ? "Today" : di===1 ? "Tomorrow" : dayName(d.date);
     L.push(`\n## ${sp.name.split(",")[0]}, ${lab} (${d.date}): best score ${d.best.s.toFixed(1)}/10 at ${fmtH(d.best.t)}${d.over?" (daylight is over)":d.isToday?" (best of the hours still ahead today)":""}`);
     try{ L.push(report(d).join(" ")); }catch(e){}
-    if (di <= 1) L.push("Hours (time: score, shorebreak ft, wind mph from, tide ft): " +
-      d.hrs.map(h => `${fmtH(h.t)}: ${h.s.toFixed(1)}, ${(h.wave*3.281).toFixed(1)}, ${Math.round(h.wind)} ${compass(h.wdir)}, ${h.tide.toFixed(1)}`).join("; "));
-    else L.push("Hours: " + d.hrs.filter((h,k)=>k%2===0).map(h => `${fmtH(h.t)} ${h.s.toFixed(1)}`).join(", "));
+    try{
+      const lows = (cur.hilo||[]).filter(p => p.t.slice(0,10)===d.date).map(p => `${p.type==="L"?"low":"high"} ${fmtT(p.t)} (${(+p.v).toFixed(1)} ft)`);
+      L.push(`Daylight ${d.sun ? fmtM(d.sun.sr)+" to "+fmtM(d.sun.ss) : "unknown"}. Tides: ${lows.join(", ") || "n/a"}.${d.best.water!=null ? ` Water ${Math.round(d.best.water)}°F` : ""}${d.best.air!=null ? `, air ${Math.round(d.best.air)}°F` : ""}${d.nws ? `. NWS: ${d.nws.text} surf, ${d.nws.rip||"unknown"} rip risk` : ""}.`);
+    }catch(e){}
+    try{
+      L.push("Hour by hour (score/10 | shorebreak ft | breaks ft out from water's edge | wind mph from dir, type | tide ft" + (di<=1 ? " | why held back" : "") + "):\n" +
+        d.hrs.filter((h,k) => di<=1 || k%2===0).map(h => { const ft = h.wave*3.281;
+          return `${fmtH(h.t)}: ${h.s.toFixed(1)} | ${ft.toFixed(1)} | ~${breakDist(ft)} | ${Math.round(h.wind)} ${compass(h.wdir)}, ${windType(h.wdir)} | ${h.tide.toFixed(1)}${di<=1 && h.cap ? " | "+h.cap : ""}`; }).join("\n"));
+    }catch(e){
+      L.push("Hours: " + d.hrs.map(h => `${fmtH(h.t)} ${h.s.toFixed(1)}`).join(", "));
+    }
   });
   const region = sp.region, rows = [], runs = [];
   SPOTS.forEach((s, i) => { if (s.region !== region || !fcCache[i]) return;
@@ -1696,7 +1704,7 @@ function askContext(){
   }
   L.push(runs.length ? `\n## W Skim windows (score 8+) in ${region}, next 5 days\n` + runs.slice(0, 20).join("\n") : `\nNo W Skim (8+) windows found in ${region} in the next 5 days among loaded beaches.`);
   L.push(`\nHow SkimCast works: score out of 10 from shorebreak size, how close the waves break, wind, tide and swell. 8+ = W Skim, 6.5+ good, 4.5+ fair, below = skip it. Wave riding wants a punchy shorebreak close to the sand; flatland wants small, mellow water near low tide. Data from NOAA tides and buoys, the National Weather Service and marine forecast models.`);
-  return L.join("\n").slice(0, 13500);
+  return L.join("\n").slice(0, 16000);
 }
 function askFmt(t){
   const lines = escA(t).replace(/\*\*(.+?)\*\*/g, "<b>$1</b>").split(/\n+/), out = []; let ul = null;
