@@ -187,7 +187,7 @@ function card(p){
   const bars = d.hrs.map(x => `<i title="${hr(+x.t.slice(11,13))}: ${x.s.toFixed(1)}" style="height:${Math.max(6, x.s*10)}%;background:${PIN[gradeOf(x.s)]}"></i>`).join("");
   const h0 = +d.hrs[0].t.slice(11,13), h1 = +d.hrs[d.hrs.length-1].t.slice(11,13);
   const lows = d.all.filter((x, k, A) => k>0 && k<A.length-1 && x.tide <= A[k-1].tide && x.tide < A[k+1].tide && +x.t.slice(11,13) >= h0 && +x.t.slice(11,13) <= h1);
-  const tideTxt = lows.length ? "Low " + hr(+lows[0].t.slice(11,13)) : "Tide " + (b.tide >= 0 ? "+" : "") + (b.tide*3.281).toFixed(1) + " ft";
+  const tideTxt = lows.length ? "Low " + hr(+lows[0].t.slice(11,13)) : "Tide " + (b.tide >= 0 ? "+" : "") + b.tide.toFixed(1) + " ft";
   return `<div class="mv-card">${head(`<span class="mv-tier mv-t-${t}">${NAME[t]}</span>`, `<div class="mv-sc">${q.s.toFixed(1)}<small>/10</small></div>`)}
     <p class="mv-best">Best window <b>${winText(wa, wb)}</b></p>
     <div class="mv-hrs" style="grid-template-columns:repeat(${d.hrs.length},1fr)" aria-label="Score by hour">${bars}</div><div class="mv-hrl"><span>${hr(h0)}</span><span>${hr(h1)}</span></div>

@@ -319,7 +319,7 @@ html.mv-lock,html.mv-lock body{overflow:hidden}
 .mv-mk{cursor:pointer}.mv-mk text{font-weight:800;pointer-events:none}
 .mv-top{position:absolute;z-index:5;top:calc(12px + env(safe-area-inset-top,0px));left:max(12px,env(safe-area-inset-left,0px));right:max(12px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:8px;max-width:440px}
 .mv-search{display:flex;gap:8px;align-items:center;background:rgba(255,255,255,.97);border:1px solid #D6D1C6;border-radius:14px;padding:6px 6px 6px 8px;box-shadow:0 4px 14px rgba(36,34,30,.12)}
-.mv-search:focus-within{border-color:#D2425A;box-shadow:0 0 0 2px #D2425A,0 4px 14px rgba(210,66,90,.18)}
+.mv-search:has(input:focus){border-color:#D2425A;box-shadow:0 0 0 2px #D2425A,0 4px 14px rgba(210,66,90,.18)}
 .mv-search input{flex:1;min-width:0;background:none;border:0;color:#24221E;font:inherit;font-size:16px;padding:6px 0;caret-color:#D2425A}
 .mv-search input:focus{outline:none}.mv-search input::placeholder{color:#7A746A}
 .mv-back{flex:none;width:34px;height:34px;border-radius:10px;border:0;background:none;color:#24221E;display:grid;place-items:center;cursor:pointer}
