@@ -1,6 +1,7 @@
 // SkimCast map view: a full-screen map of every beach, colored by the score for the day you pick (today and the next 4 days).
 // Opened by the Map button on the top bar. Loads only when someone taps it, so the homepage stays fast.
-// Scores come from the same forecast the rest of the site uses (the quick all-beach scan, or the full forecast once a beach is loaded).
+// Scores come from scoreFor() in index.html, the same full forecast the beach page and lists use, so a pin always matches its beach page.
+// Until an area's full forecast has loaded, its pins show a quick estimate (dashed outline) from the light all-beach scan.
 // Map data: US states (US Census via us-atlas), countries (Natural Earth via world-atlas), close-up coastline (OpenStreetMap via geo-maps).
 (() => {
 "use strict";
@@ -16,18 +17,21 @@ const compass = d => ["N","NE","E","SE","S","SW","W","NW"][Math.round(((d%360)+3
 
 let root, built = false, opening = null, pushed = false, coastReq = null;
 let day = 0, scan5 = {}, scan5Ts = 0, scan5Req = null, dates = [];
-let S = [], GEO = null, proj = null, map = null, sel = null, scores = new Map(), regs = [], gR, gB, rNodes, bNodes, sheet, ui, pollT = 0;
+let S = [], GEO = null, proj = null, map = null, sel = null, scores = new Map(), regs = [], gR, gB, rNodes, bNodes, sheet, ui, pollT = 0, sig = "", tip, tipFor = null, hoverP = null;
 
 function loadScript(src){ return new Promise((ok, no) => { const s = document.createElement("script"); s.src = src; s.onload = ok; s.onerror = () => no(new Error("Could not load the map library")); document.head.appendChild(s); }); }
 async function getJSON(u){ const r = await fetch(u); if (!r.ok) throw new Error("Could not load the map (" + r.status + ")"); return r.json(); }
 
 /* ---------- scores from the site's forecast ---------- */
-// Today uses the site's quick scan; the other days use the map's own 5-day scan (loaded once the map opens).
+// Beaches with the full forecast use scoreFor(), exactly like the beach page. The rest show an estimate (est) from the
+// light scan until their area loads: today from the site's scan, other days from the map's own 5-day scan.
 function scoreOf(i){
-  const c = fcCache[i] || scan5[i] || (day === 0 ? scanFc[i] : null); if (!c) return null;
+  const f = scoreFor(i, day);
+  if (f){ if (!dates.length && f.D.length > 1) setDates(f.D); return {s: f.s, d: f.d, di: f.di, est: false}; }
+  const c = scan5[i] || (day === 0 ? scanFc[i] : null); if (!c) return null;
   try{ return withSpot(i, () => { const D = build(c); if (!dates.length && D.length > 1) setDates(D);
     const di = day === 0 && D[0].over && D[1] ? 1 : day, d = D[di]; if (!d) return null;
-    return {s: d.best.s, d, di, tomorrow: day === 0 && di === 1}; }); }catch(e){ return null; }
+    return {s: d.best.s, d, di, est: true}; }); }catch(e){ return null; }
 }
 // One wave request and one wind request for all beaches, 5 days out. Same data the homepage scan uses, just more days.
 function scan5Load(){
@@ -49,7 +53,9 @@ function dayChips(){
   const lab = k => dates[k] || new Date(t0.getTime() + k*864e5).toLocaleDateString("en-CA");
   box.innerHTML = Array.from({length: 5}, (_, k) => `<button class="mv-chip${k === day ? " mv-on" : ""}" data-day="${k}" aria-pressed="${k === day}">${k === 0 ? "Today" : k === 1 ? "Tmrw" : dayName(lab(k))}</button>`).join("");
 }
-function rescore(){ scores = new Map(); S.forEach(p => { const q = scoreOf(p.i); if (q) scores.set(p.i, q); }); }
+function rescore(){ scores = new Map(); S.forEach(p => { const q = scoreOf(p.i); if (q) scores.set(p.i, q); });
+  const ns = [...scores].map(([i, q]) => i + ":" + q.s.toFixed(1) + (q.est ? "~" : "")).join(",") + mode + day, changed = ns !== sig; sig = ns; return changed; }
+const isEst = p => scores.has(p.i) && scores.get(p.i).est;
 const sOf = p => scores.has(p.i) ? scores.get(p.i).s : null;
 const tier = s => s == null ? null : gradeOf(s);
 function regionBest(r){ let b = null; r.pts.forEach(p => { const s = sOf(p); if (s != null && (b == null || s > b)) b = s; }); return b; }
@@ -65,15 +71,16 @@ function shell(){
     <button class="mv-chip" id="mvNear">◎ Near me</button></div>
     <div class="mv-row"><span class="mv-days" id="mvDays" role="group" aria-label="Day"></span><span class="mv-gap"></span><button class="mv-chip" data-m="wave">Wave riding</button><button class="mv-chip" data-m="flat">Flatland</button><span class="mv-status" id="mvStatus"></span></div></div>
   <div class="mv-zoom"><button aria-label="Zoom in" data-z="1.8">+</button><button aria-label="Zoom out" data-z="0.5556">−</button></div>
-  <div class="mv-leg">${["w","good","fair","skip"].map(t => `<span><i style="background:${PIN[t]}"></i>${NAME[t]}</span>`).join("")}</div>
+  <div class="mv-leg">${["w","good","fair","skip"].map(t => `<span><i style="background:${PIN[t]}"></i>${NAME[t]}</span>`).join("")}<span title="Quick estimate until this area's full forecast loads"><i style="background:#fff;box-shadow:none;border:1.5px dashed #1D1C1A;width:7px;height:7px"></i>Estimate</span></div>
+  <div class="mv-tip" id="mvTip" hidden></div>
   <div class="mv-sheet" id="mvSheet" aria-live="polite"></div>`;
   document.body.appendChild(root);
-  sheet = root.querySelector("#mvSheet"); ui = root.querySelector(".mv-top");
+  sheet = root.querySelector("#mvSheet"); ui = root.querySelector(".mv-top"); tip = root.querySelector("#mvTip");
   root.querySelector("#mvBack").onclick = () => close();
   root.querySelectorAll("[data-z]").forEach(b => b.onclick = () => map.top.transition().duration(250).call(map.zoom.scaleBy, +b.dataset.z));
   root.querySelector("#mvDays").addEventListener("click", e => { const b = e.target.closest("[data-day]"); if (!b) return;
     day = +b.dataset.day; dayChips(); scan5Load(); poll(); });
-  root.querySelectorAll("[data-m]").forEach(b => b.onclick = () => { if (mode !== b.dataset.m){ setMode(b.dataset.m); } refresh(); });
+  root.querySelectorAll("[data-m]").forEach(b => b.onclick = () => { if (mode !== b.dataset.m){ setMode(b.dataset.m); } refresh(true); });
   const q = root.querySelector("#mvQ");
   const go = () => { const v = q.value.trim().toLowerCase(); if (!v) return;
     const hit = S.find(p => p.name.toLowerCase() === v) || S.find(p => p.name.toLowerCase().startsWith(v)) || S.find(p => p.name.toLowerCase().includes(v) || p.region.toLowerCase().includes(v));
@@ -82,7 +89,7 @@ function shell(){
   q.addEventListener("change", go);
   root.querySelector("#mvNear").onclick = nearMe;
   sheet.addEventListener("click", e => {
-    if (e.target.closest("[data-close]")){ sheet.classList.remove("open"); sel = null; layout(map.t); }
+    if (e.target.closest("[data-close]")){ sheet.classList.remove("open"); sel = null; hideTip(); layout(map.t); }
     const f = e.target.closest("[data-go]"); if (f){ const i = +f.dataset.go, di = f.dataset.di ? +f.dataset.di : (day || null); close(true); pick(i, di); }
     const s = e.target.closest("[data-fav]"); if (s){ toggleFav(+s.dataset.fav); s.textContent = isFav(+s.dataset.fav) ? "★ Saved" : "☆ Save"; }
   });
@@ -164,24 +171,29 @@ function markers(){
   regs = [...new Set(S.map(p => p.region))].map(r => { const pts = S.filter(p => p.region === r); return {r, pts, x: d3.mean(pts, p=>p.x), y: d3.mean(pts, p=>p.y)}; });
   gR = map.layer.append("g"); gB = map.layer.append("g");
   rNodes = gR.selectAll("g").data(regs).join("g").attr("class","mv-mk").attr("role","button").attr("aria-label", d => d.r)
-    .on("click", (e,d) => map.fly(bbox(d.pts, 1.2), {t:120, b: phone() ? 60 : 40}));
+    .on("click", (e,d) => { hideTip(); map.fly(bbox(d.pts, 1.2), {t:120, b: phone() ? 60 : 40}); })
+    .on("pointerenter", (e,d) => { if (e.pointerType === "mouse") showTip(d, d.r, d.pts.length + " beaches"); })
+    .on("pointerleave", () => hideTip());
   rNodes.append("circle").attr("r", 17).attr("stroke", "#1D1C1A").attr("stroke-width", 2);
   rNodes.append("text").attr("class","n").attr("text-anchor","middle").attr("dy", "0.35em").attr("font-size", 11.5);
   rNodes.append("text").attr("text-anchor","middle").attr("y", 29).attr("font-size", 9.5).attr("fill", "#24221E").attr("font-weight", 700)
     .attr("paint-order","stroke").attr("stroke","#fff").attr("stroke-width",3).text(d => d.r.length > 13 ? d.r.split(" ")[0] : d.r);
   bNodes = gB.selectAll("g").data(S).join("g").attr("class","mv-mk").attr("role","button").attr("aria-label", d => d.name)
-    .on("click", (e,d) => { e.stopPropagation(); select(d, true); });
+    .on("click", (e,d) => { e.stopPropagation(); select(d, true); })
+    .on("pointerenter", (e,d) => { if (e.pointerType === "mouse"){ hoverP = d; showTip(d, d.name); } })
+    .on("pointerleave", (e,d) => { if (hoverP === d) hoverP = null; hideTip(); });
   bNodes.append("circle").attr("class","dot").attr("stroke","#141312").attr("stroke-width",1.5);
   bNodes.append("rect").attr("class","pill").attr("x",-17).attr("y",-11).attr("width",34).attr("height",22).attr("rx",11).attr("stroke","#141312").attr("stroke-width",1.5);
   bNodes.append("text").attr("text-anchor","middle").attr("dy","0.36em").attr("font-size", 11);
 }
 function paint(){
   rNodes.each(function(d){ const s = regionBest(d), t = tier(s), g = d3.select(this);
-    g.select("circle").attr("fill", t ? PIN[t] : "#fff").attr("stroke-dasharray", t ? null : "3 3");
+    const est = d.pts.some(p => scores.has(p.i) && scores.get(p.i).est);
+    g.select("circle").attr("fill", t ? PIN[t] : "#fff").attr("stroke-dasharray", t && !est ? null : "3 3");
     g.select(".n").text(s == null ? "…" : s.toFixed(1)).attr("fill", t ? PIN_TXT[t] : "#6A655C"); });
   bNodes.each(function(d){ const s = sOf(d), t = tier(s), g = d3.select(this);
-    g.selectAll("circle,rect").attr("fill", t ? PIN[t] : "#fff");
-    g.select("text").text(s == null ? "…" : s.toFixed(1)).attr("fill", t ? PIN_TXT[t] : "#6A655C"); });
+    g.selectAll("circle,rect").attr("fill", t ? PIN[t] : "#fff").attr("stroke-dasharray", t && !isEst(d) ? null : "3 2");
+    g.select("text").text(s == null ? "…" : (isEst(d) ? "~" : "") + s.toFixed(1)).attr("fill", t ? PIN_TXT[t] : "#6A655C"); });
   if (sel && sheet.classList.contains("open")) sheet.innerHTML = card(sel);
 }
 function layout(t){
@@ -191,7 +203,7 @@ function layout(t){
   if (showR){
     const items = regs.map(d => { const [sx,sy] = map.pt(d); return {d, sx, sy, s: regionBest(d) ?? -1}; }).sort((a,b) => b.s - a.s);
     placeLabels(items, {x:36, y:44}); items.forEach(it => { it.d._v = it; });
-    rNodes.attr("transform", d => `translate(${d._v.sx},${d._v.sy})`).attr("display", d => d._v.show ? null : "none"); return; }
+    rNodes.attr("transform", d => `translate(${d._v.sx},${d._v.sy})`).attr("display", d => d._v.show ? null : "none"); placeTip(); return; }
   const W = map.W, H = map.H;
   const items = S.map(d => { const [sx,sy] = map.pt(d); return {d, sx, sy, s: val(d)}; }).sort((a,b) => b.s - a.s);
   placeLabels(items.filter(it => it.sx > -40 && it.sy > -40 && it.sx < W+40 && it.sy < H+40), {x:36, y:24}); items.forEach(it => { it.d._v = it; });
@@ -202,7 +214,22 @@ function layout(t){
   bNodes.select("text").attr("display", d => big && d._v.show ? null : "none");
   if (big) bNodes.filter(d => d._v.show).raise();     // score pills sit on top of the small dots next to them
   if (sel) bNodes.filter(d => d === sel).raise();
+  // Zoomed in on beaches: load the full forecast for every area on screen, so these pins switch from estimates to the real scores
+  const onScreen = new Set(items.filter(it => it.sx > 0 && it.sy > 0 && it.sx < W && it.sy < H && !fresh(it.d.i)).map(it => it.d.region));
+  onScreen.forEach(r => loadRegion(r));
+  placeTip();
 }
+
+/* ---------- beach name tooltip (hover on desktop; the picked beach keeps its name tag on touch screens) ---------- */
+function showTip(p, name, sub){ if (!tip) return; tipFor = p; tip.innerHTML = esc(name.replace(/, [A-Z]{2}$/, "")) + (sub ? `<small>${esc(sub)}</small>` : ""); tip.hidden = false; placeTip(); }
+function hideTip(){ if (!tip) return; if (sel && sheet.classList.contains("open")){ showTip(sel, sel.name); return; } tipFor = null; tip.hidden = true; }   // the picked beach keeps its name tag
+function placeTip(){ if (!tip || !tipFor || !map) return;
+  const regionMode = map.t.k < 4.2, isRegion = !!tipFor.pts;
+  if (regionMode !== isRegion){ tip.hidden = true; return; }
+  const v = tipFor._v, [x, y] = v ? [v.sx, v.sy] : map.pt(tipFor), big = !isRegion && map.t.k >= 9 && v && v.show;
+  const lift = isRegion ? 10 : big ? (tipFor === sel ? 6 : 2) : (tipFor === sel ? 2 : -3);
+  tip.style.left = Math.round(x) + "px"; tip.style.top = Math.round(y - lift) + "px";
+  tip.hidden = x < -20 || y < -20 || x > map.W + 20 || y > map.H + 20; }
 
 /* ---------- beach card ---------- */
 const whenTxt = di => di === 0 ? "Today" : di === 1 ? "Tomorrow" : dates[di] ? new Date(dates[di] + "T12:00").toLocaleDateString(undefined, {weekday:"long"}) : "";
@@ -216,15 +243,17 @@ function card(p){
   const h0 = +d.hrs[0].t.slice(11,13), h1 = +d.hrs[d.hrs.length-1].t.slice(11,13);
   const lows = d.all.filter((x, k, A) => k>0 && k<A.length-1 && x.tide <= A[k-1].tide && x.tide < A[k+1].tide && +x.t.slice(11,13) >= h0 && +x.t.slice(11,13) <= h1);
   const tideTxt = lows.length ? "Low " + hr(+lows[0].t.slice(11,13)) : "Tide " + (b.tide >= 0 ? "+" : "") + b.tide.toFixed(1) + " ft";
-  return `<div class="mv-card">${head(`<span class="mv-tier mv-t-${t}">${NAME[t]}</span>`, `<div class="mv-sc">${q.s.toFixed(1)}<small>/10</small></div>`)}
+  return `<div class="mv-card">${head(`<span class="mv-tier mv-t-${t}">${NAME[t]}</span>`, `<div class="mv-sc">${q.est ? "~" : ""}${q.s.toFixed(1)}<small>/10</small></div>`)}
+    ${q.est ? `<p class="mv-est">Quick estimate. Loading the full forecast for this beach…</p>` : ""}
     <p class="mv-best">Best window <b>${winText(wa, wb)}</b></p>
     <div class="mv-hrs" style="grid-template-columns:repeat(${d.hrs.length},1fr)" aria-label="Score by hour">${bars}</div><div class="mv-hrl"><span>${hr(h0)}</span><span>${hr(h1)}</span></div>
     <div class="mv-stats"><div>Shorebreak<b>${(b.wave*3.281).toFixed(1)} ft</b></div><div>Wind<b>${Math.round(b.wind)} mph ${compass(b.wdir)}</b></div><div>${lows.length ? "Tide" : "At best time"}<b>${tideTxt}</b></div></div>
     <div class="mv-acts"><button class="mv-pri" data-go="${p.i}" data-di="${q.di}">Full forecast</button><button data-fav="${p.i}">${isFav(p.i) ? "★ Saved" : "☆ Save"}</button></div></div>`;
 }
 function select(p, fly){
-  sel = p; sheet.innerHTML = card(p); sheet.classList.add("open");
-  if (!fcCache[p.i]) forecastFor(p.i, false).then(() => { const q = scoreOf(p.i); if (q){ scores.set(p.i, q); paint(); layout(map.t); } }).catch(() => {});
+  sel = p; sheet.innerHTML = card(p); sheet.classList.add("open"); showTip(p, p.name);
+  // Same data the beach page loads: the full forecast plus the NWS surf forecast (which nudges the wave size)
+  Promise.allSettled([forecastFor(p.i, false), nwsFor(p.i)]).then(() => { if (!root.hidden){ rescore(); paint(); layout(map.t); } });
   if (fly) map.flyTo(p, Math.max(map.t.k, 16), phone() ? {b: 330, t: 110} : {r: 380});
   else layout(map.t);
 }
@@ -239,14 +268,18 @@ function nearMe(){
 }
 
 /* ---------- live data ---------- */
-function refresh(){
-  rescore(); paint(); layout(map.t);
+function refresh(force){
+  if (rescore() || force){ paint(); layout(map.t); }
   root.querySelectorAll("[data-m]").forEach(b => b.classList.toggle("mv-on", b.dataset.m === mode));
   const have = scores.size;
-  setStatus(have < S.length ? (have ? `Loading scores… ${have}/${S.length}` : "Loading scores…") : "");
+  const showR = map.t.k < 4.2, ests = S.some(isEst);
+  setStatus(have < S.length ? (have ? `Loading scores… ${have}/${S.length}` : "Loading scores…")
+    : !showR && S.some(p => isEst(p) && p._v && p._v.sx > 0 && p._v.sy > 0 && p._v.sx < map.W && p._v.sy < map.H) ? "Loading the full forecast for this area…"
+    : showR && ests ? "Dashed pins are estimates. Zoom in for exact scores." : "");
   if (!dates.length) dayChips();
 }
-function poll(){ clearTimeout(pollT); if (root.hidden) return; refresh(); if (scores.size < S.length && (day === 0 || scan5Req)) pollT = setTimeout(poll, 1500); }
+// Keep checking while the map is open: areas load in the background, and the NWS surf forecast can arrive after a beach's forecast.
+function poll(){ clearTimeout(pollT); if (root.hidden) return; refresh(); pollT = setTimeout(poll, scores.size < S.length ? 1500 : 2500); }
 
 /* ---------- open / close ---------- */
 async function ensure(){
@@ -266,7 +299,7 @@ function draw(){
   const c = S[spotIdx];
   map.fly(bbox(S, 10), {t: phone() ? 110 : 90, b: 40, l: 20, r: 20}, 0);
   if (c) map.fly(bbox(S.filter(p => p.region === c.region), 1.2), {t: 120, b: phone() ? 60 : 40}, reduced() ? 0 : 1100);
-  sel = null; sheet.classList.remove("open");
+  sel = null; sheet.classList.remove("open"); tipFor = null; if (tip) tip.hidden = true; sig = "";
 }
 async function open(fromHash){
   const btns = document.querySelectorAll(".mapbtn"); btns.forEach(b => b.setAttribute("aria-busy", "true"));
@@ -287,7 +320,7 @@ function close(keepHistory){
 function alertBox(msg){ const el = document.createElement("div"); el.className = "mv-toast"; el.textContent = msg + ". Check your connection and try again."; document.body.appendChild(el); setTimeout(() => el.remove(), 4000); }
 
 window.addEventListener("popstate", () => { if (location.hash === "#map") open(true); else close(true); });
-let rz; window.addEventListener("resize", () => { if (!root || root.hidden) return; clearTimeout(rz); rz = setTimeout(() => { const t = map.t, keep = sel; draw(); map.top.call(map.zoom.transform, t); if (keep) select(keep, false); refresh(); }, 250); });
+let rz; window.addEventListener("resize", () => { if (!root || root.hidden) return; clearTimeout(rz); rz = setTimeout(() => { const t = map.t, keep = sel; draw(); map.top.call(map.zoom.transform, t); if (keep) select(keep, false); refresh(true); }, 250); });
 document.querySelectorAll(".mapbtn").forEach(b => b.addEventListener("click", () => open(false)));
 if (location.hash === "#map") open(true);
 })();
