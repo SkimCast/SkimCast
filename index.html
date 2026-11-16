@@ -363,6 +363,10 @@ html.mv-lock,html.mv-lock body{overflow:hidden}
 .mv-acts{display:flex;gap:8px;margin-top:12px}
 .mv-acts button{flex:1;border-radius:10px;padding:10px;font:700 .85rem 'Archivo',sans-serif;border:1px solid #DCD7CC;background:none;color:#24221E;cursor:pointer}
 .mv-acts .mv-pri{background:#D2425A;border-color:#D2425A;color:#fff}
+.mv-tip{position:absolute;z-index:5;left:0;top:0;pointer-events:none;background:#1D1C1A;color:#F2EFE8;font:700 .78rem 'Archivo',system-ui,sans-serif;padding:5px 9px;border-radius:8px;white-space:nowrap;box-shadow:0 3px 10px rgba(36,34,30,.25);transform:translate(-50%,calc(-100% - 14px))}
+.mv-tip::after{content:"";position:absolute;left:50%;bottom:-5px;margin-left:-5px;border:5px solid transparent;border-bottom:0;border-top-color:#1D1C1A}
+.mv-tip[hidden]{display:none}.mv-tip small{font-weight:600;color:#A8A296;margin-left:6px}
+.mv-est{font-size:.72rem;color:#6A655C;margin:8px 0 0}
 .mv-toast{position:fixed;z-index:70;left:50%;bottom:24px;transform:translateX(-50%);background:#1D1C1A;color:#F2EFE8;padding:10px 16px;border-radius:10px;font-size:.9rem;max-width:90vw}
 @media(prefers-reduced-motion:reduce){.mv-sheet{transition:none}}
 </style>
@@ -1213,6 +1217,10 @@ function quickFrom(D){
   return {s:d.best.s, t:d.best.t, ft:d.best.wave*3.281, tomorrow:over, rip:d.nws?d.nws.rip:""};
 }
 function quick(i){ const c = fcCache[i]; if (!c) return null; try{ return withSpot(i, () => quickFrom(build(c))); }catch(e){ return null; } }
+// The one place a beach's score for a day comes from, so the map, lists and beach page always agree: the full forecast
+// (NOAA tides, both wave models, the nearshore model and the NWS surf forecast). di = null means "today, or tomorrow once daylight is over".
+function scoreFor(i, di){ const c = fcCache[i]; if (!c) return null;
+  try{ return withSpot(i, () => { const D = build(c), k = di==null || di===0 ? (D[0].over && D[1] ? 1 : 0) : di, d = D[k]; return d ? {D, d, di:k, s:d.best.s} : null; }); }catch(e){ return null; } }
 function wWindows(D){           // every run of 8+ hours still ahead, per day
   const out = []; let best = null;
   D.forEach((d, di) => {
@@ -1813,6 +1821,6 @@ fetch("/api/ask").then(r => r.json()).then(j => { if (j && j.on) $("asksec").hid
   let rt; window.addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(render, 150); });
 })();
 </script>
-<script src="/map.js?v=2" defer></script>
+<script src="/map.js?v=3" defer></script>
 </body>
 </html>
